@@ -1,4 +1,5 @@
 ---
+import { arbeitFaqs as faqs } from '@/data/faqs';
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import Demo from '@/components/demo/Demo.astro';
 import BetaSection from '@/components/site/BetaSection.astro';
@@ -7,28 +8,6 @@ import Crumbs from '@/components/site/Crumbs.astro';
 import { createBreadcrumbSchema, createFAQSchema, createSoftwareSchema } from '@/lib/schema';
 import siteConfig from '@/config/site.config';
 
-const faqs = [
-  {
-    question: 'Reicht das für die Pflicht zur Arbeitszeiterfassung?',
-    answer: 'timebench dokumentiert Beginn, Ende und Dauer jeder Arbeitszeit und prüft die Regeln des ArbZG. Ob das in eurem Fall genügt, hängt auch von Tarifvertrag und Betriebsvereinbarung ab. Die Regeln lassen sich pro Workspace anpassen. Eine Rechtsberatung ersetzt das nicht.',
-  },
-  {
-    question: 'Müssen wir zusätzlich stempeln?',
-    answer: 'Wer seine Projektzeit bucht, hat seine Arbeitszeit schon erfasst. Für Tätigkeiten ohne Projekt gibt es interne Projekte wie „Verwaltung“ oder „Weiterbildung“.',
-  },
-  {
-    question: 'Was passiert bei Vertrauensarbeitszeit?',
-    answer: 'Die Zeit wird trotzdem erfasst, nur der Saldo spielt dann eine kleinere Rolle. Ihr könnt den Arbeitsplan so setzen, dass kein Soll entsteht.',
-  },
-  {
-    question: 'Wer genehmigt Urlaub?',
-    answer: 'Admins und die als Führungskraft eingetragene Person. Führungskräfte sehen außerdem die Stunden ihrer direkten Mitarbeitenden.',
-  },
-  {
-    question: 'Können wir unsere Abwesenheiten aus dem alten System übernehmen?',
-    answer: 'Resturlaub und Überstundenstand tragt ihr als Startwert ein. Für einen vollständigen Import sprecht uns an, das richten wir in der Beta gemeinsam ein.',
-  },
-];
 
 const findings = [
   { c: 'var(--bloom-500)', t: '7:30 h ohne Pause', s: 'Jonas Muster · Mi, 4. Nov', tag: '§ 4' },

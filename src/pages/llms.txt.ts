@@ -32,6 +32,10 @@ Status: geschlossene Beta, Anmeldung über den Fragebogen auf der Startseite. Be
 
 ${PAGES.map((p) => `- [${p.title}](${base}/${p.path}): ${p.text}`).join('\n')}
 
+## Volltext
+
+- [Alle Inhalte in einer Datei](${base}/llms-full.txt): Funktionen, Desktop-Tracker, Integrationen und häufige Fragen
+
 ## Rechtliches
 
 - [Kontakt](${base}/kontakt/)

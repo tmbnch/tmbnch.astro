@@ -1,4 +1,5 @@
 ---
+import { projektFaqs as faqs } from '@/data/faqs';
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import Demo from '@/components/demo/Demo.astro';
 import BetaSection from '@/components/site/BetaSection.astro';
@@ -7,28 +8,6 @@ import Crumbs from '@/components/site/Crumbs.astro';
 import { createBreadcrumbSchema, createFAQSchema, createSoftwareSchema } from '@/lib/schema';
 import siteConfig from '@/config/site.config';
 
-const faqs = [
-  {
-    question: 'Muss jeder die Desktop-App installieren?',
-    answer: 'Die Web-App reicht zum Erfassen. Die Desktop-App lohnt sich für alle, die viel zwischen Projekten springen und abends die Vorschläge nutzen wollen. Sie läuft auf macOS, Windows und Linux.',
-  },
-  {
-    question: 'Wie kommen unsere Daten aus Toggl rüber?',
-    answer: 'Mit einem API-Token aus Toggl. timebench holt Kunden, Projekte, Tags und Einträge und gleicht danach jede Stunde ab, auch Löschungen. Lokale Änderungen in timebench bleiben dabei erhalten.',
-  },
-  {
-    question: 'Wer sieht die Stundensätze?',
-    answer: 'Nur Admins und Owner eines Workspace. Mitarbeitende sehen ihre Stunden und ob ein Eintrag abrechenbar ist.',
-  },
-  {
-    question: 'Gibt es eine App fürs Handy?',
-    answer: 'Die Web-App ist fürs Handy gebaut: Die Woche zeigt drei Tage, der Monat wird kompakt. Eine eigene App aus dem Store gibt es noch nicht.',
-  },
-  {
-    question: 'Können wir timebench selbst betreiben?',
-    answer: 'Ja. timebench läuft mit Docker Compose und PostgreSQL auf eurem eigenen Server. Wer das nicht möchte, nutzt unsere Instanz.',
-  },
-];
 
 const tree = [
   { level: 0, color: '#4f7cff', name: 'Musterfabrik AG', kind: 'Kunde', hours: '61:30' },

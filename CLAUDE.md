@@ -12,7 +12,8 @@ Marketing-Website für timebench (timebench.io). Astro 7, Tailwind v4, TypeScrip
 
 - Seiten in `src/pages/`, alle über `src/layouts/SiteLayout.astro`. `hasWaitlist` setzen, wenn die Seite einen `#warteliste`-Block hat.
 - Navigation und Footer kommen aus `src/data/navigation.ts`. Eine neue Lösungsseite wird dort eingetragen; ein `soon`-Eintrag erscheint ausgegraut.
-- Bei einer neuen Seite auch `src/pages/og/[...slug].ts` (OG-Bild) und `src/pages/llms.txt.ts` ergänzen.
+- Bei einer neuen Seite auch `src/pages/og/[...slug].ts` (OG-Bild), `src/pages/llms.txt.ts` und `src/pages/llms-full.txt.ts` ergänzen und `pnpm og:capture <slug>` laufen lassen.
+- FAQs stehen in `src/data/faqs.ts` und speisen Seite, FAQ-Schema und `llms-full.txt`. Ändert sich eine Funktion, auch den Text in `llms-full.txt.ts` prüfen.
 - Klickbare Dummies: `src/components/demo/` (Astro) und `src/scripts/demo/` (TypeScript, eine Datei pro Ansicht). Beispieldaten nur in `data.ts`.
 - Styles: Tokens in `src/styles/tokens/primitives.css` und `src/styles/themes/timebench.css`, Seitenkomponenten in `src/styles/timebench.css`. Die Klassen dort (`.wrap`, `.split`, `.btn`, `.ink-band` …) sind die erste Wahl. Tailwind ist für Einzelfälle da.
 - `src/components/ui/` ist die Komponentenbibliothek aus dem Boilerplate und wird derzeit nicht genutzt.
