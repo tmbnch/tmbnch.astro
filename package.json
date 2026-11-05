@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "astro dev",
+    "dev:netlify": "pnpm dlx --package=netlify-cli netlify dev",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
@@ -42,6 +43,7 @@
   "devDependencies": {
     "@astrojs/check": "0.9.10",
     "@eslint/js": "^10.0.1",
+    "@netlify/functions": "^6.1.0",
     "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.5",

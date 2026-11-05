@@ -8,7 +8,9 @@ Technisch ist sie eine Kopie von `rcktbs.astro`: Astro 7, Tailwind CSS v4, TypeS
 
 ```sh
 pnpm install
-pnpm dev        # Dev-Server; Astro 7 startet ihn im Hintergrund, Adresse steht in der Ausgabe
+cp .env.example .env.local   # einmalig, dann ausfüllen
+pnpm dev          # nur Astro, http://localhost:4321
+pnpm dev:netlify  # Astro plus Functions, Redirects und Forms, http://localhost:8888
 pnpm build      # statischer Build nach dist/
 pnpm check      # astro check (Typen)
 pnpm lint
@@ -42,6 +44,18 @@ Optik und Farben folgen der echten App im Monorepo (`packages/calendar`, `apps/d
 ## Warteliste
 
 Das Formular (`src/components/site/Waitlist.astro`) läuft über Netlify Forms. Netlify erkennt es beim Deploy am Attribut `data-netlify`. Die Einträge stehen im Netlify-Dashboard unter „Forms“, Formularname `warteliste`, mit dem Feld `quelle` für die Stelle auf der Seite.
+
+## Umgebungsvariablen und Functions
+
+Alle Variablen stehen mit Erklärung in `.env.example`. Lokal liegen die Werte in `.env.local`, die nicht eingecheckt wird; auf Netlify stehen sie unter Site configuration → Environment variables. Was mit `PUBLIC_` beginnt, landet im Browser-Code. Secrets bekommen dieses Präfix nie.
+
+Serverless Functions liegen in `netlify/functions/`, eine Datei pro Function im v2-Format, Pfad als `export const config`. Variablen lesen sie über `env()` und `requireEnv()` aus `netlify/lib/env.ts`. `health.ts` antwortet unter `/api/health` und zeigt, ob Functions laufen.
+
+`pnpm dev:netlify` holt die Netlify CLI per `pnpm dlx`, eine Installation ist nicht nötig.
+
+## Analyse
+
+Plausible lädt, sobald `PUBLIC_PLAUSIBLE_SCRIPT_ID` gesetzt ist (`src/components/seo/Plausible.astro`). Es setzt keine Cookies und braucht kein Einwilligungsbanner. Ein Eintrag in die Warteliste zählt als Ereignis `Warteliste` mit der Eigenschaft `quelle`; das Ziel muss im Plausible-Dashboard unter Goals angelegt sein. Die Datenschutzerklärung zeigt den Plausible-Absatz nur, wenn die Variable gesetzt ist.
 
 ## Design
 

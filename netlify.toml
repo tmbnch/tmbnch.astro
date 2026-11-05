@@ -5,6 +5,20 @@
 [build.environment]
   NODE_VERSION = "24"
 
+# Serverless Functions (v2): eine Datei pro Function, Pfad und Zeitplan stehen als
+# `export const config` in der Datei. Gemeinsamer Code liegt in netlify/lib/.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# `pnpm dev:netlify` startet Astro dahinter und bedient Functions, Redirects und
+# Forms unter http://localhost:8888. Variablen kommen aus .env.local.
+[dev]
+  framework = "#custom"
+  command = "pnpm astro dev --port 4330"
+  targetPort = 4330
+  port = 8888
+
 [[headers]]
   for = "/*"
   [headers.values]

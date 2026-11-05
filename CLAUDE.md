@@ -31,4 +31,9 @@ Deutsch, Du-Ansprache, Rechtstexte in Sie-Form. Konkrete Beispiele statt Superla
 
 ## Datenschutz
 
-Die Seite setzt weder Tracking noch Cookies ein. Wer einen Dienst ergänzt, ergänzt im selben Commit `src/pages/datenschutz.astro`.
+Die Seite setzt keine Cookies. Einzige Analyse ist Plausible, aktiv nur mit `PUBLIC_PLAUSIBLE_SCRIPT_ID`. Wer einen Dienst ergänzt, ergänzt im selben Commit `src/pages/datenschutz.astro`.
+
+## Variablen und Functions
+
+- Jede neue Variable kommt mit Kommentar in `.env.example`. Secrets nie mit `PUBLIC_`.
+- Functions in `netlify/functions/` (v2, `export const config`), gemeinsamer Code in `netlify/lib/`.

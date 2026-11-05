@@ -12,7 +12,8 @@
   },
   "include": [
     "src/**/*",
-    "src/env.d.ts"
+    "src/env.d.ts",
+    "netlify/**/*"
   ],
   "exclude": [
     "node_modules",

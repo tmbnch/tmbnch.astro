@@ -69,6 +69,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.12.0(jiti@2.7.0))
+      '@netlify/functions':
+        specifier: ^6.1.0
+        version: 6.1.0
       '@playwright/test':
         specifier: ^1.64.1
         version: 1.64.1
@@ -884,8 +887,16 @@ packages:
     resolution: {integrity: sha512-rtvtXG0NQkmIdpdI8AI/LKesf3TdZJwNP0VaxodPpb/yYzME62YAaqYVmB2MC5gO5Wxls1aIzcCK2xJFRNRhoQ==}
     engines: {node: '>=22.12.0'}
 
+  '@netlify/cache@4.2.0':
+    resolution: {integrity: sha512-xT8DGkqwnw3C1TzBmgvJl8NyEugGNKoj6o5aKoSPxKXLGI2Hfm6JodsSHwl9r5drotMMY+x1rH5GjprLngKvIA==}
+    engines: {node: '>=22.12.0'}
+
   '@netlify/dev-utils@6.0.3':
     resolution: {integrity: sha512-p+M9a8mI0H0rRohY7Z4TkblvJMwsl5nfNKzmmhz1XBgSLBoDcgwf1TroHvM0TyK5sRiD8LViXe1wuJbzYlilUQ==}
+    engines: {node: '>=22.12.0'}
+
+  '@netlify/functions@6.1.0':
+    resolution: {integrity: sha512-Kwbood+CBR0okDmimwQ7YhsLU5jV0ON/8f6SvaTklVqDMOMfaHhaSsl6ELgnpWwlKgnkDYUf1Sg2BIJnrenRrA==}
     engines: {node: '>=22.12.0'}
 
   '@netlify/otel@7.0.4':
@@ -894,6 +905,10 @@ packages:
 
   '@netlify/runtime-utils@3.0.0':
     resolution: {integrity: sha512-OHo40+V3QZkR+UrDjqhN+LekrAby/dSSJxsvyYs9i88E/mSl3goB/ysoL+VYROm190egxmQyRYlHK7vL4GeHBQ==}
+    engines: {node: '>=22.12.0'}
+
+  '@netlify/types@3.3.0':
+    resolution: {integrity: sha512-u/uh0vOFslJsTcG8nnynAKnTpVIakXbv3mkBG9DTqKZrDEzmfLKDZ3I7evHA3/CYUmNB24pNrzlHj2nIsqEwzg==}
     engines: {node: '>=22.12.0'}
 
   '@opentelemetry/api-logs@0.221.0':
@@ -3727,6 +3742,10 @@ snapshots:
       - supports-color
     optional: true
 
+  '@netlify/cache@4.2.0':
+    dependencies:
+      '@netlify/runtime-utils': 3.0.0
+
   '@netlify/dev-utils@6.0.3':
     dependencies:
       '@whatwg-node/server': 0.11.0
@@ -3742,6 +3761,11 @@ snapshots:
       semver: 7.8.5
     optional: true
 
+  '@netlify/functions@6.1.0':
+    dependencies:
+      '@netlify/cache': 4.2.0
+      '@netlify/types': 3.3.0
+
   '@netlify/otel@7.0.4':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -3753,8 +3777,9 @@ snapshots:
       - supports-color
     optional: true
 
-  '@netlify/runtime-utils@3.0.0':
-    optional: true
+  '@netlify/runtime-utils@3.0.0': {}
+
+  '@netlify/types@3.3.0': {}
 
   '@opentelemetry/api-logs@0.221.0':
     dependencies:
