@@ -20,6 +20,8 @@ Marketing-Website für timebench (timebench.io). Astro 7, Tailwind v4, TypeScrip
 ## Gestaltung
 
 - Grün (`--live`) bedeutet nur „läuft / jetzt / heute“. Primäraktionen sind Ink.
+- Jede Lösungsseite hat eine eigene Akzentfarbe (`SiteLayout accent=…`: Projektzeit `bloom`, Arbeitszeit `clock`), den zentrierten Hero `.shero` und eigene Dummies. Startseiten-Dummies dort nicht wiederholen.
+- Dummies müssen per Touch funktionieren: kein `touch-action: none`, Tippen statt Ziehen. Popover dürfen den Geisterklick nach einem Tipp nicht abfangen.
 - Ruhige, linierte Flächen, damit Projektfarben und Zahlen hervorstechen.
 - Bei 375 px darf die Seite nicht horizontal scrollen. Breite Dummies scrollen in ihrem eigenen Container.
 

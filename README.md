@@ -27,7 +27,11 @@ Dazu kommen OG-Bilder unter `/og/*.png`, generiert mit Satori in `src/lib/og.ts`
 
 ## Die klickbaren Dummies
 
-Die Produktansichten auf den Seiten sind kein Screenshot. Sie werden im Browser aus Beispieldaten aufgebaut und lassen sich anklicken: Wochen- und Monatskalender, Stundenzettel, Jahresübersicht für Urlaub, Teamkalender und das Fenster des Desktop-Trackers mit den Buchungsvorschlägen.
+Die Produktansichten auf den Seiten sind kein Screenshot. Sie werden im Browser aus Beispieldaten aufgebaut und lassen sich anklicken, mit der Maus und auf dem Handy per Tippen.
+
+- Startseite: Wochen- und Monatskalender, Stundenzettel, Jahresübersicht für Urlaub, Teamkalender und das Fenster des Desktop-Trackers mit den Buchungsvorschlägen.
+- Projektzeiterfassung: Schnelleingabe mit `@` und `#`, Tagesende mit Lücken zum Füllen, Report-Pivot mit Rundung.
+- Arbeitszeiterfassung: Stempelkarte mit ArbZG-Verstößen zum Beheben, Arbeitsplan-Editor, dazu Urlaubskalender und Teamkalender.
 
 - Ein Dummy wird mit `<Demo kind="week" />` eingebunden (`src/components/demo/Demo.astro`).
 - Die Logik liegt in `src/scripts/demo/`, eine Datei pro Ansicht. `data.ts` enthält Projekte, Personen, Feiertage und Abwesenheiten.
