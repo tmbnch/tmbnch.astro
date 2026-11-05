@@ -1,0 +1,21 @@
+---
+// Kleines Jahresraster: 5 Zeilen x 18 Tage, einzelne Zellen färben sich nacheinander ein.
+const cols = 18, rows = 5, s = 13, gap = 3, x0 = 16, y0 = 22;
+const fills: Record<number, string> = {
+  3: '#14a38b', 4: '#14a38b', 5: '#14a38b', 6: '#14a38b', 7: '#14a38b', 24: '#ea3d92', 41: '#8b5cf6',
+  58: '#f08a24', 62: '#14a38b', 63: '#14a38b', 64: '#14a38b', 79: '#14a38b', 80: '#14a38b',
+};
+const cells = Array.from({ length: rows * cols }, (_, i) => {
+  const r = Math.floor(i / cols), c = i % cols;
+  return { i, x: x0 + c * (s + gap), y: y0 + r * (s + gap), we: c % 7 === 5 || c % 7 === 6, fill: fills[i] };
+});
+---
+
+<svg class="mv" viewBox="0 0 300 128" aria-hidden="true">
+  {cells.map((c) => (
+    <Fragment>
+      <rect x={c.x} y={c.y} width={s} height={s} rx="2.5" fill={c.we ? '#e9e6da' : '#f3f1e8'}></rect>
+      {c.fill && <rect class="fill" style={`animation-delay:${(c.i % 18) * 0.08}s`} x={c.x} y={c.y} width={s} height={s} rx="2.5" fill={c.fill}></rect>}
+    </Fragment>
+  ))}
+</svg>

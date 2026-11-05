@@ -599,3 +599,15 @@ section { padding: 88px 0; }
 .legal p, .legal li { color: var(--ink-700); }
 .legal a { text-decoration: underline; text-underline-offset: 3px; }
 .legal ul { padding-left: 20px; }
+
+/* ---------- Mini-Visuals der Säulen ---------- */
+.mv { width: 100%; height: 100%; }
+.mv .grow { transform-origin: left center; transform-box: fill-box; animation: grow 2.4s cubic-bezier(.2,.8,.2,1) infinite alternate; }
+.mv .grow:nth-of-type(2) { animation-delay: .3s; }
+.mv .grow:nth-of-type(3) { animation-delay: .6s; }
+@keyframes grow { from { transform: scaleX(.15); } to { transform: scaleX(1); } }
+.mv .blink { animation: blink 1.2s infinite; }
+.mv .fill { animation: fillc 4s ease infinite; opacity: 0; }
+@keyframes fillc { 0%, 10% { opacity: 0; } 25%, 85% { opacity: 1; } 100% { opacity: 0; } }
+.mv .warn { animation: warn 2.4s ease infinite; transform-origin: center; transform-box: fill-box; }
+@keyframes warn { 0%, 40% { transform: scale(0); } 55%, 100% { transform: scale(1); } }

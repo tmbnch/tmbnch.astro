@@ -1,8 +1,218 @@
 ---
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import AppFrame from '@/components/demo/AppFrame.astro';
 import Demo from '@/components/demo/Demo.astro';
+import DemoTour, { type TourTab } from '@/components/demo/DemoTour.astro';
+import Waitlist from '@/components/site/Waitlist.astro';
+import WaitlistSection from '@/components/site/WaitlistSection.astro';
+import MiniProject from '@/components/visuals/MiniProject.astro';
+import MiniWorktime from '@/components/visuals/MiniWorktime.astro';
+import MiniAbsence from '@/components/visuals/MiniAbsence.astro';
+import DayBars from '@/components/visuals/DayBars.astro';
+import { createSoftwareSchema } from '@/lib/schema';
+
+const tour: TourTab[] = [
+  { kind: 'week', label: 'Woche', title: 'Diese Woche', opts: { h: 42 }, captionLead: 'Woche', caption: 'Klick öffnet einen Eintrag, Ziehen auf freier Fläche legt einen neuen an. Die grüne Linie ist jetzt.' },
+  { kind: 'month', label: 'Monat', title: 'Monat', captionLead: 'Monat', caption: 'Pro Tag die Summe und die ersten Einträge. Ein Klick auf einen Tag springt in die Woche.' },
+  { kind: 'timesheet', label: 'Stundenzettel', title: 'Stundenzettel', captionLead: 'Stundenzettel', caption: 'Für alle, die lieber am Freitag eintragen. Tippe „1:30“, „90m“ oder „1,5“.' },
+  { kind: 'year', label: 'Urlaub', small: 'Jahr', title: 'Mein Urlaub 2026', captionLead: 'Jahresübersicht', caption: 'Zieh über ein paar Tage im Dezember. Der Antrag zeigt, wie viel Urlaub danach übrig ist.' },
+  { kind: 'team', label: 'Team', small: 'Monat', title: 'Teamkalender', captionLead: 'Teamkalender', caption: 'Wer ist wann da, wer steht im Plus, wer hat noch Resturlaub.' },
+];
+
+const icon = (d: string) =>
+  `<svg viewBox="0 0 16 16" fill="none" stroke="#17160f" stroke-width="1.5" aria-hidden="true">${d}</svg>`;
+const features = [
+  { c: 'var(--sprout-200)', i: '<path d="M2 13h12M4 10v3M8 6v7M12 3v10"/>', t: 'Reports und Export', s: 'Pivot nach Tag, Woche oder Monat. CSV, Excel, PDF. Gespeichert als „immer letzter Monat“.' },
+  { c: 'var(--bloom-100)', i: '<path d="M11 4.5A4 4 0 1011 11.5M3 7h6M3 9h6"/>', t: 'Stundensätze', s: 'Pro Person, Kunde oder Projekt. Abrechenbar pro Eintrag, Rundung auf 15 Minuten einstellbar.' },
+  { c: '#fdf0c2', i: '<path d="M2 5l6 4 6-4M2 4h12v9H2z"/>', t: 'Freigabe-Inbox', s: 'Urlaubsanträge mit Resturlaub daneben. Genehmigen dauert zwei Sekunden.' },
+  { c: 'var(--sprout-200)', i: '<rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6h12M5 1.5v3M11 1.5v3"/>', t: 'iCal-Abo', s: 'Eigene und Team-Abwesenheiten in Outlook, Google oder Apple Kalender.' },
+  { c: 'var(--bloom-100)', i: '<path d="M3 8h10M9 4l4 4-4 4"/>', t: 'Toggl-Import', s: 'Bestehende Einträge übernehmen und stündlich synchron halten, bis das Team umgestiegen ist.' },
+  { c: '#fdf0c2', i: '<path d="M3 4l4 4-4 4M8 12h5"/>', t: 'CLI und MCP', s: 'Zeiten aus dem Terminal buchen. Oder einen KI-Assistenten deine Woche zusammenfassen lassen.' },
+  { c: 'var(--sprout-200)', i: '<rect x="1.5" y="4" width="13" height="8" rx="1.5"/><path d="M4 7h1M7 7h1M10 7h2M5 10h6"/>', t: 'Tastatur zuerst', s: '<span class="mono">n</span> legt an, <span class="mono">s</span> teilt, Pfeiltasten blättern. <span class="mono">?</span> zeigt alle Kürzel.' },
+  { c: 'var(--bloom-100)', i: '<rect x="2" y="2.5" width="12" height="4" rx="1"/><rect x="2" y="9.5" width="12" height="4" rx="1"/>', t: 'Selbst hosten', s: 'Docker Compose mit PostgreSQL. Oder ihr nutzt unsere Instanz.' },
+  { c: '#fdf0c2', i: '<rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2"/>', t: 'Monatsabschluss', s: 'Abgeschlossene Monate sind gesperrt, bis ein Admin sie wieder öffnet.' },
+  { c: 'var(--sprout-200)', i: '<circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/>', t: 'Änderungsprotokoll', s: 'Wer hat wann welchen Eintrag geändert. Hilft bei Rückfragen vom Kunden.' },
+];
 ---
 
-<SiteLayout>
-  <section><div class="wrap"><Demo kind="week" /></div></section>
+<SiteLayout
+  title="Zeiterfassung für Projektteams"
+  description="timebench erfasst Projektzeit, Arbeitszeit und Urlaub in einer App. Der Desktop-Tracker schlägt dir offene Stunden zum Buchen vor."
+  includeOrgSchema
+  extraSchemas={createSoftwareSchema()}
+  hasWaitlist
+>
+  <!-- Hero -->
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow"><span class="dot"></span>Zeiterfassung für Projektteams</span>
+        <h1>Am Freitag ist die Woche <span class="hl-under">schon gebucht</span>.</h1>
+        <p class="lead">
+          timebench erfasst Projektzeit, Arbeitszeit und Urlaub in einer App. Der Desktop-Tracker merkt sich, in welchem
+          Repo, Dokument oder Meeting du gerade steckst. Am Abend liegen die offenen Stunden als Vorschläge bereit, und
+          ein Klick auf „Buchen“ reicht.
+        </p>
+        <Waitlist source="hero" style="margin-top:28px" note="Eine Mail, wenn dein Zugang bereit ist. Kein Newsletter." />
+        <div class="facts"><span>Web, macOS, Windows, Linux</span><span>Prüft Pausen nach ArbZG</span><span>Auch selbst hostbar</span></div>
+      </div>
+      <div class="hero-stage">
+        <AppFrame title="Diese Woche">
+          <span slot="toolbar" class="seg" style="margin-left:auto" aria-hidden="true"><button tabindex="-1">Tag</button><button tabindex="-1" class="on">Woche</button><button tabindex="-1">Monat</button></span>
+          <Demo kind="week" opts={{ h: 30 }} />
+        </AppFrame>
+        <Demo kind="desk" class="desk-float" id="hero-desk" opts={{ compact: true }} />
+      </div>
+    </div>
+  </header>
+
+  <!-- Drei Säulen -->
+  <section class="ruled">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Was timebench erfasst</span>
+        <h2>Projektstunden, Arbeitszeit und Urlaub im selben Kalender.</h2>
+        <p class="lead">
+          Die meisten Teams führen dafür drei Werkzeuge: eins für Kundenstunden, eine Excel-Liste für Überstunden und ein
+          Postfach für Urlaubsanträge. In timebench ist es ein Eintrag, der alle drei Rechnungen speist.
+        </p>
+      </div>
+      <div class="pillars">
+        <a class="pillar" href="/projektzeiterfassung/">
+          <span class="num">01</span>
+          <div class="viz"><MiniProject /></div>
+          <h3>Projektzeit</h3>
+          <p>Kunde, Projekt, Aufgabe: Jede Stunde landet dort, wo sie später abgerechnet wird. Mit Stundensätzen, Rundung und Export für die Rechnung.</p>
+          <span class="more">Projektzeiterfassung <span>→</span></span>
+        </a>
+        <a class="pillar" href="/arbeitszeiterfassung/">
+          <span class="num">02</span>
+          <div class="viz"><MiniWorktime /></div>
+          <h3>Arbeitszeit</h3>
+          <p>timebench rechnet Soll gegen Ist, führt das Überstundenkonto und meldet sich, wenn nach sechs Stunden die Pause fehlt.</p>
+          <span class="more">Arbeitszeiterfassung <span>→</span></span>
+        </a>
+        <a class="pillar" href="/arbeitszeiterfassung/#abwesenheiten">
+          <span class="num">03</span>
+          <div class="viz"><MiniAbsence /></div>
+          <h3>Abwesenheiten</h3>
+          <p>Urlaub im Jahreskalender aufziehen und beantragen. Die Freigabe sieht sofort, wie viele Tage danach übrig bleiben.</p>
+          <span class="more">Urlaub &amp; Abwesenheiten <span>→</span></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Produkt-Tour -->
+  <section id="tour" class="ruled" style="background:linear-gradient(var(--paper),#f4f2e9)">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Produkt-Tour</span>
+        <h2>Probier es aus. Das hier ist klickbar.</h2>
+        <p class="lead">
+          Zieh in der Woche über eine freie Stelle, und ein neuer Eintrag entsteht. Einträge lassen sich per Drag auf einen
+          anderen Tag schieben. Im Stundenzettel tippst du Zeiten direkt ein.
+        </p>
+      </div>
+      <DemoTour tabs={tour} findings={2} nav={['Zeiterfassung', 'Abwesenheiten', 'Team', 'Reports']} />
+    </div>
+  </section>
+
+  <!-- Desktop -->
+  <section id="desktop" class="ruled">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">Desktop-App für macOS, Windows, Linux</span>
+        <h2>Der Tracker schreibt mit. Du entscheidest, was gebucht wird.</h2>
+        <p class="lead">
+          Alle fünf Sekunden notiert die Desktop-App, was vorne liegt: Fenstertitel, Website, Git-Repo samt Branch, ob
+          gerade ein Mikrofon läuft. Daraus werden Blöcke wie „techvision/mobile-app, 10:20 bis 11:40“. Die stehen dann
+          unter „Nicht erfasst“, schon mit dem Projekt, auf das du dieses Repo zuletzt gebucht hast.
+        </p>
+        <ul class="checks">
+          <li><span><b>Meetings</b> erkennt timebench am Fenstertitel oder am aktiven Mikrofon in Zoom, Teams oder Meet.</span></li>
+          <li><span><b>Nach der Mittagspause</b> fragt der Timer, ob er um 12:05 hätte stoppen sollen. Ein Klick korrigiert die Zeit.</span></li>
+          <li><span><b>Favoriten</b> und das Kürzel <span class="mono" style="font-size:14px">⌘ ⌥ T</span> starten den Timer aus jeder App heraus.</span></li>
+          <li><span><b>Kalender-Spur:</b> Aktivität und Meetings liegen als schmale Bänder neben deinen Einträgen. Lücken fallen sofort auf.</span></li>
+        </ul>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:26px">
+          <button type="button" class="btn btn-sm btn-ghost" data-scene="list" data-target="#big-desk">Liste</button>
+          <button type="button" class="btn btn-sm btn-ghost" data-scene="cal" data-target="#big-desk">Kalender-Spur</button>
+          <button type="button" class="btn btn-sm" data-scene="away" data-target="#big-desk">Zurück aus der Mittagspause</button>
+        </div>
+      </div>
+      <div style="max-width:420px;width:100%;justify-self:center">
+        <Demo kind="desk" id="big-desk" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Privatsphäre -->
+  <section id="datenschutz-feature" class="ink-band">
+    <div class="ink-blobs" aria-hidden="true">
+      <i style="width:420px;height:420px;background:var(--sprout-600);right:-120px;top:-140px"></i>
+      <i style="width:320px;height:320px;background:var(--bloom-600);left:-120px;bottom:-160px"></i>
+    </div>
+    <div class="wrap" style="position:relative">
+      <div class="sec-head">
+        <span class="eyebrow">Privatsphäre</span>
+        <h2>Was der Tracker sieht, bleibt auf deinem Rechner.</h2>
+        <p class="lead">
+          Die Aktivitätsdaten liegen sieben Tage lokal und werden dann gelöscht. Auf den Server geht nur, was du selbst als
+          Eintrag bestätigst. Dein Chef sieht deine gebuchten Stunden und sonst nichts.
+        </p>
+      </div>
+      <div class="priv">
+        <div><span class="k">lokal · 7 Tage</span><strong>Rohdaten bleiben auf dem Gerät</strong><span>Fenstertitel und Websites liegen in einer lokalen Datenbank. Eine Strecke kannst du jederzeit vergessen lassen.</span></div>
+        <div><span class="k">sperrliste</span><strong>Ausnahmen pro App</strong><span>Banking, privater Messenger, Passwortmanager: Was auf der Sperrliste steht, zeichnet timebench gar nicht erst auf.</span></div>
+        <div><span class="k">masken</span><strong>Schwärzen beim Aufzeichnen</strong><span>Muster wie Patientennamen oder Aktenzeichen werden ersetzt, bevor sie auf der Platte landen.</span></div>
+        <div><span class="k">bewusst weggelassen</span><strong>Keine Tastenanschläge, keine Screenshots</strong><span>Auch die Zwischenablage liest timebench nicht. Für eine gute Buchung reicht, welches Fenster vorne war.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ArbZG -->
+  <section class="ruled">
+    <div class="wrap split rev">
+      <div>
+        <span class="eyebrow">Arbeitszeitgesetz</span>
+        <h2>Pausen und Ruhezeiten rechnet timebench mit.</h2>
+        <p class="lead">
+          Nach sechs Stunden 30 Minuten Pause, nach neun Stunden 45. Elf Stunden Ruhe bis zum nächsten Arbeitstag,
+          höchstens zehn Stunden am Tag. Was nicht passt, steht als Auffälligkeit auf dem Dashboard.
+        </p>
+        <p class="muted" style="margin-top:14px">
+          timebench warnt und lässt dich korrigieren. Eine Pause abzuziehen, die niemand gemacht hat, wäre auch keine
+          saubere Dokumentation.
+        </p>
+        <a class="btn btn-ghost" style="margin-top:22px" href="/arbeitszeiterfassung/">Mehr zur Arbeitszeiterfassung →</a>
+      </div>
+      <DayBars findingNote="Nach 6 Stunden fehlen 30 Minuten Pause (§ 4 ArbZG). Eintrag öffnen und teilen?" />
+    </div>
+  </section>
+
+  <!-- Weitere Funktionen -->
+  <section class="ruled">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Außerdem drin</span>
+        <h2>Für den Monatsabschluss und die Rechnung danach.</h2>
+      </div>
+      <div class="fgrid">
+        {features.map((f) => (
+          <div>
+            <span class="ic" style={`--c:${f.c}`} set:html={icon(f.i)} />
+            <strong>{f.t}</strong>
+            <span set:html={f.s} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <WaitlistSection
+    title="Wir öffnen timebench Team für Team."
+    lead="Trag dich ein, und du bekommst einen Zugang, sobald ein Platz frei ist. Wer früh dabei ist, redet bei den nächsten Themen mit. Als Nächstes stehen Integrationen und Vorlagen für einzelne Branchen an."
+    source="startseite"
+  />
 </SiteLayout>

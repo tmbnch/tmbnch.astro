@@ -1,0 +1,17 @@
+---
+/** Arbeitstage als Balken mit fehlender Pause (ArbZG § 4) als Auffälligkeit. */
+interface Props {
+  /** Zusatzsatz unter der Auffälligkeit */
+  findingNote?: string;
+}
+const { findingNote = 'Nach 6 Stunden fehlen 30 Minuten Pause (§ 4 ArbZG).' } = Astro.props;
+---
+
+<div class="day-viz">
+  <div class="dbar-axis" aria-hidden="true"><div></div><div><span>7</span><span>10</span><span>13</span><span>16</span><span>19</span></div><div></div></div>
+  <div class="dbar-row"><div class="dn">Mo<small>2. Nov</small></div><div class="dbar"><b style="left:12.5%;width:29%"></b><b style="left:45%;width:33%"></b></div><div class="h">8:10</div></div>
+  <div class="dbar-row"><div class="dn">Di<small>3. Nov</small></div><div class="dbar"><b style="left:14%;width:30%"></b><b style="left:48%;width:27%"></b></div><div class="h">7:45</div></div>
+  <div class="dbar-row warn"><div class="dn">Mi<small>4. Nov</small></div><div class="dbar"><b style="left:16.7%;width:52%"></b><b style="left:72%;width:12%"></b></div><div class="h">9:30</div></div>
+  <div class="dbar-row"><div class="dn">Do<small>5. Nov</small></div><div class="dbar"><b style="left:13.9%;width:28%"></b><b style="left:46%;width:15%;background:var(--live)"></b></div><div class="h">5:42</div></div>
+  <div class="finding"><span class="ic" aria-hidden="true">!</span><div><b>Mi, 4. Nov: 7:30 h ohne Pause</b><small>{findingNote}</small></div></div>
+</div>
