@@ -1,0 +1,35 @@
+---
+/**
+ * Platzhalter für einen klickbaren Dummy. Das Script in src/scripts/demo mountet ihn im Browser.
+ */
+interface Props {
+  kind: 'week' | 'month' | 'timesheet' | 'year' | 'team' | 'desk';
+  /** Optionen für den Dummy, z. B. { h: 30 } für die Woche oder { compact: true } für den Tracker */
+  opts?: Record<string, unknown>;
+  id?: string;
+  class?: string;
+}
+const { kind, opts, id, class: className } = Astro.props;
+const labels: Record<Props['kind'], string> = {
+  week: 'Beispielansicht: Wochenkalender',
+  month: 'Beispielansicht: Monatskalender',
+  timesheet: 'Beispielansicht: Stundenzettel',
+  year: 'Beispielansicht: Urlaub im Jahresüberblick',
+  team: 'Beispielansicht: Teamkalender',
+  desk: 'Beispielansicht: Desktop-Tracker',
+};
+---
+
+<div
+  id={id}
+  class={className}
+  data-demo={kind}
+  data-opts={opts ? JSON.stringify(opts) : undefined}
+  role="region"
+  aria-label={labels[kind]}
+>
+</div>
+
+<script>
+  import '@/scripts/demo';
+</script>

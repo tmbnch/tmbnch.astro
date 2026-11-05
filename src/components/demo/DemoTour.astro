@@ -1,0 +1,47 @@
+---
+/**
+ * Tab-Leiste plus App-Rahmen mit mehreren Dummies. Die Tabs schalten Panel, Titel und Bildunterschrift.
+ */
+import AppFrame from './AppFrame.astro';
+import Demo from './Demo.astro';
+
+export interface TourTab {
+  kind: 'week' | 'month' | 'timesheet' | 'year' | 'team';
+  label: string;
+  small?: string;
+  title: string;
+  caption: string;
+  captionLead: string;
+  opts?: Record<string, unknown>;
+}
+
+interface Props {
+  tabs: TourTab[];
+  url?: string;
+  nav?: string[];
+  findings?: number;
+}
+const { tabs, url = 'app.timebench.io', nav, findings } = Astro.props;
+---
+
+<div data-tour>
+  <div class="tour-tabs" role="tablist">
+    {tabs.map((t, i) => (
+      <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} class:list={[{ on: i === 0 }]} data-tab={t.kind} data-title={t.title}>
+        {t.label}{t.small && <small>{t.small}</small>}
+      </button>
+    ))}
+  </div>
+  <AppFrame url={url} title={tabs[0].title} nav={nav} findings={findings} minHeight={540}>
+    {tabs.map((t, i) => (
+      <div class:list={['panel', { on: i === 0 }]} data-panel={t.kind} role="tabpanel">
+        <Demo kind={t.kind} opts={t.opts} />
+      </div>
+    ))}
+  </AppFrame>
+  <div class="tour-cap">
+    {tabs.map((t, i) => (
+      <span data-cap={t.kind} hidden={i !== 0}><b>{t.captionLead}:</b> {t.caption}</span>
+    ))}
+  </div>
+</div>

@@ -1,0 +1,51 @@
+---
+/**
+ * Browser-Rahmen mit App-Sidebar und laufendem Timer-Block, wie in der tmbnch-Web-App.
+ */
+interface Props {
+  url?: string;
+  title?: string;
+  /** Einträge der Sidebar; der erste ist aktiv */
+  nav?: string[];
+  /** Anzahl offener Auffälligkeiten als Badge (0 = keins) */
+  findings?: number;
+  minHeight?: number;
+  class?: string;
+}
+const {
+  url = 'app.timebench.io/zeiten',
+  title,
+  nav = ['Zeiterfassung', 'Abwesenheiten', 'Team', 'Reports'],
+  findings = 0,
+  minHeight,
+  class: className,
+} = Astro.props;
+---
+
+<div class:list={['app-frame', className]}>
+  <div class="app-chrome" aria-hidden="true"><i></i><i></i><i></i><div class="url">{url}</div></div>
+  <div class="app-band"></div>
+  <div class="app-body" style={minHeight ? `min-height:${minHeight}px` : undefined}>
+    <aside class="app-side" aria-hidden="true">
+      <div class="ws"><img src="/logo.svg" alt="" width="20" height="20" />Studio Nord</div>
+      <div class="side-timer">
+        <div class="t"><span class="pulse"></span>0:37</div>
+        <div class="d">Release-Checkliste</div>
+        <div class="p"><span style="width:7px;height:7px;border-radius:9px;background:#4f7cff"></span>Website Relaunch</div>
+      </div>
+      {nav.map((n, i) => <div class:list={['item', { on: i === 0 }]}>{n}</div>)}
+      {findings > 0 && (
+        <div class="item">Auffälligkeiten <span class="cnt" style="background:var(--bloom-500);margin-left:auto">{findings}</span></div>
+      )}
+    </aside>
+    <div class="app-main">
+      {title && (
+        <div class="app-toolbar">
+          <span class="title" data-title-slot>{title}</span>
+          <slot name="toolbar" />
+        </div>
+      )}
+      <slot />
+    </div>
+  </div>
+</div>
