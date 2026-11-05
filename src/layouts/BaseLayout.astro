@@ -2,6 +2,7 @@
 import '@/styles/global.css';
 import SEO from '@/components/seo/SEO.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
+import Plausible from '@/components/seo/Plausible.astro';
 import { createWebsiteSchema, createOrganizationSchema } from '@/lib/schema';
 import type { Thing, WithContext } from 'schema-dts';
 import siteConfig from '@/config/site.config';
@@ -59,6 +60,7 @@ if (extraSchemas) schemas.push(...(Array.isArray(extraSchemas) ? extraSchemas : 
     />
     <link rel="alternate" type="text/plain" title="LLM-Inhaltsübersicht" href="/llms.txt" />
     <JsonLd schema={schemas} />
+    <Plausible />
   </head>
 
   <body class={bodyClass}>

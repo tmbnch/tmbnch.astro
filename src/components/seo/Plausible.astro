@@ -1,0 +1,27 @@
+---
+/**
+ * Plausible Analytics, cookielos und ohne Einwilligungsbanner.
+ *
+ * Lädt nur, wenn PUBLIC_PLAUSIBLE_SCRIPT_ID gesetzt ist (Plausible → Site Settings →
+ * Tracker, Form `pa-…`). Ohne die Variable bleibt die Seite ohne Analyse, und die
+ * Datenschutzerklärung zeigt den Plausible-Absatz nicht an.
+ *
+ * Eigene Ereignisse: `window.plausible?.('Warteliste', { props: { quelle } })`.
+ * Das Ziel muss im Plausible-Dashboard unter „Goals“ angelegt sein.
+ */
+const scriptId = import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_ID;
+---
+
+{
+  scriptId && (
+    <>
+      <script is:inline async src={`https://plausible.io/js/${scriptId}.js`} />
+      <script is:inline>
+        /* eslint-disable prefer-rest-params */
+        window.plausible = window.plausible || function () { (plausible.q = plausible.q || []).push(arguments); };
+        plausible.init = plausible.init || function (i) { plausible.o = i || {}; };
+        plausible.init();
+      </script>
+    </>
+  )
+}

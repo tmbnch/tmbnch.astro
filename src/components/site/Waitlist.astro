@@ -49,6 +49,8 @@ const {
         });
         if (!res.ok) throw new Error(String(res.status));
         form.classList.add('done');
+        const quelle = form.querySelector<HTMLInputElement>('input[name="quelle"]')?.value ?? '';
+        window.plausible?.('Warteliste', { props: { quelle } });
       } catch {
         btn.disabled = false;
         btn.textContent = 'Nochmal versuchen';
