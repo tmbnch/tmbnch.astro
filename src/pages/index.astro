@@ -12,10 +12,10 @@ import DayBars from '@/components/visuals/DayBars.astro';
 import { createSoftwareSchema } from '@/lib/schema';
 
 const tour: TourTab[] = [
-  { kind: 'week', label: 'Woche', title: 'Diese Woche', opts: { h: 42 }, captionLead: 'Woche', caption: 'Klick öffnet einen Eintrag, Ziehen auf freier Fläche legt einen neuen an. Die grüne Linie ist jetzt.' },
+  { kind: 'week', label: 'Woche', title: 'Diese Woche', opts: { h: 42 }, captionLead: 'Woche', caption: '<span class="hint-mouse">Klick öffnet einen Eintrag, Ziehen auf freier Fläche legt einen neuen an.</span><span class="hint-touch">Tipp auf einen Eintrag öffnet ihn, Tipp auf eine freie Stelle legt einen neuen an.</span> Die grüne Linie ist jetzt.' },
   { kind: 'month', label: 'Monat', title: 'Monat', captionLead: 'Monat', caption: 'Pro Tag die Summe und die ersten Einträge. Ein Klick auf einen Tag springt in die Woche.' },
   { kind: 'timesheet', label: 'Stundenzettel', title: 'Stundenzettel', captionLead: 'Stundenzettel', caption: 'Für alle, die lieber am Freitag eintragen. Tippe „1:30“, „90m“ oder „1,5“.' },
-  { kind: 'year', label: 'Urlaub', small: 'Jahr', title: 'Mein Urlaub 2026', captionLead: 'Jahresübersicht', caption: 'Zieh über ein paar Tage im Dezember. Der Antrag zeigt, wie viel Urlaub danach übrig ist.' },
+  { kind: 'year', label: 'Urlaub', small: 'Jahr', title: 'Mein Urlaub 2026', captionLead: 'Jahresübersicht', caption: '<span class="hint-mouse">Zieh über ein paar Tage im Dezember.</span><span class="hint-touch">Tipp einen Tag im Dezember an und dann einen zweiten.</span> Der Antrag zeigt, wie viel Urlaub danach übrig ist.' },
   { kind: 'team', label: 'Team', small: 'Monat', title: 'Teamkalender', captionLead: 'Teamkalender', caption: 'Wer ist wann da, wer steht im Plus, wer hat noch Resturlaub.' },
 ];
 
@@ -110,8 +110,8 @@ const features = [
         <span class="eyebrow">Produkt-Tour</span>
         <h2>Probier es aus. Das hier ist klickbar.</h2>
         <p class="lead">
-          Zieh in der Woche über eine freie Stelle, und ein neuer Eintrag entsteht. Einträge lassen sich per Drag auf einen
-          anderen Tag schieben. Im Stundenzettel tippst du Zeiten direkt ein.
+          Leg in der Woche einen Eintrag an, öffne einen bestehenden oder schieb ihn auf einen anderen Tag. Im Stundenzettel
+          tippst du Zeiten direkt ein, im Urlaubskalender stellst du einen Antrag.
         </p>
       </div>
       <DemoTour tabs={tour} findings={2} nav={['Zeiterfassung', 'Abwesenheiten', 'Team', 'Reports']} />

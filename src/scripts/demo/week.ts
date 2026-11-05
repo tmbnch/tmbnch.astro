@@ -113,6 +113,12 @@ export function mountWeek(root: HTMLElement, opts: WeekOptions = {}): void {
     if (left < 0) left = Math.max(0, (wr.width - 250) / 2);
     popEl.style.left = left + 'px';
     popEl.style.top = Math.max(0, Math.min(top + 40, wk.offsetHeight - 200)) + 'px';
+    // Auf Touch-Geräten folgt dem Tipp ein Klick an derselben Stelle. Der darf nicht
+    // im gerade geöffneten Popover landen.
+    popEl.style.pointerEvents = 'none';
+    setTimeout(() => {
+      popEl.style.pointerEvents = '';
+    }, 400);
     wk.appendChild(popEl);
   }
 
@@ -129,7 +135,7 @@ export function mountWeek(root: HTMLElement, opts: WeekOptions = {}): void {
           ? '<span class="tag" style="background:var(--sprout-100);color:var(--live-text)">€ abrechenbar</span>'
           : '<span class="tag">nicht abrechenbar</span>'
       }</div>
-      <div class="hint">Ziehen verschiebt, <kbd>s</kbd> teilt den Eintrag</div>
+      <div class="hint"><span class="hint-mouse">Ziehen verschiebt, <kbd>s</kbd> teilt den Eintrag</span><span class="hint-touch">In der App verschiebst du Einträge per Drag</span></div>
     </div>`);
     pop.querySelector<HTMLButtonElement>('.x')!.onclick = closePop;
     place(pop, col, topOf(e.s));
@@ -173,6 +179,12 @@ export function mountWeek(root: HTMLElement, opts: WeekOptions = {}): void {
     const col = target.closest<HTMLElement>('.wk-col');
     if (!col) {
       closePop();
+      return;
+    }
+    // Touch: Die Seite muss scrollbar bleiben. Deshalb nur Tippen auswerten:
+    // Tipp auf Eintrag öffnet ihn, Tipp auf freie Fläche legt eine Stunde an.
+    if (ev.pointerType === 'touch') {
+      handleTap(ev, col, evEl);
       return;
     }
     ev.preventDefault();
@@ -246,6 +258,32 @@ export function mountWeek(root: HTMLElement, opts: WeekOptions = {}): void {
     window.addEventListener('pointermove', mv);
     window.addEventListener('pointerup', up);
   });
+
+  function handleTap(ev: PointerEvent, col: HTMLElement, evEl: HTMLElement | null) {
+    const sx = ev.clientX;
+    const sy = ev.clientY;
+    const done = () => {
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', done);
+    };
+    const up = (u: PointerEvent) => {
+      done();
+      if (Math.hypot(u.clientX - sx, u.clientY - sy) > 8) return;
+      if (evEl && !evEl.classList.contains('draft')) {
+        const e = entries.find((x) => x.id === Number(evEl.dataset.id));
+        if (e) showEntry(e, col);
+        return;
+      }
+      closePop();
+      const d = Number(col.dataset.d);
+      const s = Math.max(START * 60, Math.min(END * 60 - 60, snap(yToMin(col, sy) - 30)));
+      const draft = h(`<div class="ev draft" style="top:${topOf(s)}px;height:${H - 2}px"><div class="t1">${hm(s)}–${hm(s + 60)}</div></div>`);
+      col.appendChild(draft);
+      showCreate(d, s, s + 60, col);
+    };
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', done);
+  }
 
   document.addEventListener('keydown', (k) => {
     if (k.key === 'Escape') closePop();

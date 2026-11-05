@@ -10,6 +10,7 @@ export interface TourTab {
   label: string;
   small?: string;
   title: string;
+  /** Darf HTML enthalten, z. B. .hint-mouse / .hint-touch */
   caption: string;
   captionLead: string;
   opts?: Record<string, unknown>;
@@ -41,7 +42,7 @@ const { tabs, url = 'app.timebench.io', nav, findings } = Astro.props;
   </AppFrame>
   <div class="tour-cap">
     {tabs.map((t, i) => (
-      <span data-cap={t.kind} hidden={i !== 0}><b>{t.captionLead}:</b> {t.caption}</span>
+      <span data-cap={t.kind} hidden={i !== 0}><b>{t.captionLead}:</b> <Fragment set:html={t.caption} /></span>
     ))}
   </div>
 </div>

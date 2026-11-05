@@ -188,7 +188,7 @@ section { padding: 88px 0; }
 .wk-head .hol { color: var(--holiday); font-size: 10px; }
 .wk-body { display: grid; grid-template-columns: 40px repeat(var(--days), 1fr); position: relative; }
 .wk-hours div { height: var(--h); font-family: var(--mono); font-size: 10px; color: var(--fg-muted); text-align: right; padding-right: 6px; transform: translateY(-6px); }
-.wk-col { position: relative; border-left: 1px solid var(--rule); background-image: linear-gradient(var(--rule) 1px, transparent 1px); background-size: 100% var(--h); cursor: crosshair; touch-action: none; }
+.wk-col { position: relative; border-left: 1px solid var(--rule); background-image: linear-gradient(var(--rule) 1px, transparent 1px); background-size: 100% var(--h); cursor: crosshair; touch-action: pan-x pan-y; }
 .wk-col.we { background-color: var(--muted-2); }
 .wk-col.today { background-color: color-mix(in srgb, var(--sprout-100) 35%, transparent); }
 .ev {
@@ -266,7 +266,7 @@ section { padding: 88px 0; }
 
 /* ---------- Year absences ---------- */
 .yr-wrap { overflow-x: auto; }
-.yr { display: grid; grid-template-columns: 42px repeat(31, minmax(15px, 1fr)); gap: 2px; font-size: 10px; min-width: 620px; user-select: none; touch-action: none; }
+.yr { display: grid; grid-template-columns: 42px repeat(31, minmax(15px, 1fr)); gap: 2px; font-size: 10px; min-width: 620px; user-select: none; touch-action: pan-x pan-y; }
 .yr .mh { font-weight: 600; color: var(--ink-700); align-self: center; font-size: 11px; }
 .yr .dh { text-align: center; color: var(--fg-muted); font-family: var(--mono); font-size: 9px; }
 .yr .c { aspect-ratio: 1; border-radius: 3px; background: var(--muted-2); cursor: pointer; position: relative; min-height: 15px; }
@@ -621,3 +621,7 @@ section { padding: 88px 0; }
 .faq summary::after { flex: none; width: 22px; text-align: center; }
 /* Auf schmalen Screens zeigt der App-Rahmen nur den Inhalt, ohne Sidebar. */
 @media (max-width: 640px) { .app-side { display: none; } }
+
+/* Hinweise je nach Eingabegerät */
+.hint-touch { display: none; }
+@media (pointer: coarse) { .hint-touch { display: inline; } .hint-mouse { display: none; } }

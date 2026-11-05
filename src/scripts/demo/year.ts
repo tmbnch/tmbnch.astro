@@ -14,7 +14,7 @@ export function mountYear(root: HTMLElement): void {
     <div class="yr-wrap"><div class="yr"></div></div>
     <div class="legend">${Object.values(ABSENCE_TYPES).map((a) => `<span><i style="--c:${a.color}"></i>${a.name}</span>`).join('')}<span><i class="striped" style="--c:#14a38b"></i>beantragt</span><span><i style="--c:#b8a6f5"></i>Feiertag</span><span><i style="--c:var(--muted)"></i>Wochenende</span></div>
     <div class="req-panel" role="dialog" aria-label="Urlaubsantrag"><div class="info"></div><select aria-label="Abwesenheitsart">${Object.entries(ABSENCE_TYPES).map(([k, a]) => `<option value="${k}">${a.name}</option>`).join('')}</select><button class="btn btn-sm do">Beantragen</button><button class="btn btn-sm btn-ghost cancel">Abbrechen</button></div>
-    <div class="hint">Zieh über mehrere Tage, um einen Antrag vorzubereiten.</div>`;
+    <div class="hint"><span class="hint-mouse">Zieh über mehrere Tage, um einen Antrag vorzubereiten.</span><span class="hint-touch">Tipp den ersten und dann den letzten Tag an, um einen Antrag vorzubereiten.</span></div>`;
   const grid = root.querySelector<HTMLElement>('.yr')!;
   const panel = root.querySelector<HTMLElement>('.req-panel')!;
 
@@ -79,13 +79,44 @@ export function mountYear(root: HTMLElement): void {
     render();
     mark();
     const free = balance().free;
-    panel.querySelector('.info')!.innerHTML = `<strong>${fmt(sel[0])} bis ${fmt(sel[sel.length - 1])}</strong>${days} Arbeitstag${days === 1 ? '' : 'e'} · danach ${free - days} Tage verfügbar · geht an Lena Viertag`;
+    const rest = free - days;
+    const after = rest >= 0 ? `danach ${rest} Tag${rest === 1 ? '' : 'e'} verfügbar` : `<span style="color:var(--bloom-600);font-weight:600">${-rest} Tag${rest === -1 ? '' : 'e'} mehr als verfügbar</span>`;
+    panel.querySelector('.info')!.innerHTML = `<strong>${fmt(sel[0])} bis ${fmt(sel[sel.length - 1])}</strong>${days} Arbeitstag${days === 1 ? '' : 'e'} · ${after} · geht an Lena Viertag`;
     panel.classList.add('show');
   };
 
+  // Touch: zwei Tipps (Start, dann Ende), damit das Raster horizontal scrollbar bleibt.
+  let touchStart: string | null = null;
   grid.addEventListener('pointerdown', (e) => {
     const c = (e.target as HTMLElement).closest<HTMLElement>('.c:not(.void)');
     if (!c) return;
+    if (e.pointerType === 'touch') {
+      const sx = e.clientX;
+      const sy = e.clientY;
+      const done = () => {
+        window.removeEventListener('pointerup', up);
+        window.removeEventListener('pointercancel', done);
+      };
+      const up = (u: PointerEvent) => {
+        done();
+        if (Math.hypot(u.clientX - sx, u.clientY - sy) > 8) return;
+        if (!touchStart) {
+          touchStart = a = b = c.dataset.k!;
+          mark();
+          panel.classList.add('show');
+          panel.querySelector('.info')!.innerHTML = `<strong>${fmt(touchStart)}</strong>Jetzt den letzten Tag antippen.`;
+          return;
+        }
+        a = touchStart;
+        b = c.dataset.k!;
+        touchStart = null;
+        mark();
+        showPanel();
+      };
+      window.addEventListener('pointerup', up);
+      window.addEventListener('pointercancel', done);
+      return;
+    }
     e.preventDefault();
     a = b = c.dataset.k!;
     mark();
@@ -108,7 +139,7 @@ export function mountYear(root: HTMLElement): void {
 
   panel.querySelector<HTMLButtonElement>('.cancel')!.onclick = () => {
     panel.classList.remove('show');
-    a = b = null;
+    a = b = touchStart = null;
     mark();
   };
   panel.querySelector<HTMLButtonElement>('.do')!.onclick = () => {
