@@ -130,6 +130,8 @@ export const buildSalesPayload = (lead: StoredLead, submissionId: string) => {
 		answers: answersFor(lead),
 		payload: {
 			path: lead.page,
+			// timebench: Stelle auf der Seite (Hero, Startseite, Lösungsseite), sonst nur in Plausible sichtbar.
+			...(utm.quelle ? { quelle: utm.quelle } : {}),
 			referrer: utm.referrer,
 			geoCity: lead.geo?.city,
 			// Der Verdacht reist mit, sonst steht er nur im Blob: Seit Abgaben mit Verdacht

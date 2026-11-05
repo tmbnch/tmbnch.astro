@@ -32,6 +32,8 @@ const leadSchema = z.object({
   page: z.string().max(2000).optional(),
   /** Geteilt mit dem Browser-Pixel, damit Meta das Lead-Event dedupliziert */
   eventId: z.string().max(100).optional(),
+  /** '1', wenn der Besucher im Cookie-Banner Marketing zugestimmt hat. Nur dann geht der Lead an Meta. */
+  marketing: z.string().max(1).optional(),
   // Bewusst permissiv (siehe contact.ts): Ein Fehler mit Feldnamen wäre eine Anleitung für Bots.
   honeypot: z.string().max(200),
 });
@@ -220,6 +222,7 @@ export default async (request: Request, context: Context) => {
       utm: parseJson(form.get('utm')?.toString() || '{}', {}),
       page: form.get('page')?.toString() || undefined,
       eventId: form.get('eventId')?.toString() || undefined,
+      marketing: form.get('marketing')?.toString() || undefined,
       honeypot: form.get('honeypot')?.toString() || '',
     });
 
@@ -281,11 +284,12 @@ export default async (request: Request, context: Context) => {
       await sendFallbackMail(stored, delivery.reason);
     }
 
-    // Serverseitiges Lead-Event an Meta, best-effort. Die Cookie-Zuordnung (_fbp/_fbc) schickt
-    // der Browser nur mit, wenn Marketing erlaubt ist; ohne sie bleibt nur die gehashte Mail.
+    // Serverseitiges Lead-Event an Meta, best-effort und nur mit Marketing-Einwilligung: Die
+    // Datenschutzerklärung nennt die Einwilligung als Rechtsgrundlage, also geht ohne sie auch
+    // keine gehashte Mail an Meta. (rcktbs.astro sendet hier unabhängig vom Banner.)
     const metaPixelId = Netlify.env.get('META_PIXEL_ID');
     const metaCapiToken = Netlify.env.get('META_CAPI_TOKEN');
-    if (metaPixelId && metaCapiToken) {
+    if (metaPixelId && metaCapiToken && lead.marketing === '1') {
       const attribution = lead.utm || {};
       await sendMetaCapiLead({
         pixelId: metaPixelId,

@@ -177,6 +177,8 @@ const total = betaQuestions.length + 1;
       const utm = { ...withMetaCookies(collectAttribution()), quelle: form.dataset.source || '' };
       const eventId = newEventId();
       data.set('eventId', eventId);
+      const consent = (window as unknown as { __consentState?: { categories?: Record<string, boolean> } }).__consentState;
+      if (consent?.categories?.marketing) data.set('marketing', '1');
       data.set('answers', JSON.stringify(list));
       data.set('utm', JSON.stringify(utm));
       data.set('page', location.href);
