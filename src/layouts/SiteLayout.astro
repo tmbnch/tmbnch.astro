@@ -1,5 +1,10 @@
 ---
+/**
+ * Layout aller Seiten: BaseLayout mit Navigation und Footer.
+ */
 import BaseLayout from './BaseLayout.astro';
+import SiteNav from '@/components/site/SiteNav.astro';
+import SiteFooter from '@/components/site/SiteFooter.astro';
 import type { Thing, WithContext } from 'schema-dts';
 
 interface Props {
@@ -8,11 +13,15 @@ interface Props {
   noindex?: boolean;
   includeOrgSchema?: boolean;
   extraSchemas?: WithContext<Thing> | WithContext<Thing>[];
+  /** Hat die Seite einen eigenen #warteliste-Block? Sonst führt der Button zur Startseite. */
+  hasWaitlist?: boolean;
 }
 
-const props = Astro.props;
+const { hasWaitlist = false, ...props } = Astro.props;
 ---
 
 <BaseLayout {...props}>
+  <SiteNav slot="header" waitlistHref={hasWaitlist ? '#warteliste' : '/#warteliste'} />
   <slot />
+  <SiteFooter slot="footer" />
 </BaseLayout>

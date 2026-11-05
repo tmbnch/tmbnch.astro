@@ -1,58 +1,61 @@
 /* =============================================================================
-   Velocity Design Tokens - Primitive Colors
-   =============================================================================
-   Raw color scales that themes build upon.
-   Using OKLCH for perceptual color uniformity.
+   timebench Primitives ("Sprout & Bloom")
+   Quelle: rcktbs-tmbnch/docs/brand/tmbnch-palette.html
    ============================================================================= */
 
 :root {
-  /* -------------------------------------------------------------------------
-     Grayscale - The foundation (OKLCH neutral scale)
-     ------------------------------------------------------------------------- */
-  --gray-0: oklch(100% 0 0);
-  --gray-50: oklch(98.3% 0 0);
-  --gray-100: oklch(96.5% 0 0);
-  --gray-200: oklch(91.3% 0 0);
-  --gray-300: oklch(85.8% 0 0);
-  --gray-400: oklch(64% 0 0);
-  --gray-500: oklch(52% 0 0);
-  --gray-600: oklch(38% 0 0);
-  --gray-700: oklch(32% 0 0);
-  --gray-800: oklch(26.7% 0 0);
-  --gray-900: oklch(19.4% 0 0);
-  --gray-950: oklch(12.3% 0 0);
+  /* Ink & Paper */
+  --ink: #17160f;
+  --ink-700: #3a382e;
+  --paper: #fbfaf4;
+  --white: #ffffff;
 
-  /* -------------------------------------------------------------------------
-     Brand Slate-Blue Scale
-     Inspired by Rocketbase's existing visual language.
-     ------------------------------------------------------------------------- */
-  --brand-50: oklch(97.6% 0.012 255);
-  --brand-100: oklch(94.5% 0.022 255);
-  --brand-200: oklch(89.2% 0.038 255);
-  --brand-300: oklch(80.8% 0.06 255);
-  --brand-400: oklch(71.4% 0.082 255);
-  --brand-500: oklch(61.2% 0.096 255);
-  --brand-600: oklch(53.8% 0.09 255);
-  --brand-700: oklch(45.6% 0.075 255);
-  --brand-800: oklch(36.8% 0.058 255);
-  --brand-900: oklch(28.7% 0.04 255);
+  /* Warme Neutraltöne */
+  --neutral-100: #f3f1e8;
+  --neutral-200: #ecead1;
+  --neutral-250: #e9e6da;
+  --neutral-300: #e2dfd2;
+  --neutral-350: #e6e3d7;
+  --neutral-400: #cdc8b8;
+  --neutral-500: #c9c6ba;
+  --neutral-600: #9a968a;
+  --neutral-700: #6b685c;
 
-  /* Accent - Blue for links/focus */
-  --blue-500: oklch(59.5% 0.19 260);
-  --blue-600: oklch(53.2% 0.19 260);
+  /* Sprout (Blatt) */
+  --sprout-100: #e8f8d6;
+  --sprout-200: #d2f2ae;
+  --sprout-300: #b4e97c;
+  --sprout-400: #97dd4e;
+  --sprout-500: #7ac62f;
+  --sprout-600: #5ea01f;
+  --sprout-700: #497c18;
 
-  /* Status Colors - OKLCH for consistent perception */
-  /* Base colors for icons, borders, indicators */
-  --success: oklch(72.3% 0.19 145);
-  --success-light: oklch(94% 0.05 145);
-  --success-foreground: oklch(35% 0.15 145); /* WCAG AA compliant on success-light */
-  --warning: oklch(79.5% 0.18 85);
-  --warning-light: oklch(96% 0.05 85);
-  --warning-foreground: oklch(40% 0.12 85); /* WCAG AA compliant on warning-light */
-  --error: oklch(62.8% 0.22 25);
-  --error-light: oklch(94% 0.05 25);
-  --error-foreground: oklch(40% 0.18 25); /* WCAG AA compliant on error-light */
-  --info: oklch(59.5% 0.19 260);
-  --info-light: oklch(94% 0.05 260);
-  --info-foreground: oklch(40% 0.15 260); /* WCAG AA compliant on info-light */
+  /* Bloom (Werkbank) */
+  --bloom-100: #fde1ef;
+  --bloom-200: #fbc1de;
+  --bloom-300: #f895c6;
+  --bloom-400: #f567ae;
+  --bloom-500: #ea3d92;
+  --bloom-600: #c42474;
+  --bloom-700: #971b59;
+
+  /* Clock (Uhr) */
+  --clock: #f5b700;
+
+  /* Signalfarben aus der App */
+  --activity: #b8690f;
+  --meeting: #6d4aa8;
+  --holiday: #8b5cf6;
+
+  /* Brand-Skala für Tailwind (brand-*), auf Sprout gemappt */
+  --brand-50: #f4fbeb;
+  --brand-100: var(--sprout-100);
+  --brand-200: var(--sprout-200);
+  --brand-300: var(--sprout-300);
+  --brand-400: var(--sprout-400);
+  --brand-500: var(--sprout-500);
+  --brand-600: var(--sprout-600);
+  --brand-700: var(--sprout-700);
+  --brand-800: #3a6213;
+  --brand-900: #2c4a0f;
 }

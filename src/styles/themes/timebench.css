@@ -1,0 +1,101 @@
+/* =============================================================================
+   timebench Theme ("Workbench")
+   Ruhige, linierte Fläche, damit Projektfarben und Zahlen hervorstechen.
+   Grün bedeutet nur "läuft / jetzt / heute". Primäraktionen sind Ink.
+   Vorbild: rcktbs-tmbnch/docs/UI-SYSTEM.md
+   ============================================================================= */
+
+:root {
+  /* Semantische Tokens (Vertrag aus dem Velocity-Boilerplate, für components/ui) */
+  --background: var(--paper);
+  --background-secondary: var(--neutral-100);
+  --background-tertiary: var(--neutral-250);
+  --background-elevated: var(--white);
+
+  --foreground: var(--ink);
+  --foreground-secondary: var(--ink-700);
+  --foreground-muted: var(--neutral-700);
+  --foreground-subtle: var(--neutral-600);
+
+  --border: var(--neutral-400);
+  --border-strong: var(--neutral-500);
+  --border-subtle: var(--neutral-300);
+
+  --primary: var(--ink);
+  --primary-hover: var(--ink-700);
+  --primary-foreground: var(--paper);
+
+  --secondary: var(--neutral-250);
+  --secondary-hover: var(--neutral-400);
+  --secondary-foreground: var(--ink);
+
+  --accent: var(--sprout-500);
+  --accent-hover: var(--sprout-600);
+  --accent-light: var(--sprout-100);
+
+  --muted: var(--neutral-250);
+  --muted-foreground: var(--neutral-700);
+
+  --card: var(--white);
+  --card-border: var(--neutral-400);
+
+  --input-bg: var(--white);
+  --input-border: var(--neutral-400);
+  --input-focus: var(--sprout-500);
+
+  --ring: var(--sprout-500);
+
+  --destructive: var(--bloom-600);
+  --destructive-foreground: var(--white);
+  --success: var(--sprout-700);
+  --success-light: var(--sprout-100);
+  --warning: var(--clock);
+  --warning-light: #fdf0c2;
+  --error: var(--bloom-600);
+  --error-light: var(--bloom-100);
+
+  --gradient-start: var(--sprout-500);
+  --gradient-end: var(--bloom-500);
+
+  --surface-invert: var(--ink);
+  --surface-invert-secondary: #23221a;
+  --surface-invert-tertiary: var(--ink-700);
+  --on-invert: var(--paper);
+  --on-invert-secondary: var(--neutral-500);
+  --on-invert-muted: var(--neutral-600);
+  --border-invert: var(--ink-700);
+  --border-invert-strong: #4a483d;
+
+  /* Zusatz-Tokens der Seite */
+  --muted-2: var(--neutral-100);
+  --rule: var(--neutral-300);
+  --fg-muted: var(--neutral-700);
+  --sidebar: var(--neutral-350);
+  --live: var(--sprout-500);
+  --live-text: #3f7410;
+  --radius: 6px;
+
+  /* Typografie */
+  --theme-font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+  --theme-font-display: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+  --theme-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --theme-heading-weight: 680;
+  --theme-heading-tracking: -0.035em;
+  --theme-body-leading: 1.55;
+
+  --font: var(--theme-font-sans);
+  --mono: var(--theme-font-mono);
+
+  /* Schatten */
+  --theme-shadow-sm: 0 1px 2px rgb(23 22 15 / 0.08);
+  --theme-shadow-md: 0 8px 20px -10px rgb(23 22 15 / 0.25);
+  --theme-shadow-lg: 0 20px 40px -18px rgb(23 22 15 / 0.35);
+  --theme-shadow-xl: 0 40px 80px -40px rgb(23 22 15 / 0.35);
+
+  /* Radien */
+  --theme-radius-sm: 4px;
+  --theme-radius-md: 6px;
+  --theme-radius-lg: 10px;
+  --theme-radius-xl: 12px;
+  --theme-radius-full: 9999px;
+}

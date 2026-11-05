@@ -1,0 +1,29 @@
+---
+import Logo from '@/components/ui/marketing/Logo/Logo.astro';
+import siteConfig from '@/config/site.config';
+import { footerColumns } from '@/data/navigation';
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="/" aria-label="timebench Startseite"><Logo /></a>
+        <p class="muted" style="max-width:30em;margin:12px 0 0">
+          Zeiterfassung für Teams, die nach Projekten arbeiten und jede Stunde sauber nachweisen müssen.
+        </p>
+      </div>
+      {footerColumns.map((col) => (
+        <div>
+          <h5>{col.title}</h5>
+          <ul>{col.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+        </div>
+      ))}
+    </div>
+    <div class="foot-bottom">
+      <span>© {year} {siteConfig.legalName}</span>
+      <span>Gebaut in {siteConfig.address?.city}</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,52 @@
+---
+import Logo from '@/components/ui/marketing/Logo/Logo.astro';
+import { solutions, mainLinks } from '@/data/navigation';
+
+interface Props {
+  /** Ziel des Wartelisten-Buttons; Seiten ohne eigenen Block verlinken auf die Startseite */
+  waitlistHref?: string;
+}
+const { waitlistHref = '#warteliste' } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<nav class="nav" aria-label="Hauptnavigation">
+  <div class="wrap">
+    <a href="/" aria-label="timebench Startseite"><Logo /></a>
+    <div class="nav-links">
+      <div class="nav-dd">
+        <button type="button" aria-haspopup="true">
+          Lösungen
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+        </button>
+        <div class="nav-dd-panel">
+          {solutions.map((s) => (
+            <a href={s.href} class:list={[{ soon: s.soon }]} aria-current={path === s.href ? 'page' : undefined}>
+              <strong>{s.title}{s.soon && <em>bald</em>}</strong>
+              <span>{s.text}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+      {mainLinks.map((l) => <a href={l.href}>{l.label}</a>)}
+    </div>
+    <a class="btn btn-sm nav-cta" href={waitlistHref}>Auf die Warteliste</a>
+    <button class="nav-burger" type="button" aria-label="Menü" aria-expanded="false" data-nav-toggle>
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="1.6"></path></svg>
+    </button>
+  </div>
+  <div class="nav-mobile" data-nav-menu>
+    {solutions.map((s) => <a href={s.href} class:list={[{ soon: s.soon }]}>{s.title}{s.soon && ' (bald)'}</a>)}
+    {mainLinks.map((l) => <a href={l.href}>{l.label}</a>)}
+  </div>
+</nav>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-nav-menu]');
+  btn?.addEventListener('click', () => {
+    const open = menu?.classList.toggle('open') ?? false;
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.classList.remove('open')));
+</script>
