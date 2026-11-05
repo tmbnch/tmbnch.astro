@@ -40,7 +40,8 @@ export const footerColumns = [
     links: [
       { href: '/#tour', label: 'Produkt-Tour' },
       { href: '/#datenschutz-feature', label: 'Privatsphäre' },
-      { href: '/#warteliste', label: 'Warteliste' },
+      { href: '/#warteliste', label: 'Beta' },
+      { href: '/kontakt/', label: 'Kontakt' },
     ],
   },
   {

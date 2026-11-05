@@ -1,0 +1,199 @@
+---
+/**
+ * Beta-Fragebogen: zwei Klickfragen, dann Wunsch-Freitext und Kontaktdaten.
+ * Schickt an /api/beta (netlify/functions/beta.ts), von dort ins Sales-Backend.
+ * Fragen und IDs stehen in src/data/beta.ts.
+ */
+import { betaQuestions, betaWishQuestion, BETA_FUNNEL } from '@/data/beta';
+
+interface Props {
+  /** Stelle auf der Seite, geht als `quelle` in die Herkunft */
+  source: string;
+}
+const { source } = Astro.props;
+const total = betaQuestions.length + 1;
+---
+
+<form class="quiz" action="/api/beta" method="POST" data-beta-quiz data-source={source} novalidate>
+  <input type="hidden" name="funnel" value={BETA_FUNNEL} />
+  <input type="hidden" name="answers" value="[]" />
+  <input type="hidden" name="utm" value="{}" />
+  <input type="hidden" name="page" value="" />
+  <p hidden><label>Nicht ausfüllen: <input name="honeypot" tabindex="-1" autocomplete="off" /></label></p>
+
+  <div class="quiz-progress" aria-hidden="true"><b></b></div>
+
+  {
+    betaQuestions.map((q, i) => (
+      <fieldset class="quiz-step" data-step={i} data-qid={q.id} data-question={q.question} hidden={i > 0}>
+        <legend>
+          <span class="quiz-count">
+            Frage {i + 1} von {total}
+          </span>
+          {q.question}
+        </legend>
+        <div class="quiz-options">
+          {q.options.map((o) => (
+            <button type="button" class="quiz-opt" data-oid={o.id} data-label={o.label} data-freetext={o.freetext ? '' : undefined}>
+              {o.label}
+            </button>
+          ))}
+        </div>
+        {q.options.some((o) => o.freetext) && (
+          <div class="quiz-free" hidden>
+            <input type="text" maxlength="200" placeholder="Welches Tool?" aria-label="Welches Tool nutzt ihr?" />
+            <button type="button" class="btn quiz-next">Weiter</button>
+          </div>
+        )}
+        {i > 0 && (
+          <button type="button" class="quiz-back">
+            ← Zurück
+          </button>
+        )}
+      </fieldset>
+    ))
+  }
+
+  <fieldset class="quiz-step" data-step={betaQuestions.length} data-final hidden>
+    <legend>
+      <span class="quiz-count">Frage {total} von {total}</span>
+      {betaWishQuestion.question}
+    </legend>
+    <textarea
+      name="wish"
+      rows="3"
+      maxlength="2000"
+      placeholder="Zum Beispiel: Freitags fehlen immer Stunden, und keiner weiß mehr, wofür."
+      aria-label={betaWishQuestion.question}></textarea>
+    <p class="quiz-sub">Und wie erreichen wir dich?</p>
+    <div class="quiz-fields">
+      <input type="text" name="name" required minlength="2" maxlength="100" placeholder="Name" aria-label="Name" autocomplete="name" />
+      <input type="email" name="email" required maxlength="200" placeholder="E-Mail" aria-label="E-Mail" autocomplete="email" />
+      <input type="text" name="company" maxlength="200" placeholder="Firma (optional)" aria-label="Firma" autocomplete="organization" />
+      <input type="tel" name="phone" maxlength="50" placeholder="Telefon (optional)" aria-label="Telefon" autocomplete="tel" />
+    </div>
+    <p class="quiz-error" role="alert" hidden></p>
+    <div class="quiz-actions">
+      <button type="button" class="quiz-back">← Zurück</button>
+      <button type="submit" class="btn">Beta-Platz anfragen</button>
+    </div>
+    <p class="quiz-note">
+      Wir melden uns per Mail, sobald dein Zugang bereit ist. Mehr dazu in der <a href="/datenschutz/">Datenschutzerklärung</a>.
+    </p>
+  </fieldset>
+
+  <div class="quiz-done" role="status" hidden>
+    <b>Danke, du bist dabei.</b>
+    <span>Wir melden uns, sobald ein Platz für dein Team frei ist. Deine Antworten lesen wir alle.</span>
+  </div>
+</form>
+
+<script>
+  import { collectAttribution } from '@/lib/attribution';
+  import { betaWishQuestion } from '@/data/beta';
+
+  interface Answer {
+    questionId: string;
+    question: string;
+    optionId: string;
+    answer: string;
+    detail?: string;
+  }
+
+  document.querySelectorAll<HTMLFormElement>('form[data-beta-quiz]').forEach((form) => {
+    const steps = [...form.querySelectorAll<HTMLFieldSetElement>('.quiz-step')];
+    const bar = form.querySelector<HTMLElement>('.quiz-progress b')!;
+    const error = form.querySelector<HTMLElement>('.quiz-error')!;
+    const answers = new Map<string, Answer>();
+
+    const show = (i: number, focus = true) => {
+      steps.forEach((s, j) => (s.hidden = j !== i));
+      bar.style.width = `${((i + 1) / steps.length) * 100}%`;
+      if (!focus) return;
+      const target = steps[i].querySelector<HTMLElement>('.quiz-opt.on, .quiz-opt, textarea');
+      target?.focus({ preventScroll: true });
+    };
+
+    steps.forEach((step, i) => {
+      const qid = step.dataset.qid;
+      const free = step.querySelector<HTMLElement>('.quiz-free');
+      const freeInput = free?.querySelector('input');
+
+      step.querySelectorAll<HTMLButtonElement>('.quiz-opt').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          step.querySelectorAll('.quiz-opt').forEach((b) => b.classList.toggle('on', b === btn));
+          const answer: Answer = { questionId: qid!, question: step.dataset.question!, optionId: btn.dataset.oid!, answer: btn.dataset.label! };
+          answers.set(qid!, answer);
+          if (btn.hasAttribute('data-freetext') && free) {
+            free.hidden = false;
+            freeInput?.focus();
+            return;
+          }
+          if (free) free.hidden = true;
+          show(i + 1);
+        }),
+      );
+
+      const next = () => {
+        const a = answers.get(qid!);
+        if (a) a.detail = freeInput?.value.trim() || undefined;
+        show(i + 1);
+      };
+      step.querySelector('.quiz-next')?.addEventListener('click', next);
+      freeInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          next();
+        }
+      });
+      step.querySelector('.quiz-back')?.addEventListener('click', () => show(i - 1));
+    });
+
+    // Aus dem Hero-Feld vorbefüllt (BetaStart.astro)
+    window.addEventListener('beta:start', (e) => {
+      const email = (e as CustomEvent<string>).detail;
+      const field = form.querySelector<HTMLInputElement>('input[name="email"]');
+      if (field && email) field.value = email;
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      const data = new FormData(form);
+      const list = [...answers.values()];
+      const wish = String(data.get('wish') || '').trim();
+      if (wish) list.push({ questionId: betaWishQuestion.id, question: betaWishQuestion.question, optionId: 'freitext', answer: wish });
+      const utm = { ...collectAttribution(), quelle: form.dataset.source || '' };
+      data.set('answers', JSON.stringify(list));
+      data.set('utm', JSON.stringify(utm));
+      data.set('page', location.href);
+      data.delete('wish');
+
+      submit.disabled = true;
+      error.hidden = true;
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: data });
+        const body = (await res.json().catch(() => ({}))) as { success?: boolean; errors?: Record<string, string[]> };
+        if (!res.ok || !body.success) {
+          error.textContent = body.errors ? Object.values(body.errors).flat().join(' ') : 'Das hat nicht geklappt. Bitte versuch es noch einmal.';
+          error.hidden = false;
+          submit.disabled = false;
+          return;
+        }
+        steps.forEach((s) => (s.hidden = true));
+        form.querySelector<HTMLElement>('.quiz-progress')!.hidden = true;
+        form.querySelector<HTMLElement>('.quiz-done')!.hidden = false;
+        window.plausible?.('Beta', {
+          props: { quelle: form.dataset.source || '', team: answers.get('team')?.optionId ?? '', tool: answers.get('tool')?.optionId ?? '' },
+        });
+      } catch {
+        error.textContent = 'Keine Verbindung. Bitte versuch es noch einmal.';
+        error.hidden = false;
+        submit.disabled = false;
+      }
+    });
+
+    show(0, false);
+  });
+</script>

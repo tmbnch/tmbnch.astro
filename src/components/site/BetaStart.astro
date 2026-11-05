@@ -1,0 +1,32 @@
+---
+/**
+ * Einstieg im Hero: E-Mail eintragen und weiter zum Beta-Fragebogen (#warteliste),
+ * wo die Adresse schon im Feld steht. Gespeichert wird erst dort.
+ */
+interface Props {
+  note?: string;
+  style?: string;
+}
+const { note, style } = Astro.props;
+---
+
+<div style={style}>
+  <form class="waitlist" data-beta-start action="#warteliste">
+    <input type="email" name="email" required placeholder="du@firma.de" aria-label="E-Mail-Adresse" autocomplete="email" />
+    <button class="btn" type="submit">Bei der Beta dabei sein</button>
+  </form>
+  {note && <p class="waitlist-note" set:html={note} />}
+</div>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('form[data-beta-start]').forEach((form) =>
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = form.querySelector('input')!.value.trim();
+      window.dispatchEvent(new CustomEvent('beta:start', { detail: email }));
+      const target = document.getElementById('warteliste');
+      target?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      target?.querySelector<HTMLElement>('.quiz-step:not([hidden]) .quiz-opt')?.focus({ preventScroll: true });
+    }),
+  );
+</script>

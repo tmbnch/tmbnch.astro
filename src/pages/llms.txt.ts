@@ -26,7 +26,7 @@ export const GET: APIRoute = ({ site }) => {
 
 timebench ist eine Zeiterfassung für Teams, die nach Projekten arbeiten. Es gibt eine Web-App und eine Desktop-App für macOS, Windows und Linux. Die Desktop-App zeichnet lokal auf, welches Fenster, welche Website und welches Git-Repo aktiv war, und schlägt daraus Buchungen vor. Diese Aktivitätsdaten bleiben sieben Tage auf dem Rechner und werden nicht hochgeladen. timebench lässt sich auch selbst hosten (Docker Compose, PostgreSQL).
 
-Status: Warteliste. Betreiber: ${siteConfig.legalName}, ${siteConfig.address?.city}.
+Status: geschlossene Beta, Anmeldung über den Fragebogen auf der Startseite. Betreiber: ${siteConfig.legalName}, ${siteConfig.address?.city}.
 
 ## Lösungen
 
@@ -34,6 +34,7 @@ ${PAGES.map((p) => `- [${p.title}](${base}/${p.path}): ${p.text}`).join('\n')}
 
 ## Rechtliches
 
+- [Kontakt](${base}/kontakt/)
 - [Impressum](${base}/impressum/)
 - [Datenschutz](${base}/datenschutz/)
 `;

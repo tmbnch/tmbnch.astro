@@ -23,6 +23,7 @@ pnpm lint
 | `/` | Startseite: Hero, drei Säulen, Produkt-Tour, Desktop-Tracker, Privatsphäre, ArbZG, Funktionen, Warteliste |
 | `/projektzeiterfassung/` | Lösungsseite Projektzeit |
 | `/arbeitszeiterfassung/` | Lösungsseite Arbeitszeit, Urlaub und Abwesenheiten |
+| `/kontakt/` | Kontaktformular |
 | `/impressum/`, `/datenschutz/` | Rechtstexte, Betreiber ist die rocketbase.io software productions GmbH |
 
 Dazu kommen OG-Bilder unter `/og/*.png`, generiert mit Satori in `src/lib/og.ts`, außerdem `robots.txt`, `llms.txt`, Manifest und Icons.
@@ -41,9 +42,17 @@ Die Produktansichten auf den Seiten sind kein Screenshot. Sie werden im Browser 
 
 Optik und Farben folgen der echten App im Monorepo (`packages/calendar`, `apps/desktop/src/renderer`, `apps/frontend/src/absence`). Ändert sich dort etwas Sichtbares, sollte der Dummy nachziehen.
 
-## Warteliste
+## Beta-Fragebogen und Kontakt
 
-Das Formular (`src/components/site/Waitlist.astro`) läuft über Netlify Forms. Netlify erkennt es beim Deploy am Attribut `data-netlify`. Die Einträge stehen im Netlify-Dashboard unter „Forms“, Formularname `warteliste`, mit dem Feld `quelle` für die Stelle auf der Seite.
+Der Block `#warteliste` (`BetaSection.astro`) enthält den Beta-Fragebogen: Teamgröße, bisheriges Werkzeug mit Freitext für „Etwas anderes“, dann Wunsch-Freitext und Kontaktdaten. Fragen und IDs stehen in `src/data/beta.ts`. Das Feld im Hero (`BetaStart.astro`) trägt die Mail-Adresse nur vor und springt zum Fragebogen.
+
+Beide Formulare laufen wie auf rocketbase.io:
+
+- `/api/beta` (`netlify/functions/beta.ts`) und `/api/contact` (`contact.ts`) legen jeden Eintrag zuerst in Netlify Blobs ab (Store `funnel-leads`) und stellen ihn dann an `SALES_API_URL/api/public/funnel-events` zu. Im CRM heißen die Strecken `timebench-beta` und `timebench-kontakt`.
+- `lead-redeliver.ts` liefert alle zehn Minuten nach, was nicht angekommen ist.
+- Wer ohne JavaScript absendet, bekommt einen Bestätigungsschritt (`netlify/lib/human-check.ts`).
+
+Lokal testen mit `pnpm dev:netlify`. Für Testeinträge `SALES_API_URL` auf einen lokalen Dienst stellen, sonst landen sie im echten CRM.
 
 ## Umgebungsvariablen und Functions
 

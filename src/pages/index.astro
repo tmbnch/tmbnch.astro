@@ -3,8 +3,8 @@ import SiteLayout from '@/layouts/SiteLayout.astro';
 import AppFrame from '@/components/demo/AppFrame.astro';
 import Demo from '@/components/demo/Demo.astro';
 import DemoTour, { type TourTab } from '@/components/demo/DemoTour.astro';
-import Waitlist from '@/components/site/Waitlist.astro';
-import WaitlistSection from '@/components/site/WaitlistSection.astro';
+import BetaStart from '@/components/site/BetaStart.astro';
+import BetaSection from '@/components/site/BetaSection.astro';
 import MiniProject from '@/components/visuals/MiniProject.astro';
 import MiniWorktime from '@/components/visuals/MiniWorktime.astro';
 import MiniAbsence from '@/components/visuals/MiniAbsence.astro';
@@ -53,7 +53,7 @@ const features = [
           Repo, Dokument oder Meeting du gerade steckst. Am Abend liegen die offenen Stunden als Vorschläge bereit, und
           ein Klick auf „Buchen“ reicht.
         </p>
-        <Waitlist source="hero" style="margin-top:28px" note="Eine Mail, wenn dein Zugang bereit ist. Kein Newsletter." />
+        <BetaStart style="margin-top:28px" note="Drei kurze Fragen, dann bist du auf der Liste. Kein Newsletter." />
         <div class="facts"><span>Web, macOS, Windows, Linux</span><span>Prüft Pausen nach ArbZG</span><span>Auch selbst hostbar</span></div>
       </div>
       <div class="hero-stage">
@@ -210,9 +210,8 @@ const features = [
     </div>
   </section>
 
-  <WaitlistSection
-    title="Wir öffnen timebench Team für Team."
-    lead="Trag dich ein, und du bekommst einen Zugang, sobald ein Platz frei ist. Wer früh dabei ist, redet bei den nächsten Themen mit. Als Nächstes stehen Integrationen und Vorlagen für einzelne Branchen an."
+  <BetaSection
+    lead="Wir öffnen timebench Team für Team. Wer früh dabei ist, redet bei den nächsten Themen mit: Integrationen und Vorlagen für einzelne Branchen."
     source="startseite"
   />
 </SiteLayout>

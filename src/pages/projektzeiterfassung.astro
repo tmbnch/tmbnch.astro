@@ -1,7 +1,7 @@
 ---
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import Demo from '@/components/demo/Demo.astro';
-import WaitlistSection from '@/components/site/WaitlistSection.astro';
+import BetaSection from '@/components/site/BetaSection.astro';
 import Faq from '@/components/site/Faq.astro';
 import Crumbs from '@/components/site/Crumbs.astro';
 import { createBreadcrumbSchema, createFAQSchema, createSoftwareSchema } from '@/lib/schema';
@@ -78,7 +78,7 @@ const schemas = [
           rechnet timebench jede Minute mit dem Stundensatz ab, der für genau diesen Kunden gilt.
         </p>
         <div class="shero-cta">
-          <a class="btn" href="#warteliste">Auf die Warteliste</a>
+          <a class="btn" href="#warteliste">Bei der Beta dabei sein</a>
           <a class="btn btn-ghost" href="#report">Report ausprobieren</a>
         </div>
       </div>
@@ -224,9 +224,8 @@ const schemas = [
 
   <Faq title="Was Teams vor dem Wechsel wissen wollen" items={faqs} />
 
-  <WaitlistSection
-    title="Bereit für den ersten Monat ohne Nachtragen?"
-    lead="Trag dich ein. Wir melden uns, sobald ein Platz für dein Team frei ist."
+  <BetaSection
+    lead="Drei kurze Antworten, und wir melden uns, sobald ein Platz für dein Team frei ist."
     source="projektzeiterfassung"
   />
 </SiteLayout>

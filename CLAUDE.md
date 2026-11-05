@@ -37,3 +37,5 @@ Die Seite setzt keine Cookies. Einzige Analyse ist Plausible, aktiv nur mit `PUB
 
 - Jede neue Variable kommt mit Kommentar in `.env.example`. Secrets nie mit `PUBLIC_`.
 - Functions in `netlify/functions/` (v2, `export const config`), gemeinsamer Code in `netlify/lib/`.
+- Formulare gehen über `beta.ts`/`contact.ts` ins Sales-Backend; `netlify/lib/sales-delivery.ts` ist der Vertrag mit dem CRM und stammt aus rcktbs.astro. Dort geänderte Felder hier nachziehen.
+- Keine Testeinträge gegen das echte `SALES_API_URL` schicken.

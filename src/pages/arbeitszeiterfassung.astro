@@ -1,7 +1,7 @@
 ---
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import Demo from '@/components/demo/Demo.astro';
-import WaitlistSection from '@/components/site/WaitlistSection.astro';
+import BetaSection from '@/components/site/BetaSection.astro';
 import Faq from '@/components/site/Faq.astro';
 import Crumbs from '@/components/site/Crumbs.astro';
 import { createBreadcrumbSchema, createFAQSchema, createSoftwareSchema } from '@/lib/schema';
@@ -26,7 +26,7 @@ const faqs = [
   },
   {
     question: 'Können wir unsere Abwesenheiten aus dem alten System übernehmen?',
-    answer: 'Resturlaub und Überstundenstand tragt ihr als Startwert ein. Für einen vollständigen Import sprecht uns an, das richten wir in der Warteliste-Phase gemeinsam ein.',
+    answer: 'Resturlaub und Überstundenstand tragt ihr als Startwert ein. Für einen vollständigen Import sprecht uns an, das richten wir in der Beta gemeinsam ein.',
   },
 ];
 
@@ -77,7 +77,7 @@ const schemas = [
           Stempelkarte zeigt, was das ArbZG daraus macht.
         </p>
         <div class="shero-cta">
-          <a class="btn" href="#warteliste">Auf die Warteliste</a>
+          <a class="btn" href="#warteliste">Bei der Beta dabei sein</a>
           <a class="btn btn-ghost" href="#abwesenheiten">Urlaubskalender ausprobieren</a>
         </div>
       </div>
@@ -245,9 +245,8 @@ const schemas = [
 
   <Faq title="Zur Arbeitszeiterfassung" items={faqs} />
 
-  <WaitlistSection
-    title="Nächsten Monat zum ersten Mal in Ruhe abschließen."
-    lead="Trag dich ein. Wir melden uns, sobald ein Platz für dein Team frei ist."
+  <BetaSection
+    lead="Drei kurze Antworten, und wir melden uns, sobald ein Platz für dein Team frei ist."
     source="arbeitszeiterfassung"
   />
 </SiteLayout>

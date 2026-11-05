@@ -2,7 +2,8 @@
 /**
  * Datenschutzerklärung für timebench.io. Grundlage ist die Fassung von rocketbase.io,
  * gekürzt auf das, was diese Seite tatsächlich einsetzt: Hosting bei Netlify,
- * Wartelisten-Formular über Netlify Forms, selbst gehostete Schriften und, sobald
+ * Beta-Fragebogen und Kontaktformular (Netlify Functions, Blobs, eigenes CRM), selbst
+ * gehostete Schriften und, sobald
  * PUBLIC_PLAUSIBLE_SCRIPT_ID gesetzt ist, Plausible. Kommt ein weiterer Dienst dazu,
  * muss er hier ergänzt werden.
  */
@@ -68,16 +69,28 @@ const plausible = Boolean(import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_ID);
         Framework sowie Standardvertragsklauseln.
       </p>
 
-      <h2>4. Warteliste</h2>
+      <h2>4. Beta-Fragebogen und Kontaktformular</h2>
       <p>
-        Wenn Sie sich in die Warteliste eintragen, speichern wir Ihre E-Mail-Adresse und die Stelle auf der Website, an der
-        Sie sich eingetragen haben. Wir nutzen die Adresse ausschließlich, um Sie zu informieren, sobald ein Zugang zu
-        timebench für Sie bereitsteht, und für Rückfragen dazu. Einen Newsletter versenden wir darüber nicht.
+        Wenn Sie den Beta-Fragebogen ausfüllen, speichern wir Ihre Antworten (Teamgröße, bisher genutztes Werkzeug, Ihr
+        Freitext), Ihren Namen, Ihre E-Mail-Adresse und, falls angegeben, Firma und Telefonnummer. Über das
+        Kontaktformular erhalten wir Name, E-Mail-Adresse, Betreff und Nachricht. Mit beiden Formularen speichern wir
+        außerdem, von welcher Seite und über welchen Link (etwa Kampagnenparameter wie utm_source) Sie gekommen sind,
+        die ungefähre Herkunft (Stadt und Land, aus der IP-Adresse abgeleitet, die IP-Adresse selbst speichern wir nicht)
+        sowie die Kennung Ihres Browsers.
       </p>
       <p>
-        Das Formular wird über Netlify Forms verarbeitet und bei Netlify gespeichert. Rechtsgrundlage ist Ihre Einwilligung
-        nach Art. 6 Abs. 1 lit. a DSGVO, die Sie mit dem Absenden erteilen. Sie können sie jederzeit per E-Mail widerrufen;
-        wir löschen Ihren Eintrag dann. Ansonsten löschen wir die Daten, sobald die Warteliste abgeschlossen ist.
+        Die Angaben werden von einer Netlify Function entgegengenommen, als Sicherung in Netlify Blobs abgelegt und an
+        unser eigenes Kundenverwaltungssystem übertragen, das wir auf Servern in Deutschland betreiben. Erreicht ein
+        Eintrag dieses System nicht, kann er zusätzlich per E-Mail über den Dienst Plunk an uns gehen. Wir nutzen die
+        Daten, um Ihnen einen Zugang zur Beta anzubieten, Ihre Anfrage zu beantworten und um auszuwerten, welche
+        Anforderungen Teams an timebench haben. Einen Newsletter versenden wir darüber nicht.
+      </p>
+      <p>
+        Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, soweit Ihre Anfrage auf eine Nutzung von timebench zielt, sonst
+        unser berechtigtes Interesse an der Bearbeitung von Anfragen nach Art. 6 Abs. 1 lit. f DSGVO. Sie können der
+        Verarbeitung jederzeit per E-Mail widersprechen; wir löschen Ihre Angaben dann. Ansonsten löschen wir sie, sobald
+        der Zweck erledigt ist, spätestens zwei Jahre nach dem letzten Kontakt, soweit keine gesetzlichen
+        Aufbewahrungspflichten bestehen.
       </p>
 
       <h2>5. Cookies, Schriften und Analyse</h2>

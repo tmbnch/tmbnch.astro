@@ -1,0 +1,98 @@
+---
+/**
+ * Kontakt. Das Formular schickt an /api/contact (netlify/functions/contact.ts), wie auf
+ * rocketbase.io: Ablage in Netlify Blobs, Zustellung ans Sales-Backend, ohne JavaScript
+ * ein Bestätigungsschritt (netlify/lib/human-check.ts).
+ */
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import siteConfig from '@/config/site.config';
+
+const phoneHref = `tel:${siteConfig.phone?.replace(/\s/g, '')}`;
+---
+
+<SiteLayout
+  title="Kontakt"
+  description="Fragen zu timebench, zur Beta oder zum Selbsthosten? Schreib uns, wir antworten in der Regel am nächsten Werktag."
+>
+  <section class="ruled" style="border-top:0;padding-top:56px">
+    <div class="wrap contact-grid">
+      <div>
+        <span class="eyebrow">Kontakt</span>
+        <h1 class="contact-title">Schreib uns.</h1>
+        <p class="lead">
+          Ob Frage zur Beta, zum Umzug aus einem anderen Tool oder zum Betrieb auf eigenen Servern: Hinter timebench steht
+          das Team der rocketbase.io software productions GmbH in Winsen (Luhe). Wir antworten in der Regel am nächsten
+          Werktag.
+        </p>
+        <dl class="contact-direct">
+          <div><dt>E-Mail</dt><dd><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></dd></div>
+          <div><dt>Telefon</dt><dd><a href={phoneHref}>{siteConfig.phone}</a></dd></div>
+        </dl>
+        <p class="muted" style="margin-top:28px">
+          Du willst timebench ausprobieren? Dafür gibt es den <a href="/#warteliste">Beta-Fragebogen</a>.
+        </p>
+      </div>
+
+      <form class="contact-form" id="contact-form" action="/api/contact" method="POST">
+        <label>Name<input type="text" name="name" required minlength="2" maxlength="100" autocomplete="name" /></label>
+        <label>E-Mail<input type="email" name="email" required maxlength="200" autocomplete="email" /></label>
+        <label>Betreff <span class="muted">(optional)</span><input type="text" name="subject" maxlength="200" /></label>
+        <label>Nachricht<textarea name="message" required minlength="10" maxlength="5000" rows="6"></textarea></label>
+
+        <div hidden aria-hidden="true">
+          <input type="text" name="honeypot" tabindex="-1" autocomplete="off" />
+          <input type="hidden" name="funnel" value="timebench-kontakt" />
+          <input type="hidden" name="utm" value="" />
+          <input type="hidden" name="page" value="" />
+          <input type="hidden" name="renderedAt" value="" />
+        </div>
+
+        <p class="quiz-error" role="alert" hidden></p>
+        <button class="btn" type="submit">Nachricht senden</button>
+        <p class="waitlist-note">Mit dem Absenden gilt die <a href="/datenschutz/">Datenschutzerklärung</a>.</p>
+        <div class="contact-ok" role="status" hidden>
+          <b>Danke, deine Nachricht ist da.</b>
+          <span>Wir melden uns in der Regel am nächsten Werktag.</span>
+        </div>
+      </form>
+    </div>
+  </section>
+</SiteLayout>
+
+<script>
+  import { collectAttribution } from '@/lib/attribution';
+
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  if (form) {
+    const set = (name: string, value: string) => {
+      const field = form.elements.namedItem(name);
+      if (field instanceof HTMLInputElement) field.value = value;
+    };
+    set('utm', JSON.stringify(collectAttribution()));
+    set('page', location.href);
+    // Beim Laden stempeln, nicht beim Absenden: Die Function wertet die Zeit bis zum Absenden
+    // als Spam-Hinweis, und ohne Stempel hält sie die Anfrage für eine ohne JavaScript.
+    set('renderedAt', String(Date.now()));
+
+    const error = form.querySelector<HTMLElement>('.quiz-error')!;
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submit.disabled = true;
+      error.hidden = true;
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+        const body = (await res.json().catch(() => ({}))) as { success?: boolean; errors?: Record<string, string[]> };
+        if (!res.ok || !body.success) throw new Error(body.errors ? Object.values(body.errors).flat().join(' ') : '');
+        form.querySelectorAll('label, button, .waitlist-note').forEach((el) => ((el as HTMLElement).hidden = true));
+        form.querySelector<HTMLElement>('.contact-ok')!.hidden = false;
+        window.plausible?.('Kontakt');
+      } catch (err) {
+        error.textContent = (err instanceof Error && err.message) || 'Das hat nicht geklappt. Bitte versuch es noch einmal.';
+        error.hidden = false;
+        submit.disabled = false;
+      }
+    });
+  }
+</script>

@@ -20,6 +20,7 @@ const PAGES = [
     title: 'Die Arbeitszeit fällt beim Buchen mit ab.',
     description: 'ArbZG-Prüfung, Überstundenkonto, Urlaub und Freigaben aus denselben Einträgen wie die Projektzeit.',
   },
+  { slug: 'kontakt', eyebrow: 'Kontakt', title: 'Schreib uns.', description: 'Fragen zu timebench, zur Beta oder zum Selbsthosten.' },
   { slug: 'impressum', title: 'Impressum' },
   { slug: 'datenschutz', title: 'Datenschutz' },
   { slug: '404', title: 'Seite nicht gefunden' },

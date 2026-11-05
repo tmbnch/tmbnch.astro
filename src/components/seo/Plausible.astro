@@ -6,8 +6,8 @@
  * Tracker, Form `pa-…`). Ohne die Variable bleibt die Seite ohne Analyse, und die
  * Datenschutzerklärung zeigt den Plausible-Absatz nicht an.
  *
- * Eigene Ereignisse: `window.plausible?.('Warteliste', { props: { quelle } })`.
- * Das Ziel muss im Plausible-Dashboard unter „Goals“ angelegt sein.
+ * Eigene Ereignisse: `window.plausible?.('Beta', { props: { quelle, team, tool } })` im Beta-Fragebogen.
+ * Das Ziel „Beta“ muss im Plausible-Dashboard unter „Goals“ angelegt sein.
  */
 const scriptId = import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_ID;
 ---

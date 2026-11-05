@@ -625,3 +625,58 @@ section { padding: 88px 0; }
 /* Hinweise je nach Eingabegerät */
 .hint-touch { display: none; }
 @media (pointer: coarse) { .hint-touch { display: inline; } .hint-mouse { display: none; } }
+
+/* ---------- Beta-Fragebogen ---------- */
+.beta-grid { position: relative; display: grid; gap: 32px; align-items: start; }
+@media (min-width: 960px) { .beta-grid { grid-template-columns: 1fr 1.15fr; gap: 64px; } }
+.quiz { border: 1px solid #3a382e; border-radius: 12px; background: #1d1c15; padding: 22px; min-width: 0; }
+.quiz fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.quiz legend { font-family: var(--font-display, inherit); font-size: 21px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.25; padding: 0; margin-bottom: 16px; color: var(--paper); }
+.quiz-count { display: block; font-family: var(--font-mono, monospace); font-size: 12px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: #9a968a; margin-bottom: 6px; }
+.quiz-progress { height: 3px; background: #2e2c23; border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
+.quiz-progress b { display: block; height: 100%; width: 33%; background: var(--sprout-500); transition: width .25s ease; }
+.quiz-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.quiz-opt {
+  min-height: 46px; padding: 10px 14px; text-align: left; font: inherit; font-size: 15px; font-weight: 550; cursor: pointer;
+  color: var(--paper); background: #23221a; border: 1px solid #3a382e; border-radius: var(--radius);
+}
+.quiz-opt:hover { border-color: #6b675a; }
+.quiz-opt.on { border-color: var(--sprout-500); background: #23331a; color: var(--sprout-200); }
+.quiz-opt:focus-visible, .quiz-back:focus-visible { outline: 2px solid var(--sprout-500); outline-offset: 2px; }
+.quiz-free { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.quiz-free input { flex: 1 1 200px; }
+.quiz input:not([type="hidden"]), .quiz textarea, .contact-form input, .contact-form textarea {
+  width: 100%; min-height: 44px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--card); padding: 10px 14px; font: inherit; font-size: 15px; color: var(--ink);
+}
+.quiz input:not([type="hidden"]), .quiz textarea { background: #23221a; border-color: #3a382e; color: var(--paper); }
+.quiz input:focus, .quiz textarea:focus, .contact-form input:focus, .contact-form textarea:focus { outline: 2px solid var(--sprout-500); outline-offset: 1px; border-color: transparent; }
+.quiz textarea, .contact-form textarea { resize: vertical; min-height: 88px; }
+.quiz-sub { margin: 18px 0 10px; font-weight: 600; color: var(--paper); }
+.quiz-fields { display: grid; gap: 8px; }
+@media (min-width: 560px) { .quiz-fields { grid-template-columns: 1fr 1fr; } }
+.quiz-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.quiz-back { background: none; border: 0; padding: 6px 0; margin-top: 14px; font: inherit; font-size: 14px; color: #9a968a; cursor: pointer; }
+.quiz-actions .quiz-back { margin-top: 0; }
+.quiz-back:hover { color: var(--paper); }
+.quiz-note { font-size: 13px; color: #9a968a; margin: 12px 0 0; }
+.quiz-note a, .quiz a { color: inherit; }
+.quiz-error { margin: 12px 0 0; padding: 10px 14px; border-radius: var(--radius); background: #3a1d17; color: #ffb4a6; font-size: 14px; }
+.quiz-done { display: grid; gap: 6px; padding: 18px; border-radius: var(--radius); background: #23331a; color: var(--sprout-200); }
+.quiz-done b { font-size: 19px; color: var(--sprout-300); }
+.quiz [hidden], .contact-form [hidden] { display: none !important; }
+
+/* ---------- Kontakt ---------- */
+.contact-grid { display: grid; gap: 40px; align-items: start; }
+@media (min-width: 960px) { .contact-grid { grid-template-columns: 1fr 1fr; gap: 64px; } }
+.contact-grid > * { min-width: 0; }
+.contact-title { font-size: clamp(40px, 6vw, 64px); margin: 12px 0 16px; }
+.contact-direct { margin: 28px 0 0; display: grid; gap: 10px; border-top: 1px solid var(--border); padding-top: 18px; }
+.contact-direct div { display: grid; grid-template-columns: 90px 1fr; gap: 12px; }
+.contact-direct dt { color: var(--fg-muted); }
+.contact-direct dd { margin: 0; font-weight: 600; }
+.contact-form { display: grid; gap: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+.contact-form label { display: grid; gap: 6px; font-weight: 600; font-size: 14px; }
+.contact-form .quiz-error { margin: 0; background: #fde8e4; color: #8a2a17; }
+.contact-form .btn { justify-self: start; }
+.contact-ok { display: grid; gap: 4px; padding: 14px 16px; border-radius: var(--radius); background: var(--sprout-100); color: var(--live-text); }
