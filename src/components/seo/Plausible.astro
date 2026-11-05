@@ -6,8 +6,8 @@
  * Tracker, Form `pa-…`). Ohne die Variable bleibt die Seite ohne Analyse, und die
  * Datenschutzerklärung zeigt den Plausible-Absatz nicht an.
  *
- * Eigene Ereignisse: `window.plausible?.('Beta', { props: { quelle, team, tool } })` im Beta-Fragebogen.
- * Das Ziel „Beta“ muss im Plausible-Dashboard unter „Goals“ angelegt sein.
+ * Eigene Ereignisse laufen über `track()` aus src/lib/track.ts; dort steht die Liste der Namen.
+ * Jedes Ereignis muss im Plausible-Dashboard unter „Goals“ als Custom Event angelegt sein.
  */
 const scriptId = import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_ID;
 ---

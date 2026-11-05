@@ -2,6 +2,7 @@
  * Mountet alle Dummies ([data-demo]) und die kleinen Interaktionen der Seiten.
  * Eingebunden über components/demo/Demo.astro; Astro bündelt das Script einmal pro Seite.
  */
+import { track } from '@/lib/track';
 import { mountWeek } from './week';
 import { mountMonth } from './month';
 import { mountTimesheet } from './timesheet';
@@ -41,6 +42,11 @@ function mountAll(scope: ParentNode) {
       opts.onDay = () => el.closest('[data-tour]')?.querySelector<HTMLButtonElement>('.tour-tabs [data-tab="week"]')?.click();
     }
     MOUNTS[el.dataset.demo!]?.(el, opts);
+    // Erste echte Bedienung je Ansicht zählen: zeigt, welche Dummies Leute ausprobieren.
+    const kind = el.dataset.demo!;
+    const once = () => track('Demo', { ansicht: kind, seite: location.pathname }, `demo:${kind}`);
+    el.addEventListener('pointerdown', once, { once: true });
+    el.addEventListener('keydown', once, { once: true });
   });
 }
 

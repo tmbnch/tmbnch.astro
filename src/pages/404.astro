@@ -16,3 +16,9 @@ import SiteLayout from '@/layouts/SiteLayout.astro';
     </div>
   </header>
 </SiteLayout>
+
+<script>
+  import { track } from '@/lib/track';
+  // Zeigt in Plausible, welche Adressen ins Leere führen und woher die Leute kamen.
+  track('404', { pfad: location.pathname, von: document.referrer || 'direkt' });
+</script>

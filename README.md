@@ -64,7 +64,20 @@ Serverless Functions liegen in `netlify/functions/`, eine Datei pro Function im 
 
 ## Analyse
 
-Plausible lädt, sobald `PUBLIC_PLAUSIBLE_SCRIPT_ID` gesetzt ist (`src/components/seo/Plausible.astro`). Es setzt keine Cookies und braucht kein Einwilligungsbanner. Ein Eintrag in die Warteliste zählt als Ereignis `Warteliste` mit der Eigenschaft `quelle`; das Ziel muss im Plausible-Dashboard unter Goals angelegt sein. Die Datenschutzerklärung zeigt den Plausible-Absatz nur, wenn die Variable gesetzt ist.
+Plausible lädt, sobald `PUBLIC_PLAUSIBLE_SCRIPT_ID` gesetzt ist (`src/components/seo/Plausible.astro`). Es setzt keine Cookies und braucht kein Einwilligungsbanner. Eigene Ereignisse laufen über `track()` in `src/lib/track.ts`:
+
+| Ereignis | Wann | Eigenschaften |
+|---|---|---|
+| `Beta: E-Mail` | Mail im Hero eingetragen | `quelle` |
+| `Beta: Teamgröße` | Frage 1 beantwortet | `quelle`, `team` |
+| `Beta: Tool` | Frage 2 beantwortet | `quelle`, `tool` |
+| `Beta: Abgeschickt` | Fragebogen angekommen | `quelle`, `team`, `tool` |
+| `Beta: Fehler` | Absenden gescheitert | `grund` |
+| `Kontakt: Abgeschickt` | Kontaktformular angekommen | |
+| `Demo` | erste Bedienung eines Dummys | `ansicht`, `seite` |
+| `404` | Seite nicht gefunden | `pfad`, `von` |
+
+Die vier `Beta`-Schritte ergeben den Trichter für die Abbruchquote. Jeder Name muss in Plausible unter Goals als Custom Event angelegt sein. Die Datenschutzerklärung zeigt den Plausible-Absatz nur, wenn die Variable gesetzt ist.
 
 ## Design
 

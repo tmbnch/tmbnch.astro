@@ -61,6 +61,7 @@ const phoneHref = `tel:${siteConfig.phone?.replace(/\s/g, '')}`;
 
 <script>
   import { collectAttribution } from '@/lib/attribution';
+  import { track } from '@/lib/track';
 
   const form = document.getElementById('contact-form') as HTMLFormElement | null;
   if (form) {
@@ -87,7 +88,7 @@ const phoneHref = `tel:${siteConfig.phone?.replace(/\s/g, '')}`;
         if (!res.ok || !body.success) throw new Error(body.errors ? Object.values(body.errors).flat().join(' ') : '');
         form.querySelectorAll('label, button, .waitlist-note').forEach((el) => ((el as HTMLElement).hidden = true));
         form.querySelector<HTMLElement>('.contact-ok')!.hidden = false;
-        window.plausible?.('Kontakt');
+        track('Kontakt: Abgeschickt');
       } catch (err) {
         error.textContent = (err instanceof Error && err.message) || 'Das hat nicht geklappt. Bitte versuch es noch einmal.';
         error.hidden = false;

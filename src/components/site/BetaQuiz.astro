@@ -91,6 +91,9 @@ const total = betaQuestions.length + 1;
 <script>
   import { collectAttribution } from '@/lib/attribution';
   import { betaWishQuestion } from '@/data/beta';
+  import { track, type TrackEvent } from '@/lib/track';
+
+  const STEP_EVENTS: Record<string, TrackEvent> = { team: 'Beta: Teamgröße', tool: 'Beta: Tool' };
 
   interface Answer {
     questionId: string;
@@ -117,6 +120,13 @@ const total = betaQuestions.length + 1;
     steps.forEach((step, i) => {
       const qid = step.dataset.qid;
       const free = step.querySelector<HTMLElement>('.quiz-free');
+      const done = () => {
+        const a = answers.get(qid!);
+        const ev = STEP_EVENTS[qid!];
+        // Einmal je Seitenaufruf und Frage, auch wenn jemand zurückgeht und neu wählt.
+        if (ev && a) track(ev, { quelle: form.dataset.source || '', [qid!]: a.optionId }, `${form.dataset.source}:${qid}`);
+        show(i + 1);
+      };
       const freeInput = free?.querySelector('input');
 
       step.querySelectorAll<HTMLButtonElement>('.quiz-opt').forEach((btn) =>
@@ -130,14 +140,14 @@ const total = betaQuestions.length + 1;
             return;
           }
           if (free) free.hidden = true;
-          show(i + 1);
+          done();
         }),
       );
 
       const next = () => {
         const a = answers.get(qid!);
         if (a) a.detail = freeInput?.value.trim() || undefined;
-        show(i + 1);
+        done();
       };
       step.querySelector('.quiz-next')?.addEventListener('click', next);
       freeInput?.addEventListener('keydown', (e) => {
@@ -179,18 +189,22 @@ const total = betaQuestions.length + 1;
           error.textContent = body.errors ? Object.values(body.errors).flat().join(' ') : 'Das hat nicht geklappt. Bitte versuch es noch einmal.';
           error.hidden = false;
           submit.disabled = false;
+          track('Beta: Fehler', { grund: res.ok ? 'validierung' : `http-${res.status}` });
           return;
         }
         steps.forEach((s) => (s.hidden = true));
         form.querySelector<HTMLElement>('.quiz-progress')!.hidden = true;
         form.querySelector<HTMLElement>('.quiz-done')!.hidden = false;
-        window.plausible?.('Beta', {
-          props: { quelle: form.dataset.source || '', team: answers.get('team')?.optionId ?? '', tool: answers.get('tool')?.optionId ?? '' },
+        track('Beta: Abgeschickt', {
+          quelle: form.dataset.source || '',
+          team: answers.get('team')?.optionId ?? '',
+          tool: answers.get('tool')?.optionId ?? '',
         });
       } catch {
         error.textContent = 'Keine Verbindung. Bitte versuch es noch einmal.';
         error.hidden = false;
         submit.disabled = false;
+        track('Beta: Fehler', { grund: 'netzwerk' });
       }
     });
 

@@ -19,11 +19,14 @@ const { note, style } = Astro.props;
 </div>
 
 <script>
+  import { track } from '@/lib/track';
+
   document.querySelectorAll<HTMLFormElement>('form[data-beta-start]').forEach((form) =>
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const email = form.querySelector('input')!.value.trim();
       window.dispatchEvent(new CustomEvent('beta:start', { detail: email }));
+      track('Beta: E-Mail', { quelle: 'hero' }, 'hero');
       const target = document.getElementById('warteliste');
       target?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
       target?.querySelector<HTMLElement>('.quiz-step:not([hidden]) .quiz-opt')?.focus({ preventScroll: true });
