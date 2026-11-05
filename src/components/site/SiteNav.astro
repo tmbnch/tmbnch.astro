@@ -14,18 +14,22 @@ const path = Astro.url.pathname;
   <div class="wrap">
     <a href="/" aria-label="timebench Startseite"><Logo /></a>
     <div class="nav-links">
-      <div class="nav-dd">
-        <button type="button" aria-haspopup="true">
+      <div class="nav-dd" data-nav-dd>
+        <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls="nav-dd-loesungen">
           Lösungen
-          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
+          <svg class="nav-dd-chev" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg>
         </button>
-        <div class="nav-dd-panel">
-          {solutions.map((s) => (
-            <a href={s.href} class:list={[{ soon: s.soon }]} aria-current={path === s.href ? 'page' : undefined}>
-              <strong>{s.title}{s.soon && <em>bald</em>}</strong>
-              <span>{s.text}</span>
-            </a>
-          ))}
+        <!-- Das Panel beginnt direkt unter dem Knopf; der sichtbare Abstand ist Innenabstand und
+             gehört damit zum Hover-Bereich. Vorher lag dort eine Lücke, und das Panel war weg. -->
+        <div class="nav-dd-panel" id="nav-dd-loesungen">
+          <div class="nav-dd-card">
+            {solutions.map((s) => (
+              <a href={s.href} class:list={[{ soon: s.soon }]} aria-current={path === s.href ? 'page' : undefined} tabindex={s.soon ? -1 : undefined}>
+                <strong>{s.title}{s.soon && <em>bald</em>}</strong>
+                <span>{s.text}</span>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
       {mainLinks.map((l) => <a href={l.href}>{l.label}</a>)}
@@ -49,4 +53,37 @@ const path = Astro.url.pathname;
     btn.setAttribute('aria-expanded', String(open));
   });
   menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.classList.remove('open')));
+
+  // Dropdown wie auf rocketbase.io: öffnet beim Überfahren, schließt erst nach kurzer
+  // Verzögerung, Klick schaltet um (Touch, Tastatur), Klick daneben und Escape schließen.
+  document.querySelectorAll<HTMLElement>('[data-nav-dd]').forEach((dd) => {
+    const trigger = dd.querySelector<HTMLButtonElement>('button')!;
+    let closeTimer = 0;
+    const set = (open: boolean) => {
+      window.clearTimeout(closeTimer);
+      dd.classList.toggle('open', open);
+      trigger.setAttribute('aria-expanded', String(open));
+    };
+    const scheduleClose = () => {
+      window.clearTimeout(closeTimer);
+      closeTimer = window.setTimeout(() => set(false), 300);
+    };
+    // Nur echte Maus: Auf Touch-Geräten feuert pointerenter vor dem Klick und würde das
+    // Umschalten gleich wieder aufheben.
+    dd.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && set(true));
+    dd.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && scheduleClose());
+    trigger.addEventListener('click', () => set(!dd.classList.contains('open')));
+    dd.addEventListener('focusout', (e) => {
+      if (!dd.contains(e.relatedTarget as Node | null)) scheduleClose();
+    });
+    document.addEventListener('click', (e) => {
+      if (!dd.contains(e.target as Node)) set(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && dd.classList.contains('open')) {
+        set(false);
+        trigger.focus();
+      }
+    });
+  });
 </script>

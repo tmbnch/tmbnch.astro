@@ -46,19 +46,31 @@ a { color: inherit; }
 }
 .nav-links > a:hover, .nav-dd > button:hover { background: var(--muted); }
 .nav-dd { position: relative; }
+.nav-dd-chev { transition: transform .2s ease; }
+.nav-dd.open .nav-dd-chev { transform: rotate(180deg); }
+.nav-dd.open > button { background: var(--muted); }
+/* Unsichtbare Brücke: padding-top statt Abstand nach oben, damit die Maus den Bereich nie verlässt */
 .nav-dd-panel {
-  position: absolute; top: calc(100% + 6px); left: 0; width: 460px;
-  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-  box-shadow: 0 18px 40px -16px rgb(23 22 15 / .25);
-  padding: 8px; display: none; grid-template-columns: 1fr 1fr; gap: 4px;
+  position: absolute; top: 100%; left: -8px; z-index: 60; padding-top: 10px;
+  opacity: 0; visibility: hidden; transform: translateY(-6px);
+  transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
 }
-.nav-dd:hover .nav-dd-panel, .nav-dd:focus-within .nav-dd-panel { display: grid; }
-.nav-dd-panel a { text-decoration: none; padding: 12px; border-radius: var(--radius); display: block; }
-.nav-dd-panel a:hover { background: var(--muted-2); }
-.nav-dd-panel strong { display: block; font-size: 15px; }
-.nav-dd-panel span { font-size: 13px; color: var(--fg-muted); line-height: 1.4; display: block; margin-top: 2px; }
-.nav-dd-panel .soon { opacity: .55; pointer-events: none; }
-.nav-dd-panel .soon em { font-style: normal; font-size: 11px; background: var(--muted); padding: 1px 6px; border-radius: 99px; margin-left: 6px; }
+.nav-dd.open .nav-dd-panel {
+  opacity: 1; visibility: visible; transform: none;
+  transition: opacity .18s ease, transform .18s ease, visibility 0s;
+}
+@media (prefers-reduced-motion: reduce) { .nav-dd-panel { transform: none !important; } }
+.nav-dd-card {
+  width: 460px; background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 18px 40px -16px rgb(23 22 15 / .25);
+  padding: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+}
+.nav-dd-card a { text-decoration: none; padding: 12px; border-radius: var(--radius); display: block; }
+.nav-dd-card a:hover { background: var(--muted-2); }
+.nav-dd-card strong { display: block; font-size: 15px; }
+.nav-dd-card span { font-size: 13px; color: var(--fg-muted); line-height: 1.4; display: block; margin-top: 2px; }
+.nav-dd-card .soon { opacity: .55; pointer-events: none; }
+.nav-dd-card .soon em { font-style: normal; font-size: 11px; background: var(--muted); padding: 1px 6px; border-radius: 99px; margin-left: 6px; }
 .nav-cta { margin-left: auto; }
 
 /* ---------- Buttons ---------- */
