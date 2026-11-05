@@ -15,12 +15,14 @@ interface Props {
   extraSchemas?: WithContext<Thing> | WithContext<Thing>[];
   /** Hat die Seite einen eigenen #warteliste-Block? Sonst führt der Button zur Startseite. */
   hasWaitlist?: boolean;
+  /** Akzentfarbe der Seite: Startseite sprout, Projektzeit bloom, Arbeitszeit clock */
+  accent?: 'sprout' | 'bloom' | 'clock';
 }
 
-const { hasWaitlist = false, ...props } = Astro.props;
+const { hasWaitlist = false, accent = 'sprout', ...props } = Astro.props;
 ---
 
-<BaseLayout {...props}>
+<BaseLayout {...props} bodyClass={`accent-${accent}`}>
   <SiteNav slot="header" waitlistHref={hasWaitlist ? '#warteliste' : '/#warteliste'} />
   <slot />
   <SiteFooter slot="footer" />

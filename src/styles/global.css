@@ -12,6 +12,7 @@
 @import '@fontsource-variable/bricolage-grotesque/opsz.css';
 @import '@fontsource-variable/jetbrains-mono';
 @import './timebench.css';
+@import './solutions.css';
 
 /* Dark mode variant */
 @custom-variant dark (&:where(.dark, .dark *));

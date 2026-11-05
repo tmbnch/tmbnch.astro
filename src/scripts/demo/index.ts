@@ -8,6 +8,11 @@ import { mountTimesheet } from './timesheet';
 import { mountYear } from './year';
 import { mountTeam } from './team';
 import { mountDesk, type DeskApi } from './desk';
+import { mountQuick } from './quick';
+import { mountReport } from './report';
+import { mountGaps } from './gaps';
+import { mountPunchcard } from './punchcard';
+import { mountSchedule } from './schedule';
 
 type Mount = (el: HTMLElement, opts: Record<string, unknown>) => void;
 
@@ -18,6 +23,11 @@ const MOUNTS: Record<string, Mount> = {
   year: mountYear as Mount,
   team: mountTeam as Mount,
   desk: mountDesk as Mount,
+  quick: mountQuick as Mount,
+  report: mountReport as Mount,
+  gaps: mountGaps as Mount,
+  punchcard: mountPunchcard as Mount,
+  schedule: mountSchedule as Mount,
 };
 
 function mountAll(scope: ParentNode) {
@@ -113,6 +123,22 @@ function initSmallInteractions() {
     { threshold: 0.3 },
   );
   document.querySelectorAll('.report').forEach((r) => io.observe(r));
+
+  // Toggl-Abgleich (nur Anzeige)
+  document.querySelectorAll<HTMLButtonElement>('[data-sync]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const box = b.closest('.sync')!;
+      const log = box.querySelector<HTMLElement>('.sync-log')!;
+      const when = box.querySelector<HTMLElement>('[data-sync-when]')!;
+      b.disabled = true;
+      log.innerHTML = '<span class="spin"></span> gleiche mit Toggl ab …';
+      setTimeout(() => {
+        log.textContent = '✓ 3 neue Einträge übernommen, 1 gelöschter entfernt, 0 Konflikte';
+        when.textContent = 'gerade eben';
+        b.disabled = false;
+      }, 1400);
+    }),
+  );
 
   // Rangfolge der Stundensätze
   document.querySelectorAll<HTMLElement>('[data-cascade]').forEach((wrap) =>

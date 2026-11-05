@@ -4,7 +4,6 @@ import Demo from '@/components/demo/Demo.astro';
 import WaitlistSection from '@/components/site/WaitlistSection.astro';
 import Faq from '@/components/site/Faq.astro';
 import Crumbs from '@/components/site/Crumbs.astro';
-import DayBars from '@/components/visuals/DayBars.astro';
 import { createBreadcrumbSchema, createFAQSchema, createSoftwareSchema } from '@/lib/schema';
 import siteConfig from '@/config/site.config';
 
@@ -38,13 +37,6 @@ const findings = [
   { c: 'var(--holiday)', t: 'Gebucht an einem Urlaubstag', s: 'Lena Viertag · Mo, 2. Nov · 1:15 h', tag: 'Urlaub' },
 ];
 
-const saldo = [
-  { m: 'Juli', w: 50, v: '+1:15' },
-  { m: 'August', w: 20, v: '+0:30' },
-  { m: 'September', w: 78, v: '+4:10' },
-  { m: 'Oktober', w: 92, v: '+5:20' },
-];
-
 const types = [
   ['#14a38b', 'Urlaub'], ['#ea3d92', 'Krankheit'], ['#f895c6', 'Krankheit stundenweise'], ['#c9c6ba', 'Unbezahlter Urlaub'],
   ['#f08a24', 'Überstundenausgleich'], ['#b4e97c', 'Elternzeit'], ['#4f7cff', 'Berufsschule'],
@@ -72,39 +64,44 @@ const schemas = [
   description="Arbeitszeit nach ArbZG dokumentieren, Überstunden führen, Urlaub beantragen und freigeben. Aus denselben Einträgen wie die Projektzeit."
   extraSchemas={schemas}
   hasWaitlist
+  accent="clock"
 >
-  <header class="hero">
-    <div class="wrap hero-grid">
-      <div>
+  <header class="shero">
+    <div class="wrap">
+      <div class="shero-text">
         <Crumbs current="Arbeitszeiterfassung" />
-        <h1 style="font-size:clamp(38px,5.4vw,64px)">Die Arbeitszeit fällt beim Buchen <span class="hl-under">mit ab</span>.</h1>
+        <h1>Die Arbeitszeit fällt beim Buchen <span class="hl-under">mit ab</span>.</h1>
         <p class="lead">
           Seit dem Beschluss des Bundesarbeitsgerichts vom September 2022 müssen Arbeitgeber die Arbeitszeit erfassen. In
-          timebench entsteht dieser Nachweis aus denselben Einträgen, die dein Team ohnehin für Projekte bucht. Dazu kommen
-          Soll und Ist, das Überstundenkonto und der Urlaub.
+          timebench entsteht dieser Nachweis aus denselben Einträgen, die dein Team ohnehin für Projekte bucht. Die
+          Stempelkarte zeigt, was das ArbZG daraus macht.
         </p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:26px">
+        <div class="shero-cta">
           <a class="btn" href="#warteliste">Auf die Warteliste</a>
           <a class="btn btn-ghost" href="#abwesenheiten">Urlaubskalender ausprobieren</a>
         </div>
-        <div class="facts"><span>Regeln nach ArbZG voreingestellt</span><span>Teilzeit und Arbeitspläne</span><span>Feiertage pro Bundesland</span></div>
       </div>
-      <div style="display:grid;gap:14px">
-        <div class="saldo">
-          <div><small>Soll November</small><strong>64:00</strong></div>
-          <div><small>Ist</small><strong>66:15</strong></div>
-          <div><small>Saldo gesamt</small><strong class="pos">+12:30</strong></div>
-        </div>
-        <DayBars />
+      <div class="shero-stage" style="max-width:860px">
+        <Demo kind="punchcard" />
+        <p class="hint" style="justify-content:center;margin:14px 0 28px">Tipp auf eine markierte Zeile, um den Verstoß zu beheben.</p>
       </div>
     </div>
   </header>
 
+  <div class="wrap">
+    <div class="kpis">
+      <div><strong>§ 3 · 4 · 5</strong><span>Höchstarbeitszeit, Pausen, Ruhezeit</span></div>
+      <div><strong>11 h</strong><span>Ruhe zwischen zwei Arbeitstagen</span></div>
+      <div><strong>31.3.</strong><span>Resturlaub verfällt, einstellbar</span></div>
+      <div><strong>16</strong><span>Bundesländer mit eigenen Feiertagen</span></div>
+    </div>
+  </div>
+
   <!-- Regeln -->
-  <section class="ruled">
+  <section>
     <div class="wrap split">
       <div>
-        <span class="eyebrow">Regeln</span>
+        <div class="chapter"><span class="no">01</span><span class="eyebrow">Regeln</span></div>
         <h2>Das Arbeitszeitgesetz, als Einstellung.</h2>
         <p class="lead">
           Die Regeln sind nach deutschem Recht voreingestellt und versioniert. Ändert ein Tarifvertrag etwas, legt ihr eine
@@ -133,11 +130,11 @@ const schemas = [
     </div>
   </section>
 
-  <!-- Überstunden -->
-  <section class="ruled">
+  <!-- Arbeitsplan -->
+  <section class="ruled" style="background:linear-gradient(var(--paper),var(--hl-soft))">
     <div class="wrap split rev">
       <div>
-        <span class="eyebrow">Überstunden</span>
+        <div class="chapter"><span class="no">02</span><span class="eyebrow">Arbeitsplan &amp; Überstunden</span></div>
         <h2>Ein Konto, das jeder selbst nachrechnen kann.</h2>
         <p class="lead">
           Der Arbeitsplan legt fest, wer an welchem Tag wie viele Stunden schuldet. Teilzeit mit freiem Mittwoch ist ein Plan
@@ -149,33 +146,23 @@ const schemas = [
           <li><span>Die Auslastung zeigt, wie viel der Ist-Zeit abrechenbar war.</span></li>
         </ul>
       </div>
-      <div class="wide-frame">
-        <div class="hd"><b>Jonas Muster · 2026</b><span class="muted" style="font-size:13px">Arbeitsplan Vollzeit, 40 h</span></div>
-        <div class="report" style="border:0;padding:0">
-          {saldo.map((s) => (
-            <div class="rbar"><span>{s.m}</span><div class="track" style="--c:var(--ink-700)"><b data-w={s.w} style="width:0"></b></div><span class="v">{s.v}</span></div>
-          ))}
-          <div class="rbar"><span>November</span><div class="track" style="--c:var(--live)"><b data-w="40" style="width:0"></b></div><span class="v">+2:15</span></div>
-          <div class="rbar"><span class="muted">Ausgleich 13. Nov</span><div class="track"></div><span class="v" style="color:var(--bloom-600)">−8:00</span></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;border-top:1.5px solid var(--ink);margin-top:8px;padding-top:10px;font-weight:650"><span>Saldo heute</span><span class="mono" style="color:var(--live-text)">+12:30 h</span></div>
-      </div>
+      <Demo kind="schedule" />
     </div>
   </section>
 
   <!-- Abwesenheiten -->
-  <section id="abwesenheiten" class="ruled" style="background:linear-gradient(var(--paper),#f4f2e9)">
+  <section id="abwesenheiten" class="ruled">
     <div class="wrap">
       <div class="sec-head">
-        <span class="eyebrow">Urlaub &amp; Abwesenheiten</span>
+        <div class="chapter"><span class="no">03</span><span class="eyebrow">Urlaub &amp; Abwesenheiten</span></div>
         <h2>Das ganze Jahr auf einer Seite.</h2>
         <p class="lead">
-          Zwölf Monate, eine Zeile pro Monat. Urlaub beantragst du, indem du über die Tage ziehst. Der Antrag rechnet
+          Zwölf Monate, eine Zeile pro Monat. Urlaub beantragst du direkt im Kalender. Der Antrag rechnet
           Wochenenden und Feiertage heraus und zeigt, wie viel danach übrig bleibt. Probier es im Dezember.
         </p>
       </div>
       <div class="wide-frame">
-        <div class="hd"><b>Mein Urlaub 2026</b><span class="seg" aria-hidden="true"><button tabindex="-1">Liste</button><button tabindex="-1" class="on">Jahr</button><button tabindex="-1">Team</button></span></div>
+        <div class="hd"><b>Mein Urlaub 2026</b><span class="muted" style="font-size:13px">Jonas Muster · Anspruch 30 Tage</span></div>
         <Demo kind="year" />
       </div>
       <div class="split" style="margin-top:56px;align-items:start">
@@ -202,7 +189,7 @@ const schemas = [
     <div class="wrap">
       <div class="split" style="align-items:start">
         <div>
-          <span class="eyebrow">Freigabe</span>
+          <div class="chapter"><span class="no">04</span><span class="eyebrow">Freigabe</span></div>
           <h2>Genehmigen, ohne nachzuzählen.</h2>
           <p class="lead">
             Jeder Antrag zeigt, wie viele Tage er kostet und was danach übrig ist. Wer zur gleichen Zeit fehlt, steht im
@@ -234,7 +221,7 @@ const schemas = [
   <section class="ruled">
     <div class="wrap split">
       <div>
-        <span class="eyebrow">Monatsabschluss</span>
+        <div class="chapter"><span class="no">05</span><span class="eyebrow">Monatsabschluss</span></div>
         <h2>Was abgeschlossen ist, bleibt so.</h2>
         <p class="lead">
           Nach dem Abschluss lassen sich Einträge in diesem Monat nicht mehr ändern. Muss doch etwas korrigiert werden, öffnet

@@ -16,6 +16,8 @@ interface Props {
   includeOrgSchema?: boolean;
   /** Zusätzliche JSON-LD-Schemas (Software, FAQ, Breadcrumbs). */
   extraSchemas?: WithContext<Thing> | WithContext<Thing>[];
+  /** Zusätzliche Klasse am <body>, z. B. die Akzentfarbe einer Lösungsseite */
+  bodyClass?: string;
 }
 
 const {
@@ -27,6 +29,7 @@ const {
   nofollow = false,
   includeOrgSchema = false,
   extraSchemas,
+  bodyClass,
 } = Astro.props;
 
 const schemas: Array<WithContext<Thing>> = [createWebsiteSchema()];
@@ -58,7 +61,7 @@ if (extraSchemas) schemas.push(...(Array.isArray(extraSchemas) ? extraSchemas : 
     <JsonLd schema={schemas} />
   </head>
 
-  <body>
+  <body class={bodyClass}>
     <a href="#main-content" class="skip-link">Zum Inhalt springen</a>
     <slot name="header" />
     <main id="main-content">

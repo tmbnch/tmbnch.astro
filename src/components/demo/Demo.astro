@@ -3,7 +3,7 @@
  * Platzhalter für einen klickbaren Dummy. Das Script in src/scripts/demo mountet ihn im Browser.
  */
 interface Props {
-  kind: 'week' | 'month' | 'timesheet' | 'year' | 'team' | 'desk';
+  kind: 'week' | 'month' | 'timesheet' | 'year' | 'team' | 'desk' | 'quick' | 'report' | 'gaps' | 'punchcard' | 'schedule';
   /** Optionen für den Dummy, z. B. { h: 30 } für die Woche oder { compact: true } für den Tracker */
   opts?: Record<string, unknown>;
   id?: string;
@@ -17,6 +17,11 @@ const labels: Record<Props['kind'], string> = {
   year: 'Beispielansicht: Urlaub im Jahresüberblick',
   team: 'Beispielansicht: Teamkalender',
   desk: 'Beispielansicht: Desktop-Tracker',
+  quick: 'Beispielansicht: Schnelleingabe mit Timer',
+  report: 'Beispielansicht: Report nach Kunde, Projekt oder Person',
+  gaps: 'Beispielansicht: offene Lücken am Tagesende',
+  punchcard: 'Beispielansicht: Stempelkarte mit Auffälligkeiten',
+  schedule: 'Beispielansicht: Arbeitsplan und Saldo',
 };
 ---
 
