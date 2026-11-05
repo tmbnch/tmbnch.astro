@@ -1,112 +1,93 @@
 ---
+/**
+ * Datenschutzerklärung für timebench.io. Grundlage ist die Fassung von rocketbase.io,
+ * gekürzt auf das, was diese Seite tatsächlich einsetzt: Hosting bei Netlify,
+ * Wartelisten-Formular über Netlify Forms, selbst gehostete Schriften, kein Tracking.
+ * Kommt ein Analyse- oder Marketing-Dienst dazu, muss er hier ergänzt werden.
+ */
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import siteConfig from '@/config/site.config';
 ---
 
 <SiteLayout
-  title="Datenschutzbestimmungen"
-  description="Datenschutzerklärung von RocketBase: Welche Daten wir erheben, wie wir sie verwenden und welche Rechte Sie als Nutzer haben."
+  title="Datenschutz"
+  description="Datenschutzerklärung von timebench.io: welche Daten beim Besuch und beim Eintrag in die Warteliste verarbeitet werden."
   noindex
 >
-  <section class="border-b border-border bg-background-secondary py-16">
-    <div class="container max-w-3xl">
-      <h1 class="font-display text-4xl font-bold tracking-tight text-foreground">Datenschutzbestimmungen</h1>
-    </div>
-  </section>
-
-  <section class="py-16">
-    <div class="container max-w-3xl prose prose-neutral dark:prose-invert prose-headings:font-display prose-headings:font-semibold prose-a:text-brand-600 hover:prose-a:text-brand-500 dark:prose-a:text-brand-400">
-
-      <h2>Allgemeine Hinweise</h2>
-      <p>Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie unsere Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können. Ausführliche Informationen zum Thema Datenschutz entnehmen Sie unserer unter diesem Text aufgeführten Datenschutzerklärung.</p>
-
-      <h3>Datenerfassung auf unserer Website</h3>
-      <p>Wer ist verantwortlich für die Datenerfassung auf dieser Website?</p>
-      <p>Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber. Dessen Kontaktdaten können Sie dem Impressum dieser Website entnehmen.</p>
-
-      <h3>Wie erfassen wir Ihre Daten?</h3>
-      <p>Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen. Hierbei kann es sich z.B. um Daten handeln, die Sie in ein Kontaktformular eingeben.</p>
-      <p>Andere Daten werden automatisch beim Besuch der Website durch unsere IT-Systeme erfasst. Das sind vor allem technische Daten (z.B. Internetbrowser, Betriebssystem oder Uhrzeit des Seitenaufrufs). Die Erfassung dieser Daten erfolgt automatisch, sobald Sie unsere Website betreten.</p>
-
-      <h3>Wofür nutzen wir Ihre Daten?</h3>
-      <p>Ein Teil der Daten wird erhoben, um eine fehlerfreie Bereitstellung der Website zu gewährleisten. Andere Daten können zur Analyse Ihres Nutzerverhaltens verwendet werden.</p>
-
-      <h3>Welche Rechte haben Sie bezüglich Ihrer Daten?</h3>
-      <p>Sie haben jederzeit das Recht unentgeltlich Auskunft über Herkunft, Empfänger und Zweck Ihrer gespeicherten personenbezogenen Daten zu erhalten. Sie haben außerdem ein Recht, die Berichtigung, Sperrung oder Löschung dieser Daten zu verlangen. Hierzu sowie zu weiteren Fragen zum Thema Datenschutz können Sie sich jederzeit unter der im Impressum angegebenen Adresse an uns wenden. Des Weiteren steht Ihnen ein Beschwerderecht bei der zuständigen Aufsichtsbehörde zu.</p>
-
-      <h3>Analyse-Tools und Tools von Drittanbietern</h3>
-      <p>Beim Besuch unserer Website kann Ihr Surf-Verhalten statistisch ausgewertet werden. Das geschieht vor allem mit Cookies und mit sogenannten Analyseprogrammen. Die Analyse Ihres Surf-Verhaltens erfolgt in der Regel anonym; das Surf-Verhalten kann nicht zu Ihnen zurückverfolgt werden. Sie können dieser Analyse widersprechen oder sie durch die Nichtbenutzung bestimmter Tools verhindern. Detaillierte Informationen dazu finden Sie in der folgenden Datenschutzerklärung.</p>
-
-      <h2>2. Allgemeine Hinweise und Pflichtinformationen</h2>
-
-      <h3>Datenschutz</h3>
-      <p>Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung.</p>
-      <p>Wenn Sie diese Website benutzen, werden verschiedene personenbezogene Daten erhoben. Personenbezogene Daten sind Daten, mit denen Sie persönlich identifiziert werden können. Die vorliegende Datenschutzerklärung erläutert, welche Daten wir erheben und wofür wir sie nutzen. Sie erläutert auch, wie und zu welchem Zweck das geschieht.</p>
-      <p>Wir weisen darauf hin, dass die Datenübertragung im Internet (z.B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.</p>
-
-      <h3>Hinweis zur verantwortlichen Stelle</h3>
+  <section class="ruled" style="border-top:0;padding-top:56px">
+    <div class="wrap legal">
+      <span class="eyebrow">Rechtliches</span>
+      <h1>Datenschutz</h1>
       <p>
-        Die verantwortliche Stelle für die Datenverarbeitung auf dieser Website ist:<br /><br />
-        rocketbase.io software productions GmbH<br />
-        Am Ortsfelde 24<br />
-        21423 Winsen (Luhe)<br /><br />
+        Diese Erklärung gilt für die Website timebench.io. Für die Anwendung timebench selbst gelten eigene
+        Datenschutzhinweise, die Sie mit Ihrem Zugang erhalten.
+      </p>
+
+      <h2>1. Verantwortliche Stelle</h2>
+      <p>
+        {siteConfig.legalName}<br />
+        {siteConfig.address?.street}<br />
+        {siteConfig.address?.zip} {siteConfig.address?.city}<br /><br />
         Telefon: 04173 21995 20<br />
         E-Mail: <a href="mailto:info@rocketbase.io">info@rocketbase.io</a>
       </p>
-      <p>Verantwortliche Stelle ist die natürliche oder juristische Person, die allein oder gemeinsam mit anderen über die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z.B. Namen, E-Mail-Adressen o. Ä.) entscheidet.</p>
+      <p>
+        Verantwortliche Stelle ist die natürliche oder juristische Person, die allein oder gemeinsam mit anderen über die
+        Zwecke und Mittel der Verarbeitung von personenbezogenen Daten entscheidet.
+      </p>
 
-      <h4>SSL- bzw. TLS-Verschlüsselung</h4>
-      <p>Diese Seite nutzt aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte eine SSL- bzw. TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie daran, dass die Adresszeile des Browsers von „http://" auf „https://" wechselt und an dem Schloss-Symbol in Ihrer Browserzeile.</p>
+      <h2>2. Ihre Rechte</h2>
+      <p>
+        Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Herkunft, Empfänger und Zweck Ihrer gespeicherten
+        personenbezogenen Daten. Sie können außerdem die Berichtigung, Einschränkung der Verarbeitung oder Löschung dieser
+        Daten verlangen und einer Verarbeitung auf Grundlage berechtigter Interessen widersprechen. Eine erteilte
+        Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen. Wenden Sie sich dafür an die oben
+        genannte Adresse oder an <a href="mailto:datenschutz@rocketbase.io">datenschutz@rocketbase.io</a>.
+      </p>
+      <p>Zudem steht Ihnen ein Beschwerderecht bei der zuständigen Datenschutz-Aufsichtsbehörde zu.</p>
 
-      <h2>3. Datenerfassung auf unserer Website</h2>
-
-      <h3>Cookies</h3>
-      <p>Die Internetseiten verwenden teilweise so genannte Cookies. Cookies richten auf Ihrem Rechner keinen Schaden an und enthalten keine Viren. Cookies dienen dazu, unser Angebot nutzerfreundlicher, effektiver und sicherer zu machen. Cookies sind kleine Textdateien, die auf Ihrem Rechner abgelegt werden und die Ihr Browser speichert.</p>
-      <p>Die meisten der von uns verwendeten Cookies sind so genannte „Session-Cookies". Sie werden nach Ende Ihres Besuchs automatisch gelöscht. Andere Cookies bleiben auf Ihrem Endgerät gespeichert bis Sie diese löschen. Diese Cookies ermöglichen es uns, Ihren Browser beim nächsten Besuch wiederzuerkennen.</p>
-      <p>Sie können Ihren Browser so einstellen, dass Sie über das Setzen von Cookies informiert werden und Cookies nur im Einzelfall erlauben, die Annahme von Cookies für bestimmte Fälle oder generell ausschließen sowie das automatische Löschen der Cookies beim Schließen des Browser aktivieren. Bei der Deaktivierung von Cookies kann die Funktionalität dieser Website eingeschränkt sein.</p>
-
-      <h3>Server-Log-Dateien</h3>
-      <p>Der Provider der Seiten erhebt und speichert automatisch Informationen in so genannten Server-Log-Dateien, die Ihr Browser automatisch an uns übermittelt. Dies sind:</p>
+      <h2>3. Hosting und Server-Log-Dateien</h2>
+      <p>
+        Diese Website wird bei Netlify, Inc., 512 2nd Street, Suite 200, San Francisco, CA 94107, USA gehostet. Beim Aufruf
+        der Seite erhebt Netlify automatisch Informationen in Server-Log-Dateien, die Ihr Browser übermittelt:
+      </p>
       <ul>
         <li>Browsertyp und Browserversion</li>
         <li>verwendetes Betriebssystem</li>
-        <li>Referrer URL</li>
-        <li>Hostname des zugreifenden Rechners</li>
+        <li>Referrer-URL</li>
         <li>Uhrzeit der Serveranfrage</li>
         <li>IP-Adresse</li>
       </ul>
-      <p>Eine Zusammenführung dieser Daten mit anderen Datenquellen wird nicht vorgenommen. Grundlage für die Datenverarbeitung ist Art. 6 Abs. 1 lit. f DSGVO.</p>
+      <p>
+        Diese Daten dienen dem sicheren und fehlerfreien Betrieb der Website und werden nicht mit anderen Datenquellen
+        zusammengeführt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Mit Netlify besteht ein Vertrag zur
+        Auftragsverarbeitung nach Art. 28 DSGVO. Die Datenübermittlung in die USA stützt sich auf das EU-US Data Privacy
+        Framework sowie Standardvertragsklauseln.
+      </p>
 
-      <h3>Kontakt- und Anfrageformulare</h3>
-      <p>Wenn Sie uns über ein Formular auf dieser Website kontaktieren, verarbeiten wir die von Ihnen angegebenen Daten (u. a. Name, E-Mail-Adresse, Unternehmen, optional Telefonnummer sowie Ihre Angaben zum Anliegen) zur Bearbeitung Ihrer Anfrage. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO bei vorvertraglichen Anfragen, im Übrigen unser berechtigtes Interesse an der Beantwortung nach Art. 6 Abs. 1 lit. f DSGVO.</p>
-      <p>Zusätzlich erfassen wir technische Angaben zur Herkunft der Anfrage (aufgerufene Seite, Verweisquelle, Kampagnen-Parameter der URL sowie ungefähre Standortangabe auf Stadt-/Landesebene). Ihre IP-Adresse wird dabei nicht gespeichert.</p>
-      <p>Die Übermittlung und Speicherung der Formulardaten erfolgt über unseren Hosting-Dienstleister Netlify, Inc., 512 2nd Street, San Francisco, CA 94107, USA. Für den Versand der Benachrichtigungs-E-Mail nutzen wir Useplunk (Plunk). Mit beiden Anbietern bestehen Verträge zur Auftragsverarbeitung nach Art. 28 DSGVO.</p>
-      <p>Wir geben Ihre Daten nicht zu Werbezwecken weiter und versenden keinen Newsletter ohne gesonderte Einwilligung. Die Daten werden gelöscht, sobald der Zweck der Verarbeitung entfällt und keine gesetzlichen Aufbewahrungsfristen entgegenstehen.</p>
+      <h2>4. Warteliste</h2>
+      <p>
+        Wenn Sie sich in die Warteliste eintragen, speichern wir Ihre E-Mail-Adresse und die Stelle auf der Website, an der
+        Sie sich eingetragen haben. Wir nutzen die Adresse ausschließlich, um Sie zu informieren, sobald ein Zugang zu
+        timebench für Sie bereitsteht, und für Rückfragen dazu. Einen Newsletter versenden wir darüber nicht.
+      </p>
+      <p>
+        Das Formular wird über Netlify Forms verarbeitet und bei Netlify gespeichert. Rechtsgrundlage ist Ihre Einwilligung
+        nach Art. 6 Abs. 1 lit. a DSGVO, die Sie mit dem Absenden erteilen. Sie können sie jederzeit per E-Mail widerrufen;
+        wir löschen Ihren Eintrag dann. Ansonsten löschen wir die Daten, sobald die Warteliste abgeschlossen ist.
+      </p>
 
-      <h3>Anschreiben per Post</h3>
-      <p>Wir sprechen Unternehmen im Rahmen der Geschäftsanbahnung auch postalisch an. Die dafür genutzten Kontaktdaten (Firmenname, Anschrift, Ansprechpartner) stammen aus öffentlich zugänglichen Quellen wie dem Handelsregister und den Websites der jeweiligen Unternehmen. Rechtsgrundlage ist unser berechtigtes Interesse an Direktwerbung nach Art. 6 Abs. 1 lit. f DSGVO in Verbindung mit Erwägungsgrund 47.</p>
-      <p>Unsere Anschreiben enthalten einen QR-Code beziehungsweise eine Webadresse mit einer Kennung, über die wir erkennen können, auf welches Anschreiben eine Rückmeldung erfolgt. Die Kennung selbst enthält keine personenbezogenen Angaben; die Zuordnung findet ausschließlich in unserem eigenen System statt.</p>
-      <p>Sie können der Verarbeitung Ihrer Daten zu Werbezwecken jederzeit widersprechen — eine formlose Nachricht an die im Impressum genannte Adresse oder an <a href="mailto:datenschutz@rocketbase.io">datenschutz@rocketbase.io</a> genügt. Wir löschen Ihre Daten dann umgehend und schreiben Sie nicht erneut an.</p>
+      <h2>5. Cookies, Schriften und Analyse</h2>
+      <p>
+        Diese Website setzt keine Cookies und verwendet keine Analyse- oder Marketing-Dienste. Schriften werden von unserem
+        eigenen Server ausgeliefert; dabei wird keine Verbindung zu Google Fonts oder anderen Drittanbietern aufgebaut.
+      </p>
 
-      <h3>Terminbuchung (Cal.com)</h3>
-      <p>Auf einzelnen Seiten bieten wir Ihnen an, direkt einen Gesprächstermin zu buchen. Dafür setzen wir den Dienst Cal.com ein. Anbieter ist die Cal.com, Inc., 2261 Market Street #4382, San Francisco, CA 94114, USA.</p>
-      <p>Der Buchungskalender wird nur dann direkt in unsere Seite eingebunden, wenn Sie funktionalen Cookies zugestimmt haben. In diesem Fall wird beim Laden des Kalenders eine Verbindung zu Servern von Cal.com hergestellt und Ihre IP-Adresse übermittelt. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO; sie ist jederzeit mit Wirkung für die Zukunft widerrufbar.</p>
-      <p>Ohne Ihre Einwilligung wird der Kalender nicht geladen. Stattdessen finden Sie einen Link, über den Sie die Buchungsseite bei Cal.com aufrufen können — dann gilt dort die Datenschutzerklärung von Cal.com.</p>
-      <p>Wenn Sie einen Termin buchen, verarbeiten wir die von Ihnen angegebenen Daten (Name, geschäftliche E-Mail-Adresse, Unternehmen, optional Telefonnummer und Ihre Beschreibung des Anliegens) zur Durchführung des Gesprächs auf Grundlage von Art. 6 Abs. 1 lit. b bzw. lit. f DSGVO. Bei Buchungen, die aus einem von uns versendeten Anschreiben stammen, wird zusätzlich eine Kennung dieses Anschreibens gespeichert, damit wir die Anfrage zuordnen können; diese Kennung enthält selbst keine personenbezogenen Angaben.</p>
-      <p>Die Datenübermittlung erfolgt teilweise in die USA. Weitere Informationen finden Sie in der Datenschutzerklärung von Cal.com: <a href="https://cal.com/privacy" target="_blank" rel="noopener noreferrer">https://cal.com/privacy</a>.</p>
-
-      <h2>4. Analyse Tools</h2>
-
-      <h3>plausible.io</h3>
-      <p>Beim Besuch unserer Website kann Ihr Surf-Verhalten statistisch ausgewertet werden. Wir setzen dabei den Dienst plausible.io ein, der auf den Einsatz von Cookies verzichtet. Die Analyse Ihres Surf-Verhaltens erfolgt anonym; das Surf-Verhalten kann nicht zu Ihnen zurückverfolgt werden.</p>
-
-      <h3>LinkedIn Insight Tag</h3>
-      <p>Wir verwenden den LinkedIn Insight Tag. Anbieter ist die LinkedIn Ireland Unlimited Company, Wilton Plaza, Wilton Place, Dublin 2, Irland. Dieser Dienst ermöglicht die Erfassung von Daten über Besucher unserer Website, die bei LinkedIn eingeloggt sind, sowie die Messung der Effektivität unserer LinkedIn-Werbeanzeigen. Die Nutzung dieses Dienstes erfolgt auf Grundlage Ihrer Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO. Die Einwilligung ist jederzeit widerrufbar.</p>
-      <p>Weitere Informationen finden Sie in der Datenschutzrichtlinie von LinkedIn: <a href="https://www.linkedin.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">https://www.linkedin.com/legal/privacy-policy</a>.</p>
-
-      <h3>Meta-Pixel und Conversions API (Facebook / Instagram)</h3>
-      <p>Wir verwenden das Besucheraktions-Pixel sowie die Conversions API von Meta. Anbieter ist die Meta Platforms Ireland Limited, Merrion Road, Dublin 4, D04 X2K5, Irland. Damit können wir das Verhalten von Besuchern nachverfolgen, nachdem diese durch Klick auf eine Meta-Werbeanzeige (Facebook, Instagram) auf unsere Website weitergeleitet wurden. So lässt sich die Wirksamkeit unserer Werbeanzeigen auswerten und optimieren. Die Conversions API überträgt dieselben Ereignisse zusätzlich serverseitig an Meta; personenbezogene Daten (z. B. E-Mail-Adresse, Telefonnummer, Name) werden dabei vor der Übertragung mit dem Verfahren SHA-256 pseudonymisiert (gehasht).</p>
-      <p>Die Nutzung erfolgt ausschließlich auf Grundlage Ihrer Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO. Die Einwilligung ist jederzeit mit Wirkung für die Zukunft widerrufbar. Ohne Ihre Einwilligung werden weder das Pixel geladen noch Ereignisse über die Conversions API an Meta übermittelt.</p>
-      <p>Die Datenübermittlung erfolgt teilweise in die USA. Meta ist unter dem EU-US Data Privacy Framework zertifiziert; ergänzend bestehen Standardvertragsklauseln als Garantie für ein angemessenes Datenschutzniveau. Weitere Informationen finden Sie in der Datenschutzrichtlinie von Meta: <a href="https://www.facebook.com/privacy/policy" target="_blank" rel="noopener noreferrer">https://www.facebook.com/privacy/policy</a>.</p>
+      <h2>6. SSL- bzw. TLS-Verschlüsselung</h2>
+      <p>
+        Diese Seite nutzt aus Sicherheitsgründen eine SSL- bzw. TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen
+        Sie daran, dass die Adresszeile des Browsers mit „https://“ beginnt.
+      </p>
     </div>
   </section>
 </SiteLayout>

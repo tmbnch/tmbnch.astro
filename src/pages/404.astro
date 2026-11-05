@@ -2,7 +2,17 @@
 import SiteLayout from '@/layouts/SiteLayout.astro';
 ---
 
-<SiteLayout title="Seite nicht gefunden" noindex>
-  <h1>Seite nicht gefunden</h1>
-  <p><a href="/">Zur Startseite</a></p>
+<SiteLayout title="Seite nicht gefunden" description="Diese Seite gibt es auf timebench.io nicht." noindex>
+  <header class="hero" style="min-height:60vh;display:flex;align-items:center">
+    <div class="wrap" style="max-width:720px">
+      <span class="eyebrow"><span class="dot"></span>404</span>
+      <h1>Hier ist keine Zeit gebucht.</h1>
+      <p class="lead" style="margin-top:18px">Die Seite gibt es nicht oder nicht mehr. Von hier geht es weiter:</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:26px">
+        <a class="btn" href="/">Zur Startseite</a>
+        <a class="btn btn-ghost" href="/projektzeiterfassung/">Projektzeiterfassung</a>
+        <a class="btn btn-ghost" href="/arbeitszeiterfassung/">Arbeitszeiterfassung</a>
+      </div>
+    </div>
+  </header>
 </SiteLayout>
