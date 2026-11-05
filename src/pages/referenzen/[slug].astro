@@ -1,0 +1,10 @@
+---
+import ReferenceDetail from '@/features/references/ReferenceDetail.astro';
+import { getReferenceStaticPaths } from '@/features/references/paths';
+
+export const getStaticPaths = getReferenceStaticPaths;
+
+const { item } = Astro.props;
+---
+
+<ReferenceDetail item={item} />

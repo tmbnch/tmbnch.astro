@@ -1,0 +1,145 @@
+---
+/**
+ * Prozess-Drift: Warum eine Standardlösung über die Jahre auseinanderläuft.
+ *
+ * Zwei Kurven über der Zeit - was das Unternehmen braucht, und was das System
+ * abdeckt. Der Abstand dazwischen ist die Handarbeit: Workarounds, Excel-Welten
+ * daneben, manuelles Auffangen. Die Aussage des Diagramms ist, dass dieser
+ * Abstand nicht durch ein Versäumnis entsteht, sondern durch Wachstum.
+ */
+---
+
+<figure class="not-prose my-10" data-reveal="fade-up">
+  <div class="border-border bg-background-secondary overflow-x-auto rounded-2xl border p-6 sm:p-8">
+    <svg
+      viewBox="0 0 680 340"
+      role="img"
+      aria-labelledby="drift-titel drift-desc"
+      class="mx-auto block h-auto w-full min-w-[30rem] max-w-[42rem]"
+    >
+      <title id="drift-titel">Auseinanderlaufen von Anforderung und Systemabdeckung über die Zeit</title>
+      <desc id="drift-desc">
+        Zwei Kurven über der Projektlaufzeit. Die Anforderungen des Unternehmens steigen
+        stetig, die Abdeckung durch die Standardsoftware steigt anfangs mit und flacht dann
+        ab. Der wachsende Abstand zwischen beiden Kurven ist die Lücke, die das Team von Hand
+        ausgleicht - über Workarounds, Nebentabellen und manuelles Nacharbeiten.
+      </desc>
+
+      <defs>
+        <linearGradient id="luecke" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--brand-500, #6372a5)" stop-opacity="0.20" />
+          <stop offset="100%" stop-color="var(--brand-500, #6372a5)" stop-opacity="0.04" />
+        </linearGradient>
+      </defs>
+
+      <!-- Achsen -->
+      <line x1="56" y1="270" x2="640" y2="270" class="dd-axis" />
+      <line x1="56" y1="40" x2="56" y2="270" class="dd-axis" />
+      <text x="56" y="300" class="dd-axis-label" text-anchor="start">Einführung</text>
+      <text x="640" y="300" class="dd-axis-label" text-anchor="end">heute</text>
+      <text x="30" y="52" class="dd-axis-label" text-anchor="middle">Umfang</text>
+
+      <!-- Fläche zwischen den Kurven: die Handarbeit -->
+      <path
+        d="M 56 250 C 200 214, 340 178, 640 92
+           L 640 196 C 420 178, 240 208, 56 250 Z"
+        fill="url(#luecke)"
+      />
+
+      <!-- Was das Unternehmen braucht -->
+      <path d="M 56 250 C 200 214, 340 178, 640 92" class="dd-line dd-need" />
+      <!-- Was das System abdeckt: steigt an, flacht ab -->
+      <path d="M 56 250 C 240 208, 420 178, 640 196" class="dd-line dd-cover" />
+
+      <!-- Beschriftung der Kurven -->
+      <text x="636" y="82" class="dd-curve-label dd-need-label" text-anchor="end">
+        Was der Betrieb braucht
+      </text>
+      <text x="636" y="216" class="dd-curve-label dd-cover-label" text-anchor="end">
+        Was das System abdeckt
+      </text>
+
+      <!-- Der Abstand -->
+      <line x1="500" y1="120" x2="500" y2="188" class="dd-gap" />
+      <circle cx="500" cy="120" r="3" class="dd-dot dd-need-dot" />
+      <circle cx="500" cy="188" r="3" class="dd-dot dd-cover-dot" />
+      <text x="512" y="150" class="dd-gap-label">Handarbeit:</text>
+      <text x="512" y="166" class="dd-gap-label">Workarounds, Excel daneben</text>
+
+      <!-- Phasenmarken -->
+      <line x1="200" y1="40" x2="200" y2="270" class="dd-marker" />
+      <text x="206" y="56" class="dd-phase">passt gut</text>
+      <line x1="400" y1="40" x2="400" y2="270" class="dd-marker" />
+      <text x="406" y="56" class="dd-phase">erste Umwege</text>
+      <text x="580" y="56" class="dd-phase dd-phase-strong">Ausnahmen &gt; Regeln</text>
+    </svg>
+  </div>
+  <figcaption class="text-foreground-muted mt-3 text-sm leading-6">
+    Der Abstand entsteht nicht durch ein Versäumnis, sondern durch Wachstum: Das Geschäft
+    entwickelt sich weiter, das Datenmodell bleibt, wie es bei der Einführung gedacht war.
+  </figcaption>
+</figure>
+
+<style>
+  .dd-axis {
+    stroke: var(--border, #e2e4ed);
+    stroke-width: 1.5;
+  }
+  .dd-axis-label {
+    fill: var(--foreground-subtle, #9297a8);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+  .dd-line {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .dd-need {
+    stroke: var(--brand-500, #6372a5);
+  }
+  .dd-cover {
+    stroke: var(--foreground-muted, #6b7186);
+    stroke-dasharray: 6 4;
+  }
+  .dd-curve-label {
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .dd-need-label {
+    fill: var(--brand-600, #4c5c93);
+  }
+  .dd-cover-label {
+    fill: var(--foreground-muted, #6b7186);
+  }
+  .dd-gap {
+    stroke: var(--foreground-subtle, #9297a8);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 3;
+  }
+  .dd-dot {
+    fill: var(--brand-500, #6372a5);
+  }
+  .dd-cover-dot {
+    fill: var(--foreground-muted, #6b7186);
+  }
+  .dd-gap-label {
+    fill: var(--foreground-secondary, #4a5063);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .dd-marker {
+    stroke: var(--border, #e2e4ed);
+    stroke-width: 1;
+    stroke-dasharray: 2 5;
+  }
+  .dd-phase {
+    fill: var(--foreground-subtle, #9297a8);
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .dd-phase-strong {
+    fill: var(--brand-600, #4c5c93);
+  }
+</style>

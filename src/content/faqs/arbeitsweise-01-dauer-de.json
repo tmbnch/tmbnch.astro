@@ -1,0 +1,8 @@
+{
+  "question": "Wie lange dauert ein typisches Projekt?",
+  "summary": "Vier bis sechs Monate von Discovery bis Go-Live - iterativ, mit frühen nutzbaren Release-Ständen.",
+  "details": "Die tatsächliche Dauer hängt vom Umfang ab: Ein fokussiertes Self-Service-Portal kann in drei Monaten live sein, eine Standardsoftware-Ablösung über mehrere Bereiche braucht vier bis sechs Monate. Erste einsatzfähige Versionen sind meist deutlich vor dem Projektende verfügbar.",
+  "category": "arbeitsweise",
+  "order": 1,
+  "locale": "de"
+}

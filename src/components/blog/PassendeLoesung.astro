@@ -1,0 +1,44 @@
+---
+/**
+ * „Passende Lösung“: Verweis von einem Blogartikel oder einer Referenz auf die Tür(en),
+ * zu der/denen er gehört. Daten aus data/tueren.ts.
+ */
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import { tueren, type TuerId } from '@/data/tueren';
+
+interface Props {
+  doors: readonly TuerId[];
+  heading?: string;
+  class?: string;
+}
+const { doors, heading = 'Passende Lösung', class: className } = Astro.props;
+const items = doors.map((d) => ({ id: d, ...tueren[d] }));
+---
+
+{
+  items.length > 0 && (
+    <aside class:list={['not-prose', className]} aria-label={heading}>
+      <p class="text-foreground-muted text-xs font-semibold tracking-[0.2em] uppercase">{heading}</p>
+      <div class:list={['mt-4 grid gap-4', items.length > 1 && 'sm:grid-cols-2', items.length > 2 && 'lg:grid-cols-3']}>
+        {items.map((t) => (
+          <a
+            href={t.href}
+            class="group border-border bg-card hover:border-brand-400 flex flex-col rounded-2xl border p-5 no-underline shadow-sm transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div class="flex items-center gap-3">
+              <span class="border-brand-300/70 bg-brand-500/5 text-brand-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border">
+                <Icon name={t.icon} size="sm" />
+              </span>
+              <span class="font-display text-foreground text-base font-bold tracking-tight">{t.titel}</span>
+            </div>
+            <span class="text-foreground-secondary mt-3 text-sm leading-6">{t.text}</span>
+            <span class="text-brand-600 mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold transition-transform duration-300 group-hover:translate-x-1">
+              Ansehen
+              <Icon name="arrow-right" size="xs" />
+            </span>
+          </a>
+        ))}
+      </div>
+    </aside>
+  )
+}

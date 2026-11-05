@@ -1,0 +1,76 @@
+---
+/**
+ * ScrollProgress
+ * Thin progress bar pinned to the bottom edge of the page header, reflecting
+ * current scroll depth as a percentage. The offset is measured from the header
+ * that is actually rendered, since layouts use different header heights
+ * (Navbar h-16, FunnelLayout h-14, MarketingLayout floating).
+ */
+---
+
+<div
+  class="pointer-events-none fixed left-0 right-0 z-40 h-0.5"
+  style="top: var(--scroll-progress-top, 4rem)"
+  data-scroll-progress-root
+  aria-hidden="true"
+>
+  <div
+    class="bg-brand-500 h-full w-full origin-left"
+    style="transform: scaleX(0)"
+    data-scroll-progress-bar
+  />
+</div>
+
+<script>
+  function initScrollProgress() {
+    const root = document.querySelector<HTMLElement>('[data-scroll-progress-root]');
+    const bar = document.querySelector<HTMLElement>('[data-scroll-progress-bar]');
+    if (!root || !bar) return;
+
+    let rafId = 0;
+
+    // Layouts ship different headers (Navbar h-16, FunnelLayout h-14, floating
+    // header in MarketingLayout), so measure instead of assuming a height.
+    // All of them stay pinned while scrolling, so bottom stays stable.
+    const syncOffset = () => {
+      const header = document.querySelector<HTMLElement>('body > header, body > nav');
+      if (!header) return;
+      root.style.setProperty(
+        '--scroll-progress-top',
+        `${Math.max(0, header.getBoundingClientRect().bottom)}px`
+      );
+    };
+
+    // Reads first, then one compositor-only write: scaleX needs no layout,
+    // and nothing reads geometry after the write, so no forced reflow per frame.
+    // No CSS transition either: restarting one on every frame makes the bar lag
+    // behind the scroll position and jitter.
+    const update = () => {
+      const doc = document.documentElement;
+      const scrollable = doc.scrollHeight - doc.clientHeight;
+      const ratio = scrollable > 0 ? Math.min(Math.max(doc.scrollTop / scrollable, 0), 1) : 0;
+      bar.style.transform = `scaleX(${ratio.toFixed(4)})`;
+      rafId = 0;
+    };
+
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(update);
+    };
+
+    syncOffset();
+    update();
+    document.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener(
+      'resize',
+      () => {
+        syncOffset();
+        onScroll();
+      },
+      { passive: true }
+    );
+  }
+
+  initScrollProgress();
+  document.addEventListener('astro:page-load', initScrollProgress);
+</script>

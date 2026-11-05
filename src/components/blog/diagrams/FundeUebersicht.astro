@@ -1,0 +1,47 @@
+---
+/** Übersicht zum Software-Check-Artikel: Was stimmte und wo die Funde lagen. Nur Aussagen aus dem Text. */
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+const stimmte = [
+  'Entscheidungen nummeriert und dokumentiert',
+  'Anmeldung in beiden Systemen vollständig',
+  'Keine Schwachstelle mit Zugriff aus dem Internet',
+];
+const offen = [
+  { titel: 'Gleichzeitige Zugriffe', text: 'Zwei Reservierungen auf das letzte Stück' },
+  { titel: 'Produktionsumgebung', text: 'Für die Entwicklung gedacht, noch nicht enger gezogen' },
+  { titel: 'Erkennbarkeit von Störungen', text: 'Keine Alarmierung, Zustandsmeldung immer „ok“' },
+];
+---
+
+<figure class="not-prose my-10 grid gap-4 sm:grid-cols-2">
+  <div class="border-border bg-background-secondary rounded-2xl border p-5">
+    <p class="text-xs font-semibold tracking-[0.14em] text-emerald-700 uppercase dark:text-emerald-400">Was stimmte</p>
+    <ul class="mt-3 space-y-3">
+      {
+        stimmte.map((s) => (
+          <li class="text-foreground flex gap-2.5 text-sm leading-6">
+            <span class="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"><Icon name="check-circle" size="sm" /></span>
+            {s}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <div class="border-border bg-background-secondary rounded-2xl border p-5">
+    <p class="text-xs font-semibold tracking-[0.14em] text-amber-700 uppercase dark:text-amber-400">Wo die Funde lagen</p>
+    <ul class="mt-3 space-y-3">
+      {
+        offen.map((o) => (
+          <li class="flex gap-2.5 text-sm leading-6">
+            <span class="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400"><Icon name="alert-circle" size="sm" /></span>
+            <span>
+              <span class="text-foreground block font-semibold">{o.titel}</span>
+              <span class="text-foreground-secondary">{o.text}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</figure>

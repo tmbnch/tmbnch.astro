@@ -1,0 +1,159 @@
+---
+/**
+ * „Kommt euch das bekannt vor?“ für Tür 3: der Oktober im Kalender. Die ersten Arbeitstage gehen
+ * für Exporte und Excel drauf, die BWA für September kommt am 22. Dazwischen stehen die Fragen der
+ * Geschäftsführung, auf die es keine Antwort gibt. Rein dekorativ (aria-hidden).
+ */
+const wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+const OFFSET = 3; // 1. Oktober 2026 ist ein Donnerstag
+const excel = new Set([1, 2, 5, 6, 7, 8]);
+const tage = Array.from({ length: 31 }, (_, i) => {
+  const d = i + 1;
+  const wd = (OFFSET + i) % 7;
+  return { d, we: wd >= 5, excel: excel.has(d), bwa: d === 22, blind: d > 8 && d < 22 && wd < 5 };
+});
+const fragen = [
+  { text: 'Wo landen wir im Dezember?', pos: 'top-[6%] right-0', rot: '3deg' },
+  { text: 'Wer hat im November noch Luft?', pos: 'top-[36%] right-[-2%]', rot: '-2deg' },
+  { text: 'Woran verdienen wir eigentlich?', pos: 'bottom-[22%] right-0', rot: '2.5deg' },
+];
+---
+
+<div class="hk relative mx-auto h-[23rem] w-full max-w-lg sm:h-[26rem]" aria-hidden="true">
+  <div class="hk-cal absolute top-[2%] left-0 w-[74%] rounded-2xl p-3 sm:p-4" style="transform: rotate(-2deg)">
+    <div class="flex items-baseline justify-between">
+      <p class="font-display text-[0.95rem] font-bold tracking-tight sm:text-base">Oktober</p>
+      <p class="font-mono text-[0.6rem] opacity-60">2026</p>
+    </div>
+    <div class="mt-2 grid grid-cols-7 gap-[3px] text-center font-mono text-[0.72rem] sm:text-[0.64rem]">
+      {wochentage.map((w) => <span class="pb-1 opacity-50">{w}</span>)}
+      {Array.from({ length: OFFSET }).map(() => <span />)}
+      {
+        tage.map((t) => (
+          <span class:list={['hk-d', t.we && 'hk-we', t.excel && 'hk-xl', t.bwa && 'hk-bwa', t.blind && 'hk-blind']}>{t.d}</span>
+        ))
+      }
+    </div>
+    <div class="mt-3 space-y-1 text-[0.6rem] sm:text-[0.66rem]">
+      <p class="flex items-center gap-1.5"><span class="hk-sw hk-xl"></span>Exporte ziehen, Excel bauen, abgleichen</p>
+      <p class="flex items-center gap-1.5"><span class="hk-sw hk-blind"></span><span class="font-semibold text-[oklch(52%_0.19_25)]">Drei Wochen ohne Zahl</span></p>
+      <p class="flex items-center gap-1.5"><span class="hk-sw hk-bwa"></span>BWA September vom Steuerbüro</p>
+    </div>
+  </div>
+
+  <div class="hk-file absolute bottom-0 left-[14%] w-[52%] rounded-xl px-3 py-2.5" style="transform: rotate(1.5deg)">
+    <p class="flex items-center gap-2 font-mono text-[0.62rem] sm:text-[0.68rem]">
+      <span class="h-2.5 w-2.5 shrink-0 rounded-sm bg-[oklch(52%_0.13_150)]"></span>
+      <span class="truncate">Auswertung_Sept_final_v3.xlsx</span>
+    </p>
+    <div class="mt-2 grid grid-cols-3 gap-px font-mono text-[0.72rem] sm:text-[0.62rem]">
+      <span class="hk-cell">Umsatz</span><span class="hk-cell text-right">412.380</span><span class="hk-cell hk-err">#BEZUG!</span>
+      <span class="hk-cell">Stunden</span><span class="hk-cell text-right">6.214</span><span class="hk-cell text-right opacity-50">?</span>
+    </div>
+  </div>
+
+
+  {
+    fragen.map((f) => (
+      <p class:list={['hk-q absolute max-w-[46%] rounded-2xl rounded-br-sm px-3 py-2 text-[0.7rem] leading-snug font-semibold sm:text-[0.8rem]', f.pos]} style={`transform: rotate(${f.rot})`}>
+        {f.text}
+      </p>
+    ))
+  }
+</div>
+
+<style>
+  /*
+   * Unter 640 px überlappen sich Kalender (74 %) und Sprechblasen (46 %) um rund
+   * 65 px, der Dateikasten läuft aus seiner Karte. Auf dem Handy daher gestapelt
+   * und ohne Rotation, mit Schriftgraden über der Lesbarkeitsgrenze.
+   */
+  @media (max-width: 639px) {
+    .hk {
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .hk > * {
+      position: static !important;
+      width: 100% !important;
+      max-width: none !important;
+      transform: none !important;
+    }
+    .hk-q {
+      align-self: flex-end;
+      max-width: 85% !important;
+      font-size: 0.8rem !important;
+    }
+    .hk-cal {
+      font-size: 0.72rem;
+    }
+    .hk-file {
+      font-size: 0.72rem;
+    }
+  }
+
+  .hk-cal,
+  .hk-file {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 22px 44px -22px oklch(30% 0.08 265 / 0.45);
+    color: var(--color-foreground);
+  }
+  .hk-d {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1.75;
+    border-radius: 0.35rem;
+    color: var(--color-foreground-secondary);
+    background: var(--color-background-secondary);
+  }
+  .hk-we {
+    opacity: 0.4;
+    background: transparent;
+  }
+  .hk-xl {
+    color: oklch(40% 0.1 70);
+    background: repeating-linear-gradient(135deg, oklch(85% 0.13 80 / 0.75) 0 4px, oklch(92% 0.09 85 / 0.75) 4px 8px);
+    font-weight: 700;
+  }
+  .hk-blind {
+    color: var(--color-foreground-muted);
+    background: transparent;
+    border: 1px dashed color-mix(in oklch, var(--color-foreground-muted) 40%, transparent);
+  }
+  .hk-bwa {
+    color: white;
+    background: oklch(58% 0.2 25);
+    font-weight: 700;
+    box-shadow: 0 0 0 3px oklch(58% 0.2 25 / 0.25);
+  }
+  .hk-sw {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 0.2rem;
+  }
+  .hk-cell {
+    padding: 0.2rem 0.35rem;
+    background: var(--color-background-secondary);
+    white-space: nowrap;
+  }
+  .hk-err {
+    color: oklch(52% 0.19 25);
+    background: oklch(60% 0.19 25 / 0.12);
+    font-weight: 700;
+  }
+  .hk-gap {
+    color: oklch(52% 0.19 25);
+    background: var(--color-card);
+    border: 1.5px dashed oklch(58% 0.2 25 / 0.7);
+  }
+  .hk-q {
+    color: white;
+    background: var(--color-brand-500);
+    box-shadow: 0 16px 30px -16px var(--color-brand-500);
+  }
+</style>

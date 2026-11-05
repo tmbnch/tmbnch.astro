@@ -1,0 +1,81 @@
+---
+/**
+ * Screencast - kurzer, tonloser Bildschirmmitschnitt für MDX-Beiträge.
+ *
+ * Bewusst ohne externe Einbettung (YouTube/Vimeo): Das Video liegt unter
+ * public/screencasts/ und wird direkt ausgeliefert - kein Drittanbieter-
+ * Tracking, keine Consent-Frage, kein Layoutsprung durch fremde Player.
+ *
+ * Solange die Datei fehlt, rendert die Komponente einen sichtbaren Platzhalter
+ * mit der Aufnahme-Anweisung. So bleibt im Artikel erkennbar, was dort
+ * hingehört, ohne dass der Build bricht.
+ *
+ * Verwendung in MDX:
+ *   <Screencast
+ *     src="/screencasts/angebot-optionen.mp4"
+ *     poster="/screencasts/angebot-optionen.jpg"
+ *     caption="..."
+ *     todo="Was aufgenommen werden soll (nur im Platzhalter sichtbar)"
+ *   />
+ */
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+interface Props {
+  /** Pfad ab /public, z.B. "/screencasts/angebot-optionen.mp4" */
+  src: string;
+  /** Standbild, das vor dem Abspielen erscheint. Verhindert Layoutsprung. */
+  poster?: string;
+  /** Beschreibt, was im Clip passiert - auch für Nutzer ohne Video. */
+  caption?: string;
+  /** Seitenverhältnis für den reservierten Platz. */
+  ratio?: '16/9' | '4/3' | '1/1';
+  /** Aufnahme-Anweisung, erscheint nur im Platzhalter. */
+  todo?: string;
+}
+
+const { src, poster, caption, ratio = '16/9', todo } = Astro.props;
+
+// Beim Build prüfen, ob die Datei schon existiert.
+const publicPath = resolve(process.cwd(), 'public', src.replace(/^\//, ''));
+const hasVideo = existsSync(publicPath);
+const hasPoster = poster ? existsSync(resolve(process.cwd(), 'public', poster.replace(/^\//, ''))) : false;
+
+const ratioClass = { '16/9': 'aspect-video', '4/3': 'aspect-[4/3]', '1/1': 'aspect-square' }[ratio];
+---
+
+<figure class="not-prose my-10" data-reveal="fade-up">
+  {
+    hasVideo ? (
+      <div class="border-border bg-background-secondary overflow-hidden rounded-2xl border shadow-[0_18px_45px_rgba(34,43,74,0.10)] dark:shadow-[0_18px_45px_rgba(0,0,0,0.45)]">
+        {/* Tonlose Kurzclips: autoplay+loop+muted ist hier vertretbar, weil kein
+            Ton startet und der Clip eine Bewegung erklärt. controls bleibt an,
+            damit Nutzer anhalten können. playsinline verhindert Vollbild auf iOS. */}
+        <video
+          class={`block w-full ${ratioClass} bg-black object-cover`}
+          src={src}
+          poster={hasPoster ? poster : undefined}
+          controls
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label={caption}
+        />
+      </div>
+    ) : (
+      <div
+        class={`border-border bg-background-secondary text-foreground-muted flex ${ratioClass} flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-8 text-center`}
+      >
+        <span class="text-brand-500">
+          <Icon name="monitor" size="lg" />
+        </span>
+        <p class="text-foreground font-display text-base font-semibold">Screencast folgt</p>
+        {todo && <p class="max-w-md text-sm leading-6">{todo}</p>}
+        <p class="text-foreground-subtle font-mono text-xs">{src}</p>
+      </div>
+    )
+  }
+  {caption && <figcaption class="text-foreground-muted mt-3 text-sm leading-6">{caption}</figcaption>}
+</figure>

@@ -1,0 +1,145 @@
+---
+/**
+ * Klärungskosten: Was es kostet, eine Unklarheit spät statt früh aufzulösen.
+ *
+ * Die Aussage ist nicht "früh ist besser" als Allgemeinplatz, sondern dass die
+ * Kosten nicht linear steigen: Dieselbe Erkenntnis kostet in der Discovery ein
+ * Gespräch, nach dem Go-live eine Migration. Deshalb lohnt der kleine
+ * Klärungsschritt vorab auch dann, wenn er zunächst wie Verzögerung wirkt.
+ */
+
+const stufen = [
+  { label: 'Discovery', kosten: 1, hoehe: 22, text: 'ein Gespräch' },
+  { label: 'Konzept', kosten: 3, hoehe: 48, text: 'ein Modell anpassen' },
+  { label: 'Umsetzung', kosten: 10, hoehe: 96, text: 'Code und Tests ändern' },
+  { label: 'Abnahme', kosten: 30, hoehe: 156, text: 'Umbau unter Termindruck' },
+  { label: 'Nach Go-live', kosten: 100, hoehe: 210, text: 'Migration im Betrieb' },
+];
+
+const basisY = 254;
+const startX = 78;
+const abstand = 116;
+---
+
+<figure class="not-prose my-10" data-reveal="fade-up">
+  <div class="border-border bg-background-secondary overflow-x-auto rounded-2xl border p-6 sm:p-8">
+    <svg
+      viewBox="0 0 660 330"
+      role="img"
+      aria-labelledby="kosten-titel kosten-desc"
+      class="mx-auto block h-auto w-full min-w-[32rem] max-w-[42rem]"
+    >
+      <title id="kosten-titel">Kosten einer Klärung je nach Projektphase</title>
+      <desc id="kosten-desc">
+        Fünf Balken, die zeigen, was dieselbe offene Frage in verschiedenen Phasen kostet:
+        in der Discovery ein Gespräch, im Konzept eine Modellanpassung, in der Umsetzung
+        Änderungen an Code und Tests, bei der Abnahme ein Umbau unter Termindruck und nach
+        dem Go-live eine Migration im laufenden Betrieb. Der Aufwand wächst dabei nicht
+        gleichmäßig, sondern sprunghaft.
+      </desc>
+
+      <defs>
+        <marker id="kd-pfeil" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--foreground-subtle, #9297a8)" />
+        </marker>
+      </defs>
+
+      <!-- Grundlinie -->
+      <line x1="40" y1={basisY} x2="640" y2={basisY} class="kd-axis" />
+
+      {
+        stufen.map((s, i) => {
+          const x = startX + i * abstand;
+          const y = basisY - s.hoehe;
+          const spaet = i >= 3;
+          return (
+            <g>
+              <rect
+                x={x - 34}
+                y={y}
+                width="68"
+                height={s.hoehe}
+                rx="6"
+                class={`kd-bar ${spaet ? 'is-late' : ''} ${i === 0 ? 'is-early' : ''}`}
+              />
+              <text x={x} y={y - 10} class={`kd-value ${spaet ? 'is-late' : ''}`}>
+                {s.kosten}×
+              </text>
+              <text x={x} y={basisY + 20} class="kd-label">
+                {s.label}
+              </text>
+              <text x={x} y={basisY + 38} class="kd-sub">
+                {s.text}
+              </text>
+            </g>
+          );
+        })
+      }
+
+      <!-- Hinweis auf den frühen Schritt: oben links, wo bis zum dritten
+           Balken (ab x=276) Platz frei ist; Pfeil zeigt auf Discovery. -->
+      <text x="44" y="40" class="kd-note">Hier ist Klärung noch billig -</text>
+      <text x="44" y="58" class="kd-note kd-note-soft">
+        und fühlt sich trotzdem wie Verzögerung an.
+      </text>
+      <path d={`M 60 70 C 56 130, 62 180, 70 ${basisY - 22 - 16}`} class="kd-pointer" marker-end="url(#kd-pfeil)" />
+    </svg>
+  </div>
+  <figcaption class="text-foreground-muted mt-3 text-sm leading-6">
+    Relative Größenordnungen aus Projekterfahrung, keine gemessenen Werte. Entscheidend ist
+    nicht der genaue Faktor, sondern dass die Kurve nicht gleichmäßig steigt.
+  </figcaption>
+</figure>
+
+<style>
+  .kd-axis {
+    stroke: var(--border, #e2e4ed);
+    stroke-width: 1.5;
+  }
+  .kd-bar {
+    fill: var(--brand-500, #6372a5);
+    opacity: 0.55;
+  }
+  .kd-bar.is-early {
+    opacity: 0.85;
+  }
+  .kd-bar.is-late {
+    fill: var(--brand-600, #4c5c93);
+    opacity: 0.8;
+  }
+  .kd-value {
+    fill: var(--foreground-secondary, #4a5063);
+    font-size: 13px;
+    font-weight: 700;
+    text-anchor: middle;
+  }
+  .kd-value.is-late {
+    fill: var(--brand-600, #4c5c93);
+  }
+  .kd-label {
+    fill: var(--foreground, #171b26);
+    font-size: 12.5px;
+    font-weight: 600;
+    text-anchor: middle;
+  }
+  .kd-sub {
+    fill: var(--foreground-muted, #6b7186);
+    font-size: 11.5px;
+    text-anchor: middle;
+  }
+  .kd-pointer {
+    stroke: var(--foreground-subtle, #9297a8);
+    stroke-width: 1.2;
+    fill: none;
+    stroke-dasharray: 4 3;
+  }
+  .kd-note-soft {
+    font-weight: 500;
+    fill: var(--foreground-muted, #6b7186);
+  }
+  .kd-note {
+    fill: var(--foreground-secondary, #4a5063);
+    font-size: 12px;
+    font-weight: 600;
+  }
+</style>

@@ -1,0 +1,238 @@
+---
+/**
+ * Ausschnitt „Prozessbild“ aus einem Workshop, als SVG nachgebaut: Swimlanes nach BPMN-Art,
+ * ein Vorgang läuft als Punkt durch den Ablauf, Systembrüche pulsieren rot, Klebezettel aus der
+ * Aufnahme. Läuft dauerhaft im Hintergrund, ohne Interaktion. Bei reduzierter Bewegung statisch.
+ */
+const W = 700;
+const lanes = [
+  { t: 'Kunde', y: 0 },
+  { t: 'Vertrieb', y: 90 },
+  { t: 'Technik', y: 180 },
+  { t: 'Büro', y: 270 },
+];
+const H = 360;
+const tasks = [
+  { x: 150, y: 115, w: 116, t: 'Anfrage erfassen' },
+  { x: 462, y: 115, w: 128, t: 'Angebot schreiben' },
+  { x: 330, y: 205, w: 116, t: 'Aufwand schätzen' },
+  { x: 470, y: 295, w: 116, t: 'Auftrag anlegen' },
+];
+const token = 'M 120 59 V 135 H 310 V 225 H 528 V 135 H 640 V 45 H 680 V 315 H 586';
+---
+
+<svg viewBox={`0 0 ${W} ${H}`} class="wp block h-auto w-full" role="img" aria-label="Ausschnitt eines Prozessbilds aus einem Workshop: Anfrage, Schätzung, Angebot, Zusage, Auftrag">
+  <defs>
+    <marker id="wp-arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L8 4 L0 8 z" class="wp-arrfill" />
+    </marker>
+  </defs>
+
+  {
+    lanes.map((l, i) => (
+      <g>
+        <rect x="0" y={l.y} width={W} height="90" class:list={['wp-lane', i % 2 === 1 && 'wp-lane-alt']} />
+        <rect x="0" y={l.y} width="72" height="90" class="wp-lanehead" />
+        <text x="36" y={l.y + 49} text-anchor="middle" class="wp-lanet">{l.t}</text>
+      </g>
+    ))
+  }
+
+  <!-- Kanten -->
+  <path d="M 120 59 V 135 H 148" class="wp-edge" marker-end="url(#wp-arr)" />
+  <path d="M 266 135 H 287" class="wp-edge" marker-end="url(#wp-arr)" />
+  <path d="M 332 135 H 460" class="wp-edge" marker-end="url(#wp-arr)" />
+  <path d="M 310 157 V 225 H 328" class="wp-edge" marker-end="url(#wp-arr)" />
+  <path d="M 446 225 H 528 V 157" class="wp-edge" marker-end="url(#wp-arr)" />
+  <path d="M 590 135 H 640 V 61" class="wp-edge" marker-end="url(#wp-arr)" />
+  <path d="M 654 45 H 680 V 315 H 588" class="wp-edge wp-edge-dash" marker-end="url(#wp-arr)" />
+  <text x="388" y="128" class="wp-small">ja</text>
+  <text x="318" y="196" class="wp-small">nein</text>
+
+  <!-- Start, Ende, Gateway -->
+  <circle cx="120" cy="45" r="14" class="wp-start" />
+  <text x="120" y="20" text-anchor="middle" class="wp-small">Anfrage</text>
+  <circle cx="640" cy="45" r="14" class="wp-end" />
+  <circle cx="640" cy="45" r="10" class="wp-end" />
+  <text x="610" y="20" text-anchor="middle" class="wp-small">Zusage</text>
+  <path d="M 310 113 L 332 135 L 310 157 L 288 135 Z" class="wp-gw" />
+  <text x="310" y="140" text-anchor="middle" class="wp-gwx">×</text>
+  <text x="310" y="104" text-anchor="middle" class="wp-small">Standard?</text>
+
+  {
+    tasks.map((t) => (
+      <g>
+        <rect x={t.x} y={t.y} width={t.w} height="40" rx="9" class="wp-task" />
+        <text x={t.x + t.w / 2} y={t.y + 24} text-anchor="middle" class="wp-taskt">{t.t}</text>
+      </g>
+    ))
+  }
+
+  <!-- Systembrüche -->
+  <g class="wp-pain" style="--d: 0s">
+    <rect x="404" y="190" width="58" height="20" rx="10" />
+    <text x="433" y="204" text-anchor="middle">Excel</text>
+  </g>
+  <g class="wp-pain" style="--d: 1.2s">
+    <rect x="530" y="94" width="78" height="20" rx="10" />
+    <text x="569" y="108" text-anchor="middle">abgetippt</text>
+  </g>
+  <g class="wp-pain" style="--d: 2.4s">
+    <rect x="512" y="274" width="84" height="20" rx="10" />
+    <text x="554" y="288" text-anchor="middle">nochmal tippen</text>
+  </g>
+
+  <!-- Klebezettel aus der Aufnahme -->
+  <g class="wp-note" style="--d: 0.5s" transform="rotate(-4 200 236)">
+    <rect x="150" y="206" width="112" height="56" rx="3" />
+    <text x="160" y="228" class="wp-hand">Wer gibt frei</text>
+    <text x="160" y="246" class="wp-hand">ab 10.000 €?</text>
+  </g>
+  <g class="wp-note" style="--d: 2s" transform="rotate(3 300 312)">
+    <rect x="230" y="288" width="122" height="52" rx="3" />
+    <text x="240" y="309" class="wp-hand">Sätze stehen nur</text>
+    <text x="240" y="327" class="wp-hand">in Jans Datei</text>
+  </g>
+
+  <!-- Vorgang, der durchläuft -->
+  <circle r="7" class="wp-token">
+    <animateMotion dur="8s" repeatCount="indefinite" path={token} keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
+  </circle>
+  <circle r="7" class="wp-token wp-token-2" opacity="0">
+    <set attributeName="opacity" to="1" begin="4s" />
+    <animateMotion dur="8s" begin="4s" repeatCount="indefinite" path={token} keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
+  </circle>
+</svg>
+
+<style>
+  .wp text {
+    font-family: inherit;
+  }
+  .wp-lane {
+    fill: var(--color-card);
+    stroke: var(--color-border);
+  }
+  .wp-lane-alt {
+    fill: color-mix(in oklch, var(--color-background-secondary) 70%, var(--color-card));
+  }
+  .wp-lanehead {
+    fill: var(--color-background-secondary);
+    stroke: var(--color-border);
+  }
+  .wp-lanet {
+    font-size: 12px;
+    font-weight: 700;
+    fill: var(--color-foreground-secondary);
+  }
+  .wp-edge {
+    fill: none;
+    stroke: var(--color-foreground-muted);
+    stroke-width: 1.6;
+  }
+  .wp-edge-dash {
+    stroke-dasharray: 5 5;
+  }
+  .wp-arrfill {
+    fill: var(--color-foreground-muted);
+  }
+  .wp-small {
+    font-size: 11px;
+    fill: var(--color-foreground-muted);
+  }
+  .wp-start {
+    fill: var(--color-card);
+    stroke: oklch(60% 0.15 150);
+    stroke-width: 2;
+  }
+  .wp-end {
+    fill: none;
+    stroke: var(--color-foreground);
+    stroke-width: 2;
+  }
+  .wp-gw {
+    fill: oklch(95% 0.06 90);
+    stroke: oklch(70% 0.14 80);
+    stroke-width: 1.6;
+  }
+  .wp-gwx {
+    font-size: 16px;
+    font-weight: 700;
+    fill: oklch(55% 0.12 70);
+  }
+  .wp-task {
+    fill: var(--color-card);
+    stroke: var(--color-brand-400);
+    stroke-width: 1.6;
+  }
+  .wp-taskt {
+    font-size: 11.5px;
+    font-weight: 600;
+    fill: var(--color-foreground);
+  }
+  .wp-pain rect {
+    fill: oklch(60% 0.2 25);
+  }
+  .wp-pain text {
+    font-size: 10.5px;
+    font-weight: 700;
+    fill: white;
+  }
+  .wp-pain {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: wp-pulse 3.6s ease-in-out var(--d) infinite;
+  }
+  @keyframes wp-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.85;
+    }
+    12% {
+      transform: scale(1.12);
+      opacity: 1;
+    }
+    24% {
+      transform: scale(1);
+    }
+  }
+  .wp-note rect {
+    fill: oklch(94% 0.11 98);
+    filter: drop-shadow(0 4px 6px oklch(40% 0.08 80 / 0.25));
+  }
+  .wp-hand {
+    font-family: 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive !important;
+    font-size: 12px;
+    fill: oklch(32% 0.05 70);
+  }
+  .wp-note {
+    animation: wp-note 7s ease-in-out var(--d) infinite;
+  }
+  @keyframes wp-note {
+    0%,
+    100% {
+      opacity: 0.9;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  .wp-token {
+    fill: var(--color-brand-500);
+    stroke: white;
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 6px color-mix(in oklch, var(--color-brand-500) 70%, transparent));
+  }
+  .wp-token-2 {
+    fill: oklch(65% 0.15 150);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wp-pain,
+    .wp-note {
+      animation: none;
+    }
+    .wp-token {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,32 @@
+---
+/** Zum Software-Check-Artikel: Fragen, die im Quellcode nicht zu sehen sind. Nur Aussagen aus dem Text. */
+const fragen = [
+  { thema: 'Mailweg', frage: 'Was passiert, wenn eine Adresse nicht existiert?' },
+  { thema: 'Backup', frage: 'Hat schon einmal jemand zurückgespielt?' },
+  { thema: 'Alarmierung', frage: 'Wer merkt einen Ausfall, bevor jemand anruft?' },
+  { thema: 'Auslieferung', frage: 'Wie kommt eine Version in die Produktion und zurück?' },
+];
+---
+
+<figure class="not-prose my-10">
+  <div class="grid gap-3 sm:grid-cols-[1fr_auto_2fr] sm:items-stretch">
+    <div class="bg-brand-500/5 flex flex-col justify-center rounded-2xl p-5">
+      <p class="text-brand-600 dark:text-brand-300 text-xs font-semibold tracking-[0.14em] uppercase">Im Quellcode</p>
+      <p class="text-foreground mt-2 text-sm leading-6">Was geschrieben steht, kann eine KI prüfen.</p>
+    </div>
+    <div class="text-foreground-muted hidden items-center text-xl sm:flex" aria-hidden="true">→</div>
+    <div class="border-border bg-background-secondary rounded-2xl border p-5">
+      <p class="text-xs font-semibold tracking-[0.14em] text-amber-700 uppercase dark:text-amber-400">Erst im Betrieb</p>
+      <dl class="mt-3 grid gap-3 sm:grid-cols-2">
+        {
+          fragen.map((f) => (
+            <div>
+              <dt class="text-foreground text-sm font-semibold">{f.thema}</dt>
+              <dd class="text-foreground-secondary text-sm leading-6">{f.frage}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+</figure>

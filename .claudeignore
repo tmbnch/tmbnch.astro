@@ -1,0 +1,64 @@
+# --- Paketmanager & Caches ---
+node_modules/
+.pnpm/
+.yarn/
+.bun/
+bun.lockb
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# --- Build-Output ---
+dist/
+build/
+out/
+.next/
+.vercel/
+.vite/
+.vite-cache/
+vite.config.ts
+
+# --- Tool-/Runtime-spezifisch ---
+.swc/
+.tanstack/
+.turbo/
+.cache/
+*.tsbuildinfo
+*.log
+*.output.*
+*.generated.*
+*.gen.*
+
+# --- Tests & Coverage ---
+coverage/
+*.test.ts
+*.spec.ts
+*.snap
+
+# --- Monorepo-spezifisch ---
+**/dist/
+**/build/
+**/out/
+**/.tanstack/
+**/.swc/
+**/node_modules/
+**/.turbo/
+**/routeTree.gen.ts
+
+# --- Editor & System-Dateien ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- Env-Dateien ---
+.env
+.env.*
+
+# --- Prisma / DB ---
+.prisma/
+*.db
+
+# --- Optional: exclude everything not needed ---
+*.bak
+*.tmp

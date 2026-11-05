@@ -1,0 +1,59 @@
+---
+/**
+ * Hochkant-Fassung des Ablöseplans fürs Handy: dieselbe Zeitleiste, aber die Namen stehen über
+ * den Balken, damit alle sieben Monate ohne seitliches Scrollen in die Breite passen. Die
+ * Probeläufe entfallen hier, der Stichtag steht als Satz darunter.
+ */
+import '@/components/angebote/frame.css';
+import '@/components/zahlen/zahlen.css';
+import '@/components/abloesung/abloesung.css';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const dauer = 7;
+const pct = (m: number) => `${(m / dauer) * 100}%`;
+type Bar = { von: number; bis: number; art: 'ws' | 'bau' | 'live' | 'alt' | 'lesen'; t: string };
+const zeilen: { name: string; bars: Bar[] }[] = [
+  { name: 'Aufnahme mit euch', bars: [{ von: 0, bis: 1, art: 'ws', t: '' }] },
+  { name: 'Angebot & Kalkulation', bars: [{ von: 1, bis: 2, art: 'bau', t: 'Bau' }, { von: 2, bis: 7, art: 'live', t: 'live' }] },
+  { name: 'Einsatz & Abrechnung', bars: [{ von: 1.8, bis: 3.5, art: 'bau', t: 'Bau' }, { von: 3.5, bis: 7, art: 'live', t: 'live' }] },
+  { name: 'Zahlen & Steuerung', bars: [{ von: 3.2, bis: 4.2, art: 'bau', t: 'Bau' }, { von: 4.2, bis: 7, art: 'live', t: 'live' }] },
+  { name: 'Euer altes Programm', bars: [{ von: 0, bis: 5, art: 'alt', t: 'läuft parallel weiter' }, { von: 5, bis: 7, art: 'lesen', t: 'nur lesen' }] },
+];
+---
+
+<figure class:list={['af-frame z-app', className]} style={`--ap-monate: ${dauer}`}>
+  <div class="af-bar" aria-hidden="true">
+    <span class="af-dots"><span></span><span></span><span></span></span>
+    <span class="af-url">der weg dahin · beispiel</span>
+    <span class="af-dots invisible"><span></span><span></span><span></span></span>
+  </div>
+  <div class="p-3">
+    <div class="grid text-center" style={`grid-template-columns: repeat(${dauer}, minmax(0, 1fr))`}>
+      {Array.from({ length: dauer }, (_, i) => <span class="z-label">M{i + 1}</span>)}
+    </div>
+    <div class="relative mt-1 space-y-2.5">
+      {
+        zeilen.map((z) => (
+          <div>
+            <p class="text-[0.8rem] font-semibold">{z.name}</p>
+            <div class="ap-grid relative mt-1 h-9">
+              {z.bars.map((b) => (
+                <span class:list={['ap-bar', `ap-${b.art}`]} style={`left:${pct(b.von)};width:${pct(b.bis - b.von)}`}>
+                  {b.t}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+      <span class="ap-stichtag" style={`left:${pct(5)}`}></span>
+    </div>
+    <p class="mt-3 text-[0.82rem] leading-5">
+      <span class="font-bold">Stichtag in Monat 5:</span> Ab hier arbeitet ihr nur noch im Neuen.
+    </p>
+  </div>
+</figure>

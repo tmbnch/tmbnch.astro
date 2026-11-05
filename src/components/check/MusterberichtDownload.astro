@@ -1,0 +1,58 @@
+---
+/**
+ * Download des Musterberichts zum Software-Check. Dieselbe Karte im Blogbeitrag und auf der
+ * Tür-Seite /software-check/, damit Text und Datei an beiden Stellen gleich bleiben.
+ *
+ * Bewusst ohne E-Mail-Abfrage: Der Bericht ist Beleg, kein Köder. Gezählt wird der Klick als
+ * Plausible-Event „musterbericht_download“ mit der Eigenschaft `ort` (blog, check, …). Das Ziel
+ * muss in Plausible einmal unter Goals angelegt werden, sonst taucht es nicht in der Auswertung auf.
+ *
+ * Der Bericht ist ein Muster mit fiktivem Betrieb und hat nichts mit einem Kundenbericht zu tun.
+ */
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+interface Props {
+  /** Wo die Karte steht, landet als Event-Eigenschaft in Plausible. */
+  ort: string;
+}
+
+const { ort } = Astro.props;
+const href = '/downloads/musterbericht-software-check.pdf';
+---
+
+<aside class="not-prose border-brand-300/60 bg-brand-500/5 my-10 flex flex-col gap-4 rounded-2xl border p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+  <span class="bg-background border-border text-brand-600 dark:text-brand-300 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
+    <Icon name="file-text" size="lg" />
+  </span>
+  <div class="min-w-0 flex-1">
+    <p class="font-display text-foreground font-bold">Musterbericht zum Software-Check</p>
+    <p class="text-foreground-secondary mt-1 text-sm leading-6">
+      So sieht aus, was ihr am Ende bekommt: Ablauf in wenigen Tagen, Management-Summary, die Prüffelder über OWASP hinaus und wie eingestuft wird,
+      Befunde mit Fundstelle und Empfehlung, Reihenfolge, Papier zum Betrieb und Fragen an eure Dienstleister. Betrieb
+      und Befunde sind ausgedacht, es ist kein Bericht eines Kunden.
+    </p>
+  </div>
+  <a
+    href={href}
+    download
+    data-musterbericht={ort}
+    class="bg-foreground text-background hover:bg-foreground/85 inline-flex shrink-0 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors"
+  >
+    <Icon name="download" size="sm" />
+    PDF, 10 Seiten
+  </a>
+</aside>
+
+<script>
+  import { trackPlausible } from '@/lib/leadTracking';
+
+  // Einmal pro Seite registrieren, auch wenn die Karte mehrfach eingebunden ist.
+  if (!(window as unknown as { __musterbericht?: boolean }).__musterbericht) {
+    (window as unknown as { __musterbericht?: boolean }).__musterbericht = true;
+    document.addEventListener('click', (e) => {
+      const link = e.target instanceof Element ? e.target.closest('[data-musterbericht]') : null;
+      if (!link) return;
+      trackPlausible('musterbericht_download', { ort: link.getAttribute('data-musterbericht') || 'unbekannt' });
+    });
+  }
+</script>

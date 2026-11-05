@@ -1,0 +1,227 @@
+---
+/**
+ * Vorschau im In-App-Browser: /dev/instagram/ (nur im Dev-Server, im Build gibt es die Seite nicht).
+ *
+ * Zeigt eine Seite der Site so, wie sie aus einer Anzeige heraus aussieht: im Browser von
+ * Instagram oder Facebook auf dem iPhone, mit deren Kopf- und Fußleiste, die zusammen rund
+ * 170 px des Bildschirms nehmen. Dazu Safari und Android zum Vergleich. Die Seite läuft im
+ * iframe vom Dev-Server, also mit Quiz, Consent und Leiste. Mit „Quelle: Preview“ zeigt der
+ * Rahmen den gebauten Stand von `astro preview` (Port 4322); die Live-Site lässt sich nicht
+ * einbetten, sie sendet X-Frame-Options: DENY.
+ *
+ * Aufruf: /dev/instagram/?pfad=/f/einsatz/&geraet=ig-iphone13&quelle=dev
+ */
+import { funnels } from '@/data/funnels';
+import consentConfig from '@/config/consent.config';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { vorschau: 'instagram' } }] : [];
+}
+
+const seiten = [
+  '/f/einsatz/',
+  '/f/zahlen/',
+  '/f/eigene-software/',
+  '/f/angebote/',
+  ...funnels.map((f) => `/f/${f.slug}/`),
+  '/b/angebot/',
+  '/',
+  '/discovery-workshop/',
+];
+
+/** Maße in CSS-Pixeln: Bildschirm, Statusleiste, Kopfleiste der App, Fußleiste, Home-Balken. */
+const geraete = {
+  'ig-iphone13': { name: 'Instagram · iPhone 13', w: 390, h: 844, status: 47, kopf: 44, fuss: 64, home: 34, app: 'instagram' },
+  'ig-iphonese': { name: 'Instagram · iPhone SE', w: 375, h: 667, status: 20, kopf: 44, fuss: 50, home: 0, app: 'instagram' },
+  'fb-iphone13': { name: 'Facebook · iPhone 13', w: 390, h: 844, status: 47, kopf: 44, fuss: 44, home: 34, app: 'facebook' },
+  'ig-android': { name: 'Instagram · Android', w: 360, h: 800, status: 24, kopf: 56, fuss: 48, home: 0, app: 'instagram' },
+  'safari-iphone13': { name: 'Safari · iPhone 13', w: 390, h: 844, status: 47, kopf: 0, fuss: 50, home: 34, app: 'safari' },
+};
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Vorschau im In-App-Browser</title>
+    <style is:global>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; display: grid; grid-template-columns: 18rem 1fr; background: #e9ebef; font: 14px/1.45 system-ui, -apple-system, sans-serif; color: #1a1d24; }
+      aside { background: #fff; border-right: 1px solid #d9dce3; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; position: sticky; top: 0; height: 100vh; overflow: auto; }
+      h1 { font-size: 1rem; margin: 0; }
+      label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7280; margin-bottom: 0.375rem; }
+      select, input, button { font: inherit; width: 100%; border: 1px solid #cfd3db; border-radius: 0.5rem; padding: 0.5rem 0.625rem; background: #fff; }
+      button { cursor: pointer; text-align: left; }
+      button.aktiv { border-color: #111; background: #111; color: #fff; }
+      .geraete { display: grid; gap: 0.375rem; }
+      .aktionen { display: grid; gap: 0.375rem; }
+      .aktionen button { text-align: center; }
+      .mass { color: #6b7280; font-size: 12px; }
+      main { display: grid; place-items: center; padding: 1.5rem; }
+      .buehne { transform-origin: top center; }
+      .phone { position: relative; background: #000; border-radius: 48px; padding: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.35); }
+      .screen { position: relative; overflow: hidden; border-radius: 38px; background: #fff; display: flex; flex-direction: column; }
+      .status { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 28px 6px; font-weight: 600; font-size: 15px; background: #fff; }
+      .status .insel { position: absolute; left: 50%; top: 11px; width: 120px; height: 34px; margin-left: -60px; background: #000; border-radius: 20px; }
+      .kopf, .fuss { background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; flex: none; }
+      .kopf { border-bottom: 1px solid #e5e7eb; }
+      .fuss { border-top: 1px solid #e5e7eb; justify-content: space-around; }
+      .rund { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #d1d5db; display: grid; place-items: center; font-size: 16px; color: #111; background: #fff; }
+      .mitte { text-align: center; line-height: 1.15; }
+      .mitte b { display: block; font-size: 15px; }
+      .mitte span { font-size: 12px; color: #6b7280; }
+      .home { background: #fff; display: grid; place-items: center; }
+      .home i { width: 134px; height: 5px; border-radius: 3px; background: #111; }
+      iframe { border: 0; width: 100%; flex: 1; background: #fff; }
+      .android .status { font-size: 13px; padding: 2px 16px; align-items: center; }
+      .android .kopf { justify-content: flex-start; gap: 14px; }
+      .android .rund { border: 0; }
+      .safari .fuss { flex-direction: column; justify-content: center; gap: 6px; }
+      .safari .adresse { width: 90%; height: 36px; border-radius: 10px; background: #eef0f3; display: grid; place-items: center; font-size: 14px; }
+      .hinweis { font-size: 12px; color: #6b7280; }
+      kbd { font-family: ui-monospace, monospace; font-size: 12px; background: #f3f4f6; padding: 1px 4px; border-radius: 3px; }
+    </style>
+  </head>
+  <body>
+    <aside>
+      <h1>Vorschau im In-App-Browser</h1>
+      <div>
+        <label for="pfad">Seite</label>
+        <select id="pfad">{seiten.map((s) => <option value={s}>{s}</option>)}</select>
+        <input id="pfad-frei" type="text" placeholder="oder Pfad eintippen, Enter" style="margin-top: 0.375rem" />
+      </div>
+      <div>
+        <label>Gerät</label>
+        <div class="geraete" id="geraete">
+          {Object.entries(geraete).map(([key, g]) => <button type="button" data-geraet={key}>{g.name}<br /><span class="mass">{g.w} × {g.h}, Inhalt {g.h - g.status - g.kopf - g.fuss - g.home} px hoch</span></button>)}
+        </div>
+      </div>
+      <div>
+        <label for="quelle">Quelle</label>
+        <select id="quelle">
+          <option value="">Dev-Server (diese Adresse)</option>
+          <option value="http://localhost:4322">Preview, gebauter Stand (Port 4322)</option>
+        </select>
+      </div>
+      <div>
+        <label for="erzwingen" style="display:flex; align-items:center; gap:0.5rem; text-transform:none; letter-spacing:0; font-size:13px; cursor:pointer">
+          <input type="checkbox" id="erzwingen" checked style="width:auto" />
+          Consent bei jedem Laden zeigen
+        </label>
+        <p class="hinweis" style="margin:0.375rem 0 0">Löscht die gespeicherte Entscheidung vor jedem Laden, auch nach einem Klick auf einen Link im Rahmen. Nur mit dem Dev-Server als Quelle.</p>
+      </div>
+      <div class="aktionen">
+        <button type="button" id="neu">Neu laden</button>
+        <button type="button" id="consent">Consent zurücksetzen und neu laden</button>
+        <button type="button" id="offen">Seite im Tab öffnen</button>
+      </div>
+      <p class="hinweis">Die Live-Site lässt sich nicht einbetten (X-Frame-Options). Consent zurücksetzen geht nur mit dem Dev-Server als Quelle.</p>
+    </aside>
+    <main>
+      <div class="buehne" id="buehne">
+        <div class="phone" id="phone">
+          <div class="screen" id="screen">
+            <div class="status" id="status"><span>9:41</span><span class="insel" id="insel"></span><span>●●● ⌔ ▮</span></div>
+            <div class="kopf" id="kopf"></div>
+            <iframe id="frame" title="Vorschau"></iframe>
+            <div class="fuss" id="fuss"></div>
+            <div class="home" id="home"><i></i></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script define:vars={{ geraete, seiten, consentKey: consentConfig.storageKey }}>
+      const $ = (id) => document.getElementById(id);
+      const url = new URL(location.href);
+      let geraet = url.searchParams.get('geraet') in geraete ? url.searchParams.get('geraet') : 'ig-iphone13';
+      let pfad = url.searchParams.get('pfad') || seiten[0];
+      let quelle = url.searchParams.get('quelle') === 'preview' ? 'http://localhost:4322' : '';
+
+      function kopfleiste(g) {
+        if (g.app === 'instagram') {
+          const host = location.hostname === 'localhost' ? 'rocketbase.io' : location.hostname;
+          return `<span class="rund">✕</span><div class="mitte"><b>🔒 ${host}</b><span>Instagram</span></div><span class="rund">···</span>`;
+        }
+        if (g.app === 'facebook') return `<span class="rund">✕</span><div class="mitte"><b>rocketbase.io</b><span>🔒</span></div><span class="rund">···</span>`;
+        return '';
+      }
+      function fussleiste(g) {
+        if (g.app === 'safari') return `<div class="adresse">🔒 rocketbase.io</div>`;
+        if (g.app === 'facebook') return `<span class="rund">‹</span><span class="rund">›</span><span class="rund">⇪</span><span class="rund">☆</span><span class="rund">↻</span>`;
+        return `<span class="rund">‹</span><span class="rund">›</span><span class="rund">➤</span><span class="rund">◎</span><span class="rund">↻</span>`;
+      }
+
+      // Consent erzwingen: Der Rahmen teilt sich den localStorage mit dieser Seite (gleiche
+      // Herkunft), also lässt sich die Entscheidung hier löschen, bevor die Seite im Rahmen lädt.
+      function consentLoeschen() {
+        if (!$('erzwingen').checked || quelle) return;
+        try { localStorage.removeItem(consentKey); } catch { /* privater Modus */ }
+      }
+
+      function zeichnen() {
+        const g = geraete[geraet];
+        $('phone').classList.toggle('android', g.app === 'android' || geraet === 'ig-android');
+        $('phone').classList.toggle('safari', g.app === 'safari');
+        $('screen').style.width = g.w + 'px';
+        $('screen').style.height = g.h + 'px';
+        $('status').style.height = g.status + 'px';
+        $('insel').style.display = g.status >= 44 ? '' : 'none';
+        $('kopf').style.height = g.kopf + 'px';
+        $('kopf').style.display = g.kopf ? '' : 'none';
+        $('kopf').innerHTML = kopfleiste(g);
+        $('fuss').style.height = g.fuss + 'px';
+        $('fuss').innerHTML = fussleiste(g);
+        $('home').style.height = g.home + 'px';
+        $('home').style.display = g.home ? '' : 'none';
+        const frame = $('frame');
+        const ziel = quelle + pfad;
+        if (frame.getAttribute('src') !== ziel) { consentLoeschen(); frame.src = ziel; }
+        for (const b of document.querySelectorAll('[data-geraet]')) b.classList.toggle('aktiv', b.dataset.geraet === geraet);
+        $('pfad').value = seiten.includes(pfad) ? pfad : '';
+        $('quelle').value = quelle;
+        const s = Math.min(1, (innerHeight - 48) / (g.h + 24));
+        $('buehne').style.transform = `scale(${s})`;
+        $('buehne').style.height = Math.round((g.h + 24) * s) + 'px';
+        const q = new URLSearchParams({ pfad, geraet });
+        if (quelle) q.set('quelle', 'preview');
+        history.replaceState(null, '', '?' + q.toString());
+        document.title = `${pfad} · ${g.name}`;
+      }
+
+      $('pfad').addEventListener('change', (e) => { pfad = e.target.value; zeichnen(); });
+      $('pfad-frei').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.value) { pfad = e.target.value; zeichnen(); } });
+      $('quelle').addEventListener('change', (e) => { quelle = e.target.value; zeichnen(); });
+      $('geraete').addEventListener('click', (e) => { const b = e.target.closest('[data-geraet]'); if (b) { geraet = b.dataset.geraet; zeichnen(); } });
+      $('neu').addEventListener('click', () => { consentLoeschen(); $('frame').contentWindow.location.reload(); });
+      $('consent').addEventListener('click', () => {
+        try { $('frame').contentWindow.localStorage.clear(); $('frame').contentWindow.location.reload(); }
+        catch { alert('Geht nur mit dem Dev-Server als Quelle.'); }
+      });
+      $('offen').addEventListener('click', () => window.open(quelle + pfad, '_blank'));
+      // Die Astro-Dev-Toolbar im iframe liegt sonst wie ein Overlay im Bild.
+      $('frame').addEventListener('load', () => {
+        try {
+          // Beim Verlassen der Seite im Rahmen (Klick auf einen Link) löschen, damit die nächste
+          // Seite wie bei einem frischen Besucher mit der Karte startet.
+          $('frame').contentWindow.addEventListener('pagehide', consentLoeschen);
+        } catch {
+          // fremde Quelle
+        }
+        try {
+          const doc = $('frame').contentDocument;
+          const st = doc.createElement('style');
+          st.textContent = 'astro-dev-toolbar { display: none !important; }';
+          doc.head.appendChild(st);
+        } catch {
+          // fremde Quelle (Preview-Server): kein Zugriff, kein Problem
+        }
+      });
+      addEventListener('resize', zeichnen);
+      zeichnen();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,341 @@
+---
+title: 'Was ein Betrieb wert ist, dessen Zahlen im Kopf des Inhabers liegen'
+seoTitle: 'Unternehmensnachfolge: Was den Kaufpreis trägt'
+description: '186.000 Betriebe suchen bis 2030 einen Nachfolger. Was ein Käufer nicht prüfen kann, bezahlt er nicht. Warum Live-Kennzahlen den Kaufpreis tragen.'
+publishedAt: 2026-09-14
+author: 'Marten Prieß'
+image: './hero.png'
+imageAlt: 'Astronaut prüft einen Stapel Unterlagen an einem Schreibtisch im All'
+tags:
+  [
+    'unternehmensnachfolge',
+    'unternehmenswert',
+    'kpi',
+    'reporting',
+    'individualsoftware',
+    'beratung',
+  ]
+doors: ['zahlen']
+featured: false
+draft: false
+locale: de
+cta:
+  headline: 'Was würde ein Käufer bei euch als Erstes fragen?'
+  body: 'Wir gehen die vier Fragen aus diesem Beitrag mit euren Zahlen durch und sagen euch, welche davon heute aus dem System kommen und welche aus dem Kopf. Ohne Bewertung, ohne Verkaufsabsicht.'
+---
+
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import Figure from '@/components/blog/Figure.astro';
+import Screencast from '@/components/blog/Screencast.astro';
+import { contactLinks } from '@/data/rocketbase';
+
+Ein Übergabegespräch, zweite Runde. Der Interessent hat die Jahresabschlüsse gelesen und stellt die Frage, die in jedem dieser Gespräche kommt: "Was verdienen Sie an einem einzelnen Betreuungsvertrag?" Der Inhaber weiß es. Ungefähr. Er weiß, welche Kunden angenehm sind und welche jedes Jahr um den Preis feilschen, welcher Berater zu viel Zeit in welchem Objekt lässt und dass der große Logistikkunde eigentlich zu billig ist. Nur steht davon nichts in den Unterlagen.
+
+"Kommt darauf an", sagt er. Das ist ehrlich. Und es kostet Geld, weil der Käufer ab diesem Moment nicht mehr den Betrieb bewertet, sondern sein eigenes Risiko.
+
+Was ist ein Betrieb wert, dessen Zahlen im Kopf des Inhabers liegen? Und was ändert sich, wenn sie im System liegen? Die Antworten stützen sich auf Zahlen von KfW, DIHK, IfM Bonn und aus der Bewertungsforschung.
+
+## Der Markt hat sich gedreht
+
+Wer heute verkaufen will, trifft auf mehr Verkäufer als Käufer. Das [IfM Bonn](https://www.ifm-bonn.org/statistiken/unternehmensuebertragungen-und-nachfolgen) rechnet für die Jahre 2026 bis 2030 mit rund 186.000 Unternehmen, die zur Übergabe anstehen. Gut 30 Prozent davon entfallen auf unternehmensbezogene Dienstleistungen, also auf Beratungen, Prüf- und Wartungsbetriebe. Gleichauf liegt das produzierende Gewerbe. Die IHKs haben laut [DIHK-Report Unternehmensnachfolge 2025](https://www.dihk.de/resource/blob/134302/195174566635ef655907ea91b0ec327a/unternehmensentwicklung-dihk-report-unternehmensnachfolge-2025-data.pdf) im Jahr 2024 9.636 Alt-Inhaber beraten, so viele wie nie seit Beginn der Erhebung. Interesse an einer Übernahme äußerten 4.016 Personen. Der Report beziffert die Lücke: 5.620 Unternehmen, denen kein Kandidat gegenübersteht.
+
+<div className="not-prose my-10 grid gap-4 sm:grid-cols-3" data-reveal="fade-up">
+  <div className="border-border bg-background-secondary rounded-2xl border p-6">
+    <p className="font-display text-foreground text-4xl font-bold tracking-tight">186.000</p>
+    <div className="text-foreground-secondary mt-2 text-sm leading-6">
+      Unternehmen stehen 2026 bis 2030 zur Übergabe an. Gut 30 Prozent davon sind
+      unternehmensbezogene Dienstleistungen.
+    </div>
+    <p className="text-foreground-muted mt-3 text-xs">IfM Bonn, Daten und Fakten Nr. 37, 2025</p>
+  </div>
+  <div className="border-border bg-background-secondary rounded-2xl border p-6">
+    <p className="font-display text-foreground text-4xl font-bold tracking-tight">5.620</p>
+    <div className="text-foreground-secondary mt-2 text-sm leading-6">
+      Betriebe in der IHK-Beratung 2024, denen kein potenzieller Nachfolger gegenübersteht. Seit
+      2019 hat sich diese Lücke fast verdoppelt.
+    </div>
+    <p className="text-foreground-muted mt-3 text-xs">DIHK-Report Unternehmensnachfolge 2025</p>
+  </div>
+  <div className="border-border bg-background-secondary rounded-2xl border p-6">
+    <p className="font-display text-foreground text-4xl font-bold tracking-tight">57 %</p>
+    <div className="text-foreground-secondary mt-2 text-sm leading-6">
+      der befragten Beteiligungsgesellschaften nennen unrealistische Preisvorstellungen der
+      Verkäufer als Dealbreaker. Mit Abstand der häufigste Grund, aus dem ein Deal platzt.
+    </div>
+    <div className="text-foreground-muted mt-3 text-xs">
+      Rödl &amp; Partner, Private-Equity-Studie 2026
+    </div>
+  </div>
+</div>
+
+In einem Käufermarkt entscheidet der Käufer, was er glaubt. Und er glaubt, was er prüfen kann.
+
+## Woran der Preis scheitert
+
+Woran es hakt, beschreibt der DIHK-Report aus Sicht der IHK-Berater: 38 Prozent der Alt-Inhaber sind schlecht vorbereitet, weil sie sich zu spät mit der Übergabe beschäftigen. Bei 36 Prozent gilt der geforderte Kaufpreis als zu hoch. Auf der Käuferseite fällt das Urteil noch deutlicher aus. In der [Private-Equity-Studie von Rödl &amp; Partner](https://www.roedl.com/insights/private-equity-studie-2026/) nennen 57 Prozent der Beteiligungsgesellschaften unrealistische Preisvorstellungen als häufigsten Grund, aus dem eine Übernahme platzt.
+
+Beides sind Urteile von außen, und beim Preis lohnt der genauere Blick. Ein Preis wirkt überzogen, wenn nichts ihn stützt.
+
+Wie die Forderungen tatsächlich aussehen, zeigt das [Nachfolge-Monitoring der KfW](https://www.kfw.de/%C3%9Cber-die-KfW/Newsroom/Aktuelles/News-Details_876800.html) vom Januar 2026. Im Durchschnitt streben Nachfolgeplaner im Mittelstand das 1,2-Fache ihres Jahresumsatzes als Kaufpreis an, der Median liegt bei 0,6. Die KfW liest das ausdrücklich als Indiz, dass die Mehrheit gerade keine überzogenen Preise ansetzt. Die Spreizung entsteht an der Spitze. Die durchschnittliche Kaufpreisvorstellung ist seit 2019 um 34 Prozent auf rund 499.000 Euro gestiegen.
+
+Woher kommt so eine Vorstellung? Aus dem, was der Inhaber über seinen Betrieb weiß: die treuen Kunden, die volle Auftragslage, die Berater, die bleiben würden. Der Käufer kennt davon nichts. Er kennt drei Jahresabschlüsse, eine Kundenliste und eine Excel-Datei, die jemand für den Datenraum zusammengestellt hat.
+
+Zwischen diesen beiden Bildern liegt der Abschlag.
+
+## Was der Käufer nicht prüfen kann, bezahlt er nicht
+
+Die KfW benennt den Mechanismus nüchtern: Bei einer Übergabe an Außenstehende ist der Wissensvorsprung des Verkäufers größer, und Suche, Kaufpreisermittlung und Verhandlung kosten mehr Zeit. Konkret heißt das, der Verkäufer weiß, welcher Vertrag Geld bringt, und der Käufer muss es raten.
+
+Wie teuer das Raten ist, hat die Bewertungsforschung mehrfach gemessen. [Micah Officer](https://doi.org/10.1016/j.jfineco.2006.01.004) hat 2007 im Journal of Financial Economics gezeigt, dass eigenständige Privatunternehmen im Schnitt 15 bis 30 Prozent unter den Multiples, also den Bewertungsfaktoren, vergleichbarer börsennotierter Firmen verkauft werden. Sein Hauptgrund ist die fehlende Handelbarkeit. Die Datenlage kommt aber dazu: [Hussaini, Nguyen, Rigoni und Perego](https://doi.org/10.1080/00036846.2024.2364082) zeigten 2025, dass Zielunternehmen mit schlechter lesbaren Geschäftsberichten niedrigere Gebote erhalten. Käufer und Markt ziehen für fehlende Transparenz also etwas ab. Die Studie betrachtet börsennotierte Ziele, bei denen es immerhin geprüfte Berichte gibt. Bei einem Betrieb mit 40 Leuten, dessen Marge je Vertrag in niemandes Tabelle steht, ist die Lücke entsprechend größer.
+
+Bei Krediten gilt dasselbe Muster. [Michael Minnis](https://doi.org/10.1111/j.1475-679X.2011.00411.x) zeigte 2011 für private US-Firmen, dass geprüfte Zahlen zu messbar niedrigeren Fremdkapitalkosten führen und Banken ihnen mehr Gewicht geben. Wer belegen kann, bekommt bessere Konditionen, und wer nur erzählen kann, bezahlt den Unterschied.
+
+<div className="not-prose my-10 grid gap-4 md:grid-cols-2 md:items-stretch" data-reveal="fade-up">
+  <div className="border-border bg-background-secondary relative overflow-hidden rounded-2xl border p-6 sm:p-7">
+    <span
+      className="pointer-events-none absolute -top-4 -right-4 text-gray-200 dark:text-gray-800 [&>svg]:h-28 [&>svg]:w-28"
+      aria-hidden="true"
+    >
+      <Icon name="brain" size="xl" strokeWidth={1.25} />
+    </span>
+    <div className="text-foreground-muted relative text-[0.7rem] font-semibold tracking-[0.22em] uppercase">
+      Zahlen im Kopf
+    </div>
+    <p className="text-foreground-secondary relative mt-4 text-sm leading-5">Der Käufer bewertet</p>
+    <div className="font-display text-foreground relative mt-1 text-3xl leading-none font-bold tracking-tight">
+      sein Risiko
+    </div>
+    <div className="text-foreground-secondary relative mt-4 text-sm leading-6">
+      "Kommt darauf an" auf die Frage nach der Marge je Vertrag. Der Käufer nimmt den
+      Jahresabschluss, zieht einen Sicherheitsabschlag ab und bietet auf das, was übrig bleibt. Jede
+      Unklarheit landet im Abschlag, nie im Aufschlag.
+    </div>
+  </div>
+  <div className="border-brand-300 bg-card dark:border-brand-800 relative overflow-hidden rounded-2xl border p-6 shadow-[0_22px_55px_rgba(34,43,74,0.08)] sm:p-7">
+    <span
+      className="text-brand-300 dark:text-brand-700 pointer-events-none absolute -top-4 -right-4 [&>svg]:h-28 [&>svg]:w-28"
+      aria-hidden="true"
+    >
+      <Icon name="database" size="xl" strokeWidth={1.5} />
+    </span>
+    <div className="text-brand-600 relative text-[0.7rem] font-semibold tracking-[0.22em] uppercase">
+      Zahlen im System
+    </div>
+    <p className="text-foreground-secondary relative mt-4 text-sm leading-5">Der Käufer bewertet</p>
+    <div className="font-display text-brand-600 relative mt-1 text-3xl leading-none font-bold tracking-tight">
+      den Betrieb
+    </div>
+    <div className="text-foreground-secondary relative mt-4 text-sm leading-6">
+      Deckungsbeitrag je Vertrag, Auslastung je Team, Vertragswert im Folgejahr, Forderungslaufzeit:
+      alles abrufbar, alles über drei Jahre. Der Käufer prüft, was er sieht, und bezahlt, was er
+      geprüft hat.
+    </div>
+  </div>
+</div>
+
+## Die vier Fragen, die ein Käufer einem Dienstleister stellt
+
+Ein Betrieb mit Betreuungs-, Wartungs- oder Audit-Verträgen wird anders bewertet als ein Händler oder ein Produzent. Sein Wert steckt in wiederkehrenden Verträgen, in den Leuten, die sie erfüllen, und in der Frage, wie viel davon ohne den Inhaber weiterläuft. Jeder ernsthafte Käufer stellt deshalb dieselben vier Fragen. Wer sie aus dem System beantwortet, verhandelt. Wer sie aus dem Gedächtnis beantwortet, verteidigt sich.
+
+<div className="not-prose my-10 grid gap-4 md:grid-cols-2" data-reveal="fade-up">
+  <div className="border-border bg-background-secondary rounded-2xl border p-6">
+    <div className="flex items-baseline gap-3">
+      <div className="font-display text-brand-600/35 text-3xl leading-none font-bold tabular-nums">
+        01
+      </div>
+      <div className="font-display text-foreground text-lg leading-snug font-bold">
+        Welche Verträge laufen im nächsten Jahr aus, und was ist das wert?
+      </div>
+    </div>
+    <div className="text-foreground-secondary mt-3 text-sm leading-6">
+      Bei Dauerverträgen ist der Vertragswert-Wegfall die wichtigste Zahl im Haus. Läuft ein Fünftel
+      des Vertragswerts zum Jahresende aus, kauft der Interessent ein anderes Unternehmen als das,
+      das er in der Bilanz sieht. Eine Kündigungsfrist, die nur im Vertrags-PDF steht, existiert für
+      diese Frage nicht.
+    </div>
+  </div>
+  <div className="border-border bg-background-secondary rounded-2xl border p-6">
+    <div className="flex items-baseline gap-3">
+      <div className="font-display text-brand-600/35 text-3xl leading-none font-bold tabular-nums">
+        02
+      </div>
+      <div className="font-display text-foreground text-lg leading-snug font-bold">
+        Was verdient ihr an jedem einzelnen Vertrag?
+      </div>
+    </div>
+    <div className="text-foreground-secondary mt-3 text-sm leading-6">
+      Die Marge des Betriebs steht im Abschluss. Die Marge je Vertrag steht nirgends, wenn Stunden,
+      Fahrzeit und Zusatzleistungen nicht am Vertrag hängen. Genau dort liegt aber die Antwort auf
+      die Frage, welche Kunden das Geschäft tragen und welche es subventionieren.
+    </div>
+  </div>
+  <div className="border-border bg-background-secondary rounded-2xl border p-6">
+    <div className="flex items-baseline gap-3">
+      <div className="font-display text-brand-600/35 text-3xl leading-none font-bold tabular-nums">
+        03
+      </div>
+      <div className="font-display text-foreground text-lg leading-snug font-bold">
+        Wie viel davon hängt an euch persönlich?
+      </div>
+    </div>
+    <div className="text-foreground-secondary mt-3 text-sm leading-6">
+      Welche Kunden hat der Inhaber selbst betreut, welche Angebote nur er kalkuliert, welche fünf
+      Kunden machen die Hälfte des Umsatzes? Ein Käufer will sehen, dass der Betrieb ohne seinen
+      Gründer funktioniert. Das lässt sich behaupten oder zeigen: Auslastung je Berater, Umsatz je
+      Kunde, Kalkulation nach hinterlegten Regeln statt nach Erfahrung.
+    </div>
+  </div>
+  <div className="border-border bg-background-secondary rounded-2xl border p-6">
+    <div className="flex items-baseline gap-3">
+      <div className="font-display text-brand-600/35 text-3xl leading-none font-bold tabular-nums">
+        04
+      </div>
+      <div className="font-display text-foreground text-lg leading-snug font-bold">
+        Wann kommt das Geld?
+      </div>
+    </div>
+    <div className="text-foreground-secondary mt-3 text-sm leading-6">
+      Offene Forderungen, durchschnittliche Zahlungsdauer, Mahnstufen. Ein Betrieb mit 47 Tagen
+      Forderungslaufzeit und einer mit 15 Tagen sind bei gleichem Umsatz zwei verschiedene
+      Investitionen. Die Zahl kennt jede Buchhaltung. Ob sie jemand auf Knopfdruck zeigen kann, ist
+      eine andere Frage.
+    </div>
+  </div>
+</div>
+
+<aside className="not-prose my-8" data-reveal="fade-up">
+  <div className="border-brand-200 bg-brand-50/60 dark:border-brand-800 dark:bg-brand-900/15 rounded-2xl border p-6 sm:p-7">
+    <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+      <div className="flex-1">
+        <div className="font-display text-foreground text-lg leading-snug font-semibold sm:text-xl">
+          Könntet ihr die vier Fragen heute beantworten?
+        </div>
+        <div className="text-foreground-secondary mt-1.5 text-sm leading-6">
+          Aus dem System, nicht aus dem Kopf. Wenn eine davon länger als eine Minute dauert, lohnt
+          ein Gespräch.
+        </div>
+      </div>
+      <div className="shrink-0">
+        <Button href={contactLinks.cal} target="_blank">
+          <span>Mit Marten sprechen</span>
+          <Icon name="arrow-up-right" size="sm" />
+        </Button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+## Wie das aussieht, wenn die Zahlen im System liegen
+
+Für [FKC Consulting](/referenzen/fkc-consulting/), eine Beratung für Arbeitsschutz, Datenschutz und Weiterbildung mit Dauerverträgen, haben wir die komplette Strecke von der Anfrage bis zur Rechnung gebaut. Der Teil, der für die vier Fragen zählt, ist das Cockpit der Geschäftsführung. Es zieht seine Zahlen aus den Verträgen, der Leistungserfassung und der Rechnungsstellung. Niemand stellt sie zusammen.
+
+<Screencast
+  src="/screencasts/cockpit-live-zahlen.mp4"
+  poster="/screencasts/cockpit-live-zahlen.png"
+  ratio="16/9"
+  caption="Umsatz abgerechnet und prognostiziert, Deckungsbeitrag, Auslastung je Team, offene Forderungen mit Laufzeit: Die vier Käuferfragen stehen auf einer Seite, jeden Tag aktuell, ohne dass jemand eine Tabelle pflegt. Der Blick in die Umsatzentwicklung legt Ist, Plan, Prognose aus laufenden Angeboten und Vorjahr übereinander."
+/>
+
+Drei Dinge daran sind für eine Übergabe entscheidend. Die Umsatzprognose entsteht aus den laufenden Angeboten, gewichtet nach Wahrscheinlichkeit, und liegt neben dem Vorjahr. Der Deckungsbeitrag steht am einzelnen Vertrag, weil die Kalkulation Stunden, Fahrzeit und Aufwand je Baustein kennt, wie im Beitrag zum [Angebotsprozess](/blog/angebotsprozess-anfrage-bis-zusage/) beschrieben. Und der Vertragswert-Wegfall ins Folgejahr ist eine eigene Kachel: welche Verträge enden, welche wurden reduziert, was fehlt dann.
+
+Das ist derselbe Umbau, den wir im Beitrag über den [Monatsabschluss als Projekt](/blog/geschaeftszahlen-metabase-individualsoftware/) beschrieben haben. Dort ging es um die Geschäftsführung, die ihre Zahlen für sich selbst braucht. Hier geht es um den Tag, an dem jemand anderes sie sehen will.
+
+## Der Nebeneffekt, der vor dem Verkauf kommt
+
+Niemand baut sich ein Cockpit, um in acht Jahren besser zu verkaufen. Der Grund, es heute zu bauen, ist derselbe, aus dem der Käufer es später sehen will: Man führt anders, wenn man die Marge je Vertrag kennt. Der Kunde, der jedes Jahr um den Preis feilscht, bekommt eine Zahl neben dem Namen. Der Berater, der zu viel Zeit im Objekt lässt, fällt in der Auslastung auf, lange vor der Jahresrechnung.
+
+Und die Bank sieht es auch. Wer einen Kredit für den nächsten Standort oder für die Übernahme eines Wettbewerbers braucht, führt dasselbe Gespräch wie mit einem Käufer, nur früher. Minnis' Befund weist in dieselbe Richtung, auch wenn er geprüfte Abschlüsse untersucht hat und nicht selbst geführte Kennzahlen: Belegte Zahlen machen Kredite billiger.
+
+## Ein ehrlicher Einwand
+
+Zahlen machen keinen schwachen Betrieb wertvoll. Das IfM rechnet 4.000 Übergaben weniger als zuvor, weil sich bei einigen Betrieben die Ertragslage so verschlechtert hat, dass sich eine Übernahme nicht mehr lohnt. Betroffen sind vor allem unternehmensbezogene Dienstleister unter 500.000 Euro Jahresumsatz, also die kleineren Betriebe aus genau dieser Zielgruppe. Ein Cockpit macht das sichtbar, es ändert es nicht.
+
+Und wer in sechs Monaten den Vertrag unterschreiben will, für den ist ein Software-Projekt das falsche Werkzeug. Er braucht einen Berater, einen Datenraum und Geduld.
+
+Wie viel Vorlauf der Umbau braucht, hängt aber weniger am Kalender als an den Altdaten. Bei FKC lagen im abgelösten System nur die letzten drei Jahre. Zusammengeführt wurden am Ende über zwanzig Jahre Projekt- und Rechnungshistorie aus den Bestandsstrukturen daneben. Wo die Altsysteme ihre Daten hergeben, entsteht die Historie schon mit der Migration. Wo sie es nicht tun, fängt die Zeitreihe am Tag der Umstellung an, und dann zählt jedes Jahr Vorlauf.
+
+Der DIHK-Report beschreibt, was stattdessen oft passiert: Alt-Inhaber fahren in Erwartung der Übergabe Investitionen herunter und überlassen Digitalisierung und Erneuerung dem Nachfolger. Die Attraktivität des Betriebs leidet, die Aufgabe für den Nachfolger wächst. Das ist die Reihenfolge, die den Preis drückt. Wer die Zahlen ins System holt, bevor er ans Verkaufen denkt, dreht sie um.
+
+<div className="not-prose my-10" data-reveal="fade-up">
+  <div className="border-border bg-background-secondary rounded-2xl border p-6 sm:p-7">
+    <p className="text-brand-600 text-xs font-semibold tracking-[0.18em] uppercase">Quellen</p>
+    <ul className="mt-4 space-y-3 text-sm leading-6 [&_li>a>p]:inline [&_li>p]:inline">
+      <li className="text-foreground-secondary">
+        <a
+          href="https://www.kfw.de/%C3%9Cber-die-KfW/Newsroom/Aktuelles/News-Details_876800.html"
+          className="text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 underline underline-offset-2"
+        >
+          KfW Research, Nachfolge-Monitoring Mittelstand 2025
+        </a>
+        , Fokus Volkswirtschaft Nr. 526, Januar 2026. Angestrebter Kaufpreis im Durchschnitt beim
+        1,2-Fachen des Jahresumsatzes, Median 0,6. Die KfW wertet das als Indiz gegen systematisch
+        überzogene Preisvorstellungen.
+      </li>
+      <li className="text-foreground-secondary">
+        <a
+          href="https://www.dihk.de/resource/blob/134302/195174566635ef655907ea91b0ec327a/unternehmensentwicklung-dihk-report-unternehmensnachfolge-2025-data.pdf"
+          className="text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 underline underline-offset-2"
+        >
+          DIHK-Report Unternehmensnachfolge 2025
+        </a>
+        . 9.636 beratene Alt-Inhaber 2024 gegenüber 4.016 Interessenten, also 5.620 Betriebe ohne
+        Gegenüber. 36 Prozent fordern nach Einschätzung der IHKs einen überhöhten Kaufpreis.
+      </li>
+      <li className="text-foreground-secondary">
+        <a
+          href="https://www.ifm-bonn.org/statistiken/unternehmensuebertragungen-und-nachfolgen"
+          className="text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 underline underline-offset-2"
+        >
+          IfM Bonn, Unternehmensnachfolgen in Deutschland 2026 bis 2030
+        </a>
+        , Daten und Fakten Nr. 37, November 2025. 186.000 Übergaben zwischen 2026 und 2030, davon
+        gut 30 Prozent unternehmensbezogene Dienstleistungen und ebenso viele im produzierenden
+        Gewerbe.
+      </li>
+      <li className="text-foreground-secondary">
+        <a
+          href="https://www.roedl.com/insights/private-equity-studie-2026/"
+          className="text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 underline underline-offset-2"
+        >
+          Rödl &amp; Partner, Private-Equity-Studie 2026
+        </a>
+        . Umfrage unter in Deutschland aktiven Private-Equity-Häusern, 15. Ausgabe. 57 Prozent
+        nennen unrealistische Preisvorstellungen der Verkäufer als Dealbreaker, mit Abstand der
+        häufigste Grund.
+      </li>
+      <li className="text-foreground-secondary">
+        <a
+          href="https://doi.org/10.1016/j.jfineco.2006.01.004"
+          className="text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 underline underline-offset-2"
+        >
+          Officer, The price of corporate liquidity
+        </a>
+        , Journal of Financial Economics 83, 2007. Abschläge von 15 bis 30 Prozent für eigenständige
+        Privatunternehmen gegenüber vergleichbaren börsennotierten Zielen.
+      </li>
+      <li className="text-foreground-secondary">
+        <a
+          href="https://doi.org/10.1080/00036846.2024.2364082"
+          className="text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 underline underline-offset-2"
+        >
+          Hussaini, Nguyen, Rigoni, Perego, The value of information risk: is there an acquisition
+          discount for less readable financial disclosures?
+        </a>
+        , Applied Economics 57(31), 2025 (online 2024). Weniger lesbare Berichte führen zu
+        niedrigeren Geboten, bei branchenfremden Käufern stärker. Untersucht sind börsennotierte
+        Ziele.
+      </li>
+      <li className="text-foreground-secondary">
+        <a
+          href="https://doi.org/10.1111/j.1475-679X.2011.00411.x"
+          className="text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 underline underline-offset-2"
+        >
+          Minnis, The Value of Financial Statement Verification in Debt Financing
+        </a>
+        , Journal of Accounting Research 49, 2011. Geprüfte Zahlen senken die Fremdkapitalkosten
+        privater Unternehmen.
+      </li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,235 @@
+---
+/**
+ * Polygon Luminary - bgjar-inspired hero background with a dense low-poly
+ * mosaic of small, overlapping triangles. Gentle floating motion, parallax
+ * on pointer move, brand-tinted, reduced-motion aware.
+ */
+---
+
+<div class="hero-poly pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true" data-poly>
+  <svg
+    class="absolute inset-0 h-full w-full"
+    viewBox="0 0 1440 720"
+    preserveAspectRatio="xMidYMid slice"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <linearGradient id="polyGrad1" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="var(--poly-a)" />
+        <stop offset="100%" stop-color="var(--poly-b)" />
+      </linearGradient>
+      <linearGradient id="polyGrad2" x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--poly-b)" />
+        <stop offset="100%" stop-color="var(--poly-c)" />
+      </linearGradient>
+      <linearGradient id="polyGrad3" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0%" stop-color="var(--poly-c)" />
+        <stop offset="100%" stop-color="var(--poly-a)" />
+      </linearGradient>
+      <linearGradient id="polyGrad4" x1="0.5" y1="0" x2="0.5" y2="1">
+        <stop offset="0%" stop-color="var(--poly-b)" />
+        <stop offset="100%" stop-color="var(--poly-a)" />
+      </linearGradient>
+      <linearGradient id="polyGrad5" x1="1" y1="1" x2="0" y2="0">
+        <stop offset="0%" stop-color="var(--poly-a)" />
+        <stop offset="100%" stop-color="var(--poly-c)" />
+      </linearGradient>
+      <radialGradient id="polyGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0%" stop-color="var(--poly-glow)" stop-opacity="0.55" />
+        <stop offset="100%" stop-color="var(--poly-glow)" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+
+    <!-- Soft ambient glows -->
+    <circle cx="220" cy="160" r="280" fill="url(#polyGlow)" />
+    <circle cx="1220" cy="560" r="320" fill="url(#polyGlow)" />
+    <circle cx="780" cy="360" r="260" fill="url(#polyGlow)" opacity="0.6" />
+
+    <!-- Dense low-poly mosaic - row 1 (y ≈ 0–140) -->
+    <g class="hero-poly-layer">
+      <polygon class="hero-poly a" points="-40,0 120,60 40,160"      fill="url(#polyGrad1)" />
+      <polygon class="hero-poly b" points="120,60 40,160 200,180"    fill="url(#polyGrad2)" />
+      <polygon class="hero-poly c" points="120,60 200,180 280,80"    fill="url(#polyGrad3)" />
+      <polygon class="hero-poly d" points="280,80 200,180 360,200"   fill="url(#polyGrad4)" />
+      <polygon class="hero-poly e" points="280,80 360,200 440,100"   fill="url(#polyGrad5)" />
+      <polygon class="hero-poly f" points="440,100 360,200 520,220"  fill="url(#polyGrad1)" />
+      <polygon class="hero-poly a" points="440,100 520,220 620,80"   fill="url(#polyGrad2)" />
+      <polygon class="hero-poly b" points="620,80 520,220 700,200"   fill="url(#polyGrad3)" />
+      <polygon class="hero-poly c" points="620,80 700,200 800,60"    fill="url(#polyGrad4)" />
+      <polygon class="hero-poly d" points="800,60 700,200 860,180"   fill="url(#polyGrad5)" />
+      <polygon class="hero-poly e" points="800,60 860,180 960,40"    fill="url(#polyGrad1)" />
+      <polygon class="hero-poly f" points="960,40 860,180 1040,200"  fill="url(#polyGrad2)" />
+      <polygon class="hero-poly a" points="960,40 1040,200 1120,80"  fill="url(#polyGrad3)" />
+      <polygon class="hero-poly b" points="1120,80 1040,200 1200,220" fill="url(#polyGrad4)" />
+      <polygon class="hero-poly c" points="1120,80 1200,220 1300,60" fill="url(#polyGrad5)" />
+      <polygon class="hero-poly d" points="1300,60 1200,220 1360,200" fill="url(#polyGrad1)" />
+      <polygon class="hero-poly e" points="1300,60 1360,200 1480,0"   fill="url(#polyGrad2)" />
+
+      <!-- row 2 (y ≈ 160–320) -->
+      <polygon class="hero-poly f" points="40,160 200,180 100,320"    fill="url(#polyGrad3)" />
+      <polygon class="hero-poly a" points="200,180 100,320 280,340"   fill="url(#polyGrad4)" />
+      <polygon class="hero-poly b" points="200,180 280,340 360,200"   fill="url(#polyGrad5)" />
+      <polygon class="hero-poly c" points="360,200 280,340 440,320"   fill="url(#polyGrad1)" />
+      <polygon class="hero-poly d" points="360,200 440,320 520,220"   fill="url(#polyGrad2)" />
+      <polygon class="hero-poly e" points="520,220 440,320 600,340"   fill="url(#polyGrad3)" />
+      <polygon class="hero-poly f" points="520,220 600,340 700,200"   fill="url(#polyGrad4)" />
+      <polygon class="hero-poly a" points="700,200 600,340 780,320"   fill="url(#polyGrad5)" />
+      <polygon class="hero-poly b" points="700,200 780,320 860,180"   fill="url(#polyGrad1)" />
+      <polygon class="hero-poly c" points="860,180 780,320 940,340"   fill="url(#polyGrad2)" />
+      <polygon class="hero-poly d" points="860,180 940,340 1040,200"  fill="url(#polyGrad3)" />
+      <polygon class="hero-poly e" points="1040,200 940,340 1120,320" fill="url(#polyGrad4)" />
+      <polygon class="hero-poly f" points="1040,200 1120,320 1200,220" fill="url(#polyGrad5)" />
+      <polygon class="hero-poly a" points="1200,220 1120,320 1280,340" fill="url(#polyGrad1)" />
+      <polygon class="hero-poly b" points="1200,220 1280,340 1360,200" fill="url(#polyGrad2)" />
+      <polygon class="hero-poly c" points="1360,200 1280,340 1440,320" fill="url(#polyGrad3)" />
+      <polygon class="hero-poly d" points="1360,200 1440,320 1520,160" fill="url(#polyGrad4)" />
+
+      <!-- row 3 (y ≈ 320–500) -->
+      <polygon class="hero-poly e" points="100,320 280,340 180,480"   fill="url(#polyGrad5)" />
+      <polygon class="hero-poly f" points="280,340 180,480 360,500"   fill="url(#polyGrad1)" />
+      <polygon class="hero-poly a" points="280,340 360,500 440,320"   fill="url(#polyGrad2)" />
+      <polygon class="hero-poly b" points="440,320 360,500 520,480"   fill="url(#polyGrad3)" />
+      <polygon class="hero-poly c" points="440,320 520,480 600,340"   fill="url(#polyGrad4)" />
+      <polygon class="hero-poly d" points="600,340 520,480 680,500"   fill="url(#polyGrad5)" />
+      <polygon class="hero-poly e" points="600,340 680,500 780,320"   fill="url(#polyGrad1)" />
+      <polygon class="hero-poly f" points="780,320 680,500 860,480"   fill="url(#polyGrad2)" />
+      <polygon class="hero-poly a" points="780,320 860,480 940,340"   fill="url(#polyGrad3)" />
+      <polygon class="hero-poly b" points="940,340 860,480 1020,500"  fill="url(#polyGrad4)" />
+      <polygon class="hero-poly c" points="940,340 1020,500 1120,320" fill="url(#polyGrad5)" />
+      <polygon class="hero-poly d" points="1120,320 1020,500 1200,480" fill="url(#polyGrad1)" />
+      <polygon class="hero-poly e" points="1120,320 1200,480 1280,340" fill="url(#polyGrad2)" />
+      <polygon class="hero-poly f" points="1280,340 1200,480 1360,500" fill="url(#polyGrad3)" />
+      <polygon class="hero-poly a" points="1280,340 1360,500 1440,320" fill="url(#polyGrad4)" />
+      <polygon class="hero-poly b" points="1440,320 1360,500 1520,460" fill="url(#polyGrad5)" />
+
+      <!-- row 4 (y ≈ 480–640) -->
+      <polygon class="hero-poly c" points="180,480 360,500 260,640"   fill="url(#polyGrad1)" />
+      <polygon class="hero-poly d" points="360,500 260,640 440,660"   fill="url(#polyGrad2)" />
+      <polygon class="hero-poly e" points="360,500 440,660 520,480"   fill="url(#polyGrad3)" />
+      <polygon class="hero-poly f" points="520,480 440,660 600,640"   fill="url(#polyGrad4)" />
+      <polygon class="hero-poly a" points="520,480 600,640 680,500"   fill="url(#polyGrad5)" />
+      <polygon class="hero-poly b" points="680,500 600,640 760,660"   fill="url(#polyGrad1)" />
+      <polygon class="hero-poly c" points="680,500 760,660 860,480"   fill="url(#polyGrad2)" />
+      <polygon class="hero-poly d" points="860,480 760,660 940,640"   fill="url(#polyGrad3)" />
+      <polygon class="hero-poly e" points="860,480 940,640 1020,500"  fill="url(#polyGrad4)" />
+      <polygon class="hero-poly f" points="1020,500 940,640 1100,660" fill="url(#polyGrad5)" />
+      <polygon class="hero-poly a" points="1020,500 1100,660 1200,480" fill="url(#polyGrad1)" />
+      <polygon class="hero-poly b" points="1200,480 1100,660 1280,640" fill="url(#polyGrad2)" />
+      <polygon class="hero-poly c" points="1200,480 1280,640 1360,500" fill="url(#polyGrad3)" />
+      <polygon class="hero-poly d" points="1360,500 1280,640 1440,660" fill="url(#polyGrad4)" />
+      <polygon class="hero-poly e" points="1360,500 1440,660 1520,460" fill="url(#polyGrad5)" />
+
+      <!-- row 5 (y ≈ 640–780) edge -->
+      <polygon class="hero-poly f" points="-40,620 260,640 100,780"    fill="url(#polyGrad1)" />
+      <polygon class="hero-poly a" points="260,640 100,780 360,780"    fill="url(#polyGrad2)" />
+      <polygon class="hero-poly b" points="260,640 360,780 440,660"    fill="url(#polyGrad3)" />
+      <polygon class="hero-poly c" points="440,660 360,780 560,780"    fill="url(#polyGrad4)" />
+      <polygon class="hero-poly d" points="440,660 560,780 600,640"    fill="url(#polyGrad5)" />
+      <polygon class="hero-poly e" points="600,640 560,780 720,780"    fill="url(#polyGrad1)" />
+      <polygon class="hero-poly f" points="600,640 720,780 760,660"    fill="url(#polyGrad2)" />
+      <polygon class="hero-poly a" points="760,660 720,780 880,780"    fill="url(#polyGrad3)" />
+      <polygon class="hero-poly b" points="760,660 880,780 940,640"    fill="url(#polyGrad4)" />
+      <polygon class="hero-poly c" points="940,640 880,780 1040,780"   fill="url(#polyGrad5)" />
+      <polygon class="hero-poly d" points="940,640 1040,780 1100,660"  fill="url(#polyGrad1)" />
+      <polygon class="hero-poly e" points="1100,660 1040,780 1200,780" fill="url(#polyGrad2)" />
+      <polygon class="hero-poly f" points="1100,660 1200,780 1280,640" fill="url(#polyGrad3)" />
+      <polygon class="hero-poly a" points="1280,640 1200,780 1360,780" fill="url(#polyGrad4)" />
+      <polygon class="hero-poly b" points="1280,640 1360,780 1440,660" fill="url(#polyGrad5)" />
+      <polygon class="hero-poly c" points="1440,660 1360,780 1520,780" fill="url(#polyGrad1)" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .hero-poly {
+    --poly-a: oklch(80.8% 0.06 255);
+    --poly-b: oklch(71.4% 0.082 255);
+    --poly-c: oklch(89.2% 0.038 255);
+    --poly-glow: oklch(71.4% 0.082 255);
+    --poly-mx: 0;
+    --poly-my: 0;
+  }
+
+  :global(.dark) .hero-poly {
+    --poly-a: oklch(42% 0.18 295);
+    --poly-b: oklch(50% 0.22 295);
+    --poly-c: oklch(34% 0.14 295);
+    --poly-glow: oklch(58% 0.25 295);
+  }
+
+  .hero-poly-layer polygon {
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: hero-poly-breathe ease-in-out infinite;
+    transition: translate 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform, opacity;
+  }
+
+  /* Six rotating variants - each polygon picks one via .a–.f class.
+     Different duration/delay/translate vectors break up the rhythm so
+     the mosaic shimmers instead of pulsing in unison. */
+  .hero-poly.a { animation-duration: 11s; animation-delay:  0s;    translate: calc(var(--poly-mx) * 12px) calc(var(--poly-my) *  8px); opacity: 0.34; }
+  .hero-poly.b { animation-duration: 13s; animation-delay: -1.5s;  translate: calc(var(--poly-mx) * -10px) calc(var(--poly-my) *  10px); opacity: 0.42; }
+  .hero-poly.c { animation-duration: 15s; animation-delay: -3s;    translate: calc(var(--poly-mx) *  14px) calc(var(--poly-my) * -8px); opacity: 0.38; }
+  .hero-poly.d { animation-duration: 12s; animation-delay: -4.5s;  translate: calc(var(--poly-mx) * -12px) calc(var(--poly-my) * -10px); opacity: 0.3;  }
+  .hero-poly.e { animation-duration: 14s; animation-delay: -2s;    translate: calc(var(--poly-mx) *  10px) calc(var(--poly-my) *  12px); opacity: 0.46; }
+  .hero-poly.f { animation-duration: 16s; animation-delay: -5.5s;  translate: calc(var(--poly-mx) * -14px) calc(var(--poly-my) *  -6px); opacity: 0.36; }
+
+  @keyframes hero-poly-breathe {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.015); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-poly-layer polygon {
+      animation: none;
+      translate: 0 0;
+    }
+  }
+
+  @media (hover: none) {
+    .hero-poly-layer polygon {
+      translate: 0 0;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-poly]');
+  if (root && window.matchMedia('(hover: hover)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const section = root.parentElement;
+    if (section) {
+      let rafId = 0;
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+
+      const tick = () => {
+        currentX += (targetX - currentX) * 0.08;
+        currentY += (targetY - currentY) * 0.08;
+        root.style.setProperty('--poly-mx', currentX.toFixed(3));
+        root.style.setProperty('--poly-my', currentY.toFixed(3));
+
+        if (Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001) {
+          rafId = requestAnimationFrame(tick);
+        } else {
+          rafId = 0;
+        }
+      };
+
+      section.addEventListener('pointermove', (e) => {
+        const rect = section.getBoundingClientRect();
+        targetX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+        targetY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+        if (!rafId) rafId = requestAnimationFrame(tick);
+      });
+
+      section.addEventListener('pointerleave', () => {
+        targetX = 0;
+        targetY = 0;
+        if (!rafId) rafId = requestAnimationFrame(tick);
+      });
+    }
+  }
+</script>

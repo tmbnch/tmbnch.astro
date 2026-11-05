@@ -1,0 +1,132 @@
+---
+/**
+ * „Von heute bis dahin“ für die Funnel-Seiten (/f/*): die Strecke in drei Stationen und die
+ * Einwände, die jemand vor dem Eintragen im Kopf hat, offen beantwortet.
+ *
+ * Ersetzt auf den Anzeigen-Landings die eingeklappte FAQ (seit 2026-10-18). Der Workshop taucht
+ * hier nicht als Schritt auf: Die Aufnahme ist ein Satz auf der Linie, was sie kostet, kommt im
+ * Gespräch. Preise stehen nirgends, der Rahmen wird im Erstgespräch genannt.
+ *
+ * Wochen je Tor (Marten, 2026-10-18), gerechnet ab Beauftragung nach der Aufnahme:
+ * Angebote 2 bis 4, Einsatz 3 bis 6, Zahlen 4 bis 6, Ablösung erster Bereich 4 bis 6.
+ * Jeder weitere Bereich 1 bis 3 Monate, vier Bereiche zusammen 4 bis 6 Monate (Marten,
+ * 2026-10-22). Bei FKC waren es noch neun Monate; mit dem erprobten Stack geht es heute
+ * schneller. Die Neun gehört nicht auf die Seite, sie schreckt ab.
+ */
+interface Station {
+  /** Zeitmarke links, etwa „Heute“ oder „Danach, 3 bis 6 Wochen“. */
+  wann: string;
+  titel: string;
+  text: string;
+}
+
+interface Einwand {
+  /** Der Satz, wie er im Kopf steht, ohne Anführungszeichen; die setzt die Komponente. */
+  satz: string;
+  antwort: string;
+}
+
+interface Props {
+  stationen: readonly [Station, Station, Station];
+  einwaende: Einwand[];
+  class?: string;
+}
+
+const { stationen, einwaende, class: className } = Astro.props;
+---
+
+<section class:list={['bg-background-secondary border-border relative border-y py-16 lg:py-24', className]}>
+  <div class="relative z-10 container max-w-6xl">
+    <header class="mx-auto max-w-2xl text-center">
+      <p class="text-brand-600 dark:text-brand-300 font-mono text-xs font-semibold tracking-[0.2em] uppercase">
+        Von heute bis dahin
+      </p>
+      <h2 class="font-display text-foreground mt-4 text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+        Vom heutigen Stand bis es läuft.
+      </h2>
+      <p class="text-foreground-secondary mt-4 text-[0.95rem] leading-6 sm:text-base sm:leading-7">
+        Drei Stationen: wo ihr heute steht, was im Erstgespräch passiert, und was ein paar Wochen
+        später läuft. Wir setzen dabei auf dem auf, was bei anderen Betrieben schon arbeitet, und
+        programmieren zum Festpreis, was bei euch anders ist.
+      </p>
+    </header>
+
+    <!-- Die Strecke: drei Stationen, mobil untereinander an einer Linie, ab lg nebeneinander -->
+    <ol class="strecke relative mt-8 grid gap-6 lg:mt-14 lg:grid-cols-3 lg:gap-6" data-szene data-szene-kinder>
+      {
+        stationen.map((s, i) => (
+          <li class="strecke-station relative pl-10 lg:pl-0 lg:pt-10">
+            <span class:list={['strecke-punkt', i === 0 && 'strecke-punkt-heute']} aria-hidden="true">{i + 1}</span>
+            <p class="text-foreground-muted font-mono text-[11px] font-semibold tracking-[0.18em] uppercase">
+              {s.wann}
+            </p>
+            <h3 class="font-display text-foreground mt-2 text-lg font-bold tracking-tight">{s.titel}</h3>
+            <p class="text-foreground-secondary mt-1.5 text-[0.95rem] leading-6 lg:leading-7">{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- Die Einwände: offen, Behauptung und Antwort -->
+    <div class="mt-12 lg:mt-20">
+      <h3 class="font-display text-foreground text-xl font-bold tracking-tight sm:text-2xl">
+        Was ihr euch vielleicht gerade fragt.
+      </h3>
+      <dl class="mt-6 grid gap-x-10 gap-y-5 md:grid-cols-2 md:gap-y-7">
+        {
+          einwaende.map((e) => (
+            <div class="border-border/70 border-l-2 pl-4">
+              <dt class="font-display text-foreground text-base font-bold tracking-tight">„{e.satz}“</dt>
+              <dd class="text-foreground-secondary mt-1 text-[0.95rem] leading-6 lg:leading-7">{e.antwort}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Linie und Punkte: mobil senkrecht links, ab lg waagerecht oben */
+  .strecke::before {
+    content: '';
+    position: absolute;
+    left: 0.875rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 2px;
+    background: color-mix(in oklch, var(--color-brand-400) 45%, var(--color-border));
+  }
+  .strecke-punkt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    width: 1.875rem;
+    height: 1.875rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 2px solid var(--color-brand-500);
+    background: var(--color-card);
+    color: var(--color-brand-600);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  /* Station 1 ist der Ist-Zustand, nicht schon ein Schritt von uns: gedämpfter Punkt. */
+  .strecke-punkt-heute {
+    border-color: color-mix(in oklch, var(--color-foreground) 25%, transparent);
+    color: var(--color-foreground-muted);
+  }
+  @media (min-width: 1024px) {
+    .strecke::before {
+      left: 0.875rem;
+      right: 0.875rem;
+      top: 0.875rem;
+      bottom: auto;
+      width: auto;
+      height: 2px;
+    }
+  }
+</style>

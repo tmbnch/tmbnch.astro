@@ -1,0 +1,611 @@
+---
+/**
+ * Inhalt der Tür 5 „Software-Check“, geteilt von zwei Seiten (wie ZahlenPage):
+ *
+ *   /software-check/    (variant="site"):   Tür 5 in der Navigation, LandingLayout, indexiert, statt Quiz ein CTA
+ *   /f/software-check/  (variant="funnel"): Anzeigen-Landing, FunnelLayout, noindex, Quiz im Hero
+ *
+ * Anders als die Türen 1 bis 3 richtet sich diese Seite an Betriebe, die Software schon HABEN,
+ * und zwar vor allem SELBST GEBAUTE (Marten, 2026-10-20): ein Mitarbeiter mit KI, ein Freelancer,
+ * ein Tool aus dem Fachbereich. Nicht der Aufhänger: Code einer anderen Agentur prüfen. Wer eine
+ * Agentur hat, hat einen Partner; wer selbst gebaut hat, hat niemanden, der Updates, Meldepflicht
+ * und Betrieb trägt. Dort ist der Folgeauftrag. Deshalb kein Nachbau einer Kundenlösung, sondern
+ * der Bericht als Motiv.
+ *
+ * Zwei Personen auf der Seite (seit 2026-10-20, nach dem Delta-Sport-Review): der Fachbereichler,
+ * der allein gebaut hat, UND das kleine Team, das gut baut und vor dem Go-Live einen zweiten Kopf
+ * will. Letztere nicht abwertend ansprechen; sie sind das bessere Geschäft. Paket D (Begleitung)
+ * ist für sie: Review als Anfang, nicht als Ende.
+ *
+ * Das Erstgespräch verspricht keine Einschätzung der Sicherheit (geht nicht in 30 Minuten),
+ * sondern eine Einordnung: welcher Weg passt, ob der CRA greift, ob es sich lohnt.
+ *
+ * Bewusst ohne Preise (salesHAX), ohne das Wort „zertifiziert“ (wir sind keine Prüfstelle) und
+ * ohne „Pentest“ als Versprechen. Der Rahmen ist OWASP ASVS 5.0; CRA und NIS2 sind der Anlass.
+ * Angebotslogik und Prüfrahmen stehen in rcktbs-sales unter docs/vertrieb/security-check-angebot.md.
+ */
+import BlogQuerverweis from '@/components/blog/BlogQuerverweis.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import Blueprint from '@/components/hero-backgrounds/Blueprint.astro';
+import { ClientLogoStrip } from '@/components/ui/marketing/ClientLogoStrip';
+import SectionHeader from '@/components/angebote/SectionHeader.astro';
+import FunnelQuiz from '@/components/funnel/FunnelQuiz';
+import ErstgespraechKarte from '@/components/funnel/ErstgespraechKarte.astro';
+import DealZeile from '@/components/funnel/DealZeile.astro';
+import VertrauensBand from '@/components/funnel/VertrauensBand.astro';
+import '@/styles/szene.css';
+import { Picture } from 'astro:assets';
+import founderPortrait from '@/assets/rocketbase/founder-marten-priess.jpg';
+import type { FunnelQuizQuestion } from '@/data/funnels';
+import { contactLinks } from '@/data/rocketbase';
+import BerichtMock from './BerichtMock.astro';
+import FragenMosaik from './FragenMosaik.astro';
+import StackLeiste from './StackLeiste.astro';
+import '@/components/angebote/frame.css';
+
+interface Props {
+  variant: 'site' | 'funnel';
+}
+const { variant } = Astro.props;
+const istFunnel = variant === 'funnel';
+
+// Für die Check-Seite zählt Konzernerfahrung mehr als Mittelstandsnähe: bonprix und Statista zuerst.
+const clientLogos = [
+  { key: 'bonprix_logo', name: 'bonprix' },
+  { key: 'statista-logo', name: 'Statista' },
+  { key: 'stage_logo', name: 'Stage Entertainment' },
+  { key: 'fkc_logo', name: 'FKC Consulting' },
+];
+
+// Quiz: drei kurze Fragen, danach das Kontaktformular (Telefon Pflicht, Firma optional).
+const quizFragen: FunnelQuizQuestion[] = [
+  {
+    id: 'was',
+    question: 'Worum geht es?',
+    hint: 'Grobe Einordnung reicht.',
+    options: [
+      {
+        id: 'intern',
+        label: 'Software, die wir selbst mit KI gebaut haben',
+        description: 'Läuft oder steht kurz davor. Von außen hat es noch keiner angeschaut.',
+      },
+      {
+        id: 'portal',
+        label: 'Ein Kundenportal oder eine App, die Kunden nutzen',
+        description: 'Selbst gebaut oder von einem Freelancer.',
+      },
+      {
+        id: 'produkt',
+        label: 'Ein Produkt mit Software drin, das wir verkaufen',
+        description: 'Gerät, Anlage oder Software, die wir an Kunden abgeben.',
+      },
+      {
+        id: 'konzept',
+        label: 'Etwas, das erst gebaut werden soll',
+        description: 'Wir wollen, dass vorher jemand draufschaut, bevor Geld fließt.',
+      },
+      {
+        id: 'sonstiges',
+        label: 'Anders',
+        allowText: true,
+        textPlaceholder: 'Beschreibt in ein, zwei Sätzen, worum es geht …',
+      },
+    ],
+  },
+  {
+    id: 'anlass',
+    question: 'Was ist der Anlass?',
+    hint: 'Das, was am meisten drückt.',
+    options: [
+      {
+        id: 'golive',
+        label: 'Der Go-Live steht an',
+        description: 'Bevor es produktiv geht, soll jemand draufschauen, der das schon öfter gemacht hat.',
+      },
+      {
+        id: 'kunde',
+        label: 'Ein Kunde fragt nach einem Sicherheitsnachweis',
+        description: 'NIS2, Lieferkette, Ausschreibung.',
+      },
+      {
+        id: 'cra',
+        label: 'Der Cyber Resilience Act',
+        description: 'Wir müssen bis Ende 2027 nachweisbar sauber sein.',
+      },
+      {
+        id: 'bauch',
+        label: 'Schlechtes Bauchgefühl',
+        description: 'Zu schnell gebaut, nie von außen angeschaut.',
+      },
+      {
+        id: 'vorfall',
+        label: 'Es gab schon einen Vorfall oder Beinahe-Vorfall',
+        description: 'Wir wollen wissen, was sonst noch offen ist.',
+      },
+    ],
+  },
+  {
+    id: 'groesse',
+    question: 'Wie viele Leute arbeiten bei euch?',
+    hint: 'Ungefähr reicht.',
+    options: [
+      { id: 'lt30', label: 'Unter 30' },
+      { id: '30-80', label: '30 bis 80' },
+      { id: '80-150', label: '80 bis 150' },
+      { id: 'gt150', label: 'Über 150' },
+    ],
+  },
+];
+
+const quizProps = {
+  einordnung: 'software-check' as const,
+  funnel: 'software-check',
+  questions: quizFragen,
+  contact: {
+    heading: 'Wohin darf sich Marten Prieß melden?',
+    text: 'Hinterlasst eure Kontaktdaten, Marten Prieß meldet sich werktags persönlich und sucht mit euch einen Termin.',
+  },
+  success: {
+    heading: 'Danke, eure Nachricht ist angekommen.',
+    text: 'Marten Prieß meldet sich werktags bei euch.',
+  },
+  submitLabel: 'Nachricht senden',
+  phoneHint: 'Telefon für eine kurze Rückfrage. Wir rufen an, wenn es hilft.',
+  leadEvent: 'software_check_lead',
+  privacyUrl: '/datenschutz/',
+};
+
+const pakete = [
+  {
+    nr: 'A',
+    icon: 'layout',
+    titel: 'Architektur-Review',
+    wann: 'Für Gebautes und Geplantes. Nicht nur Sicherheit.',
+    text: 'Ein erfahrener Entwickler und Architekt nimmt Konzept, Code-Struktur, Datenmodell, Rollen und Betrieb mit euch auf und sagt euch, wo es später teuer wird: Was trägt, was hält beim Wachsen nicht, was kann so keiner übernehmen.',
+    ergebnis: ['Befundliste nach Priorität', 'Empfehlung: so lassen, umbauen, neu', 'Entscheidungsvorlage für euch'],
+    dauer: 'Ergebnis nach wenigen Tagen',
+  },
+  {
+    nr: 'B',
+    icon: 'shield',
+    titel: 'Software-Check',
+    wann: 'Das Review vor dem Go-Live oder für Software, die läuft.',
+    text: 'Prüfung gegen OWASP ASVS 5.0, den Standard für Webanwendungen und Schnittstellen. Automatisiert, wo es geht; von Hand dort, wo KI-gebauter Code am häufigsten Fehler hat: Zugriffsrechte, Anmeldung, Eingaben, Konfiguration, Schlüssel.',
+    ergebnis: ['Prüfbericht mit Level und Abdeckung', 'Jeder Befund mit Einstufung und Fix-Vorschlag, so formuliert, dass eure KI direkt damit weiterarbeiten kann', 'Stückliste aller Komponenten'],
+    dauer: 'ab zwei Tagen, je nach Größe',
+  },
+];
+
+// Ausbaustufen: nur nennen, ohne Umfang oder Takt. Was sie enthalten, klärt das Gespräch.
+const ausbau = [
+  {
+    icon: 'file-text',
+    titel: 'CRA-Fahrplan',
+    text: 'Wenn ihr Software an andere abgebt: Einordnung, ob und wie euch der Cyber Resilience Act trifft, und ein Plan bis Dezember 2027.',
+  },
+  {
+    icon: 'users',
+    titel: 'Begleitung',
+    text: 'Wenn ihr weiterbaut: ein fester Termin mit denen, die bauen, dazwischen Rückfragen und Code-Review. Ein Senior, der erreichbar ist.',
+  },
+];
+
+const ablauf = [
+  { titel: 'Scope-Termin', meta: '1 Stunde', text: 'Was wird geprüft, welches Level, wer gibt Zugang zu Code und Testumgebung.' },
+  { titel: 'Automatische Analyse', meta: 'Tag 1', text: 'Code, Abhängigkeiten, Schlüssel im Repository, laufende Anwendung. Werkzeuge, die auch große Hersteller nutzen.' },
+  { titel: 'Prüfung von Hand', meta: 'Tag 1 bis 4', text: 'Die Kapitel, die Werkzeuge nicht sehen: Darf Nutzer A die Daten von Nutzer B sehen? Was passiert bei einem manipulierten Aufruf? Wo liegen die Schlüssel?' },
+  { titel: 'Bericht und Termin', meta: '1,5 Stunden', text: 'Wir gehen den Bericht mit euch durch. Was ist kritisch, was kann warten, was kostet die Behebung.' },
+];
+
+const nichtDabei = [
+  'Kein Penetrationstest mit Einbruchsnachweis. Wenn ihr den braucht, sagen wir es und holen einen Partner dazu.',
+  'Kein Zertifikat. Das stellen Prüfstellen aus; wir bereiten vor und begleiten.',
+  'Keine Angstmache. Was im Bericht steht, ist belegt, eingestuft und mit einem Vorschlag versehen.',
+];
+
+---
+
+<!-- HERO: Seite einspaltig (Botschaft, ein Knopf), Funnel zweispaltig mit Quiz -->
+<section
+  data-hero
+  class:list={[
+    'relative overflow-x-clip lg:flex lg:flex-col',
+    istFunnel ? 'lg:min-h-[calc(100svh-3.5rem)]' : 'pt-24 sm:pt-20 lg:pt-16',
+  ]}
+>
+  <Blueprint />
+  <div
+    class="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_60%_50%_at_30%_40%,var(--color-background)_0%,transparent_75%)] opacity-80"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div
+    class:list={[
+      'relative z-10 mx-auto w-full px-5 pt-8 pb-16 sm:px-8 sm:pt-14',
+      istFunnel
+        ? 'max-w-[84rem] lg:grid lg:flex-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:items-center lg:gap-16 lg:px-12 lg:py-6'
+        : 'container max-w-6xl lg:pt-20 lg:pb-24',
+    ]}
+  >
+    <div class:list={['text-center', istFunnel ? 'lg:text-left' : 'mx-auto max-w-5xl']}>
+      <p
+        data-reveal="fade-down"
+        class="text-brand-600 dark:text-brand-300 text-sm font-semibold tracking-[0.22em] uppercase"
+      >
+        Software-Check
+      </p>
+      <h1
+        data-reveal="fade-down"
+        lang="de"
+        class:list={[
+          'font-display text-foreground mt-3 font-bold tracking-tight text-balance hyphens-auto [-webkit-hyphens:auto] sm:mt-5',
+          istFunnel
+            ? 'text-[2.05rem] leading-[1.08] sm:text-6xl sm:leading-[1.05] xl:text-[4.25rem]'
+            : 'text-[2.2rem] leading-[1.08] sm:text-6xl sm:leading-[1.05] lg:text-[4.5rem]',
+        ]}
+      >
+        Ihr habt mit KI gebaut.
+        <span class="text-brand-500 block">Jetzt soll jemand draufschauen, der es auch selbst könnte.</span>
+      </h1>
+      <p
+        data-reveal
+        class:list={[
+          'text-foreground-muted mt-6 hidden flex-wrap items-center gap-x-2.5 gap-y-2 text-sm font-medium sm:flex',
+          istFunnel ? 'justify-center lg:justify-start' : 'justify-center',
+        ]}
+      >
+        <span>Schluss mit</span>
+        {
+          ['„Läuft doch“', '„Claude sagt, passt“', 'Hoffen, dass nichts passiert'].map((alt) => (
+            <span class="hero-alt border-border rounded-md border px-2 py-0.5">{alt}</span>
+          ))
+        }
+      </p>
+      {istFunnel && <DealZeile />}
+      {
+        !istFunnel && (
+          <>
+            <p
+              data-reveal
+              class="text-foreground-secondary mx-auto mt-6 max-w-2xl text-lg leading-8 sm:mt-8 sm:text-xl sm:leading-9"
+            >
+              Das Tool, das jemand bei euch mit KI gebaut hat. Das Portal vom Freelancer. Das Produkt mit
+              Software drin. Ein erfahrener Entwickler und Architekt schaut drauf: Sicherheit, Struktur,
+              Wartbarkeit, Betrieb.
+            </p>
+            <div data-reveal class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10">
+              <Button size="lg" href={contactLinks.cal} target="_blank">
+                Erstgespräch buchen
+                <Icon name="arrow-up-right" size="sm" />
+              </Button>
+              <Button variant="outline" size="lg" href="#pakete">
+                Was geprüft wird
+                <Icon name="arrow-right" size="sm" />
+              </Button>
+            </div>
+            <p data-reveal class="text-foreground-muted mt-6 text-sm">
+              30 Minuten, online, kostenlos. Marten Prieß, Diplom-Wirtschaftsinformatiker, führt das
+              Gespräch selbst.
+            </p>
+          </>
+        )
+      }
+    </div>
+
+    {
+      istFunnel && (
+        <div id="quiz" class="mt-7 scroll-mt-20 sm:mt-10 lg:mt-0 lg:min-h-[38rem]" data-quiz>
+          <FunnelQuiz client:load {...quizProps} markRequired compact />
+        </div>
+      )
+    }
+  </div>
+
+  <div class="relative z-10">
+    <a
+      href="#heute"
+      class="hero-scroll absolute top-0 left-1/2 z-20 hidden h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full lg:flex"
+      aria-label="Weiter nach unten"
+      data-hero-scroll
+    >
+      <span class="hero-scroll-icon flex"><Icon name="chevron-down" size="sm" /></span>
+    </a>
+    <ClientLogoStrip heading="Aus Projekten mit" logos={clientLogos} variant="light" uniform class="py-10 lg:py-11" />
+  </div>
+</section>
+
+<!-- FRAGEN: die Entscheidungen, nicht der Code-Stil -->
+<FragenMosaik variant={variant} />
+
+<!-- HEUTE -->
+<section
+  id="heute"
+  class="heute-sec bg-background relative scroll-mt-20 overflow-x-clip pt-14 pb-12 sm:py-20 lg:py-24"
+>
+  <div
+    class="container grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-16"
+  >
+    <div class="af-rise order-2 lg:order-1">
+      <p
+        class="inline-flex items-center gap-2 font-mono text-xs font-semibold tracking-[0.2em] text-[oklch(58%_0.19_25)] uppercase"
+      >
+        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+        Kommt euch das bekannt vor?
+      </p>
+      <h2
+        class="font-display text-foreground mt-4 text-3xl font-bold tracking-tight text-balance sm:text-4xl lg:text-[2.35rem] lg:leading-[1.15]"
+      >
+        Die Software läuft.{' '}
+        <span class="text-foreground-muted">Von außen hat sie keiner gesehen.</span>
+      </h2>
+      <p class="text-foreground-secondary mt-5 text-[0.95rem] leading-7">
+        Jemand bei euch hat über Monate ein Tool gebaut, mit KI, mit Doku, mit Backlog. Es läuft im
+        Alltag, es hat Kundendaten drin, und außer ihm kennt es keiner. Oder zwei Leute bauen seit
+        einem halben Jahr sauber an etwas, das in sechs Wochen produktiv geht. Beide Fälle haben
+        dieselbe Lücke.
+      </p>
+      <p class="text-foreground mt-4 text-[0.95rem] leading-7 font-semibold">
+        Keiner im Haus hat so etwas schon einmal betrieben. Was passiert, wenn zwei gleichzeitig
+        klicken, wenn die Datenbank weg ist, wenn ein Kunde den Sicherheitsnachweis will: Das sieht
+        man nicht im Code. Das sieht man, weil man es erlebt hat.
+      </p>
+    </div>
+
+    <div class="szene-auf order-1 lg:order-2" data-szene>
+      <BerichtMock />
+    </div>
+  </div>
+</section>
+
+<!-- 01 PAKETE -->
+<section id="pakete" class="bg-background-secondary border-border relative scroll-mt-20 overflow-x-clip border-y py-16 lg:py-28">
+  <div class="relative z-10 container max-w-6xl">
+    <SectionHeader
+      size="md"
+      number="01"
+      eyebrow="Zwei Wege"
+      title="Was wir prüfen, und was ihr danach in der Hand habt."
+      lead="Beide sind für sich ein Einstieg. Welcher passt, hängt davon ab, ob es um die Struktur geht oder um Sicherheit. Oft beides, dann in dieser Reihenfolge."
+    />
+    <div class="mx-auto mt-14 grid max-w-4xl gap-5 md:grid-cols-2">
+      {
+        pakete.map((p) => (
+          <article data-reveal class="border-border bg-card flex flex-col rounded-[1.6rem] border p-6 shadow-sm sm:p-7">
+            <div class="flex items-center justify-between">
+              <span class="border-brand-300/70 bg-brand-500/5 text-brand-600 flex h-11 w-11 items-center justify-center rounded-xl border">
+                <Icon name={p.icon} size="sm" />
+              </span>
+              <span class="text-brand-600 dark:text-brand-300 font-mono text-xs font-semibold tracking-[0.2em]">{p.nr}</span>
+            </div>
+            <h3 class="font-display text-foreground mt-5 text-xl font-bold tracking-tight">{p.titel}</h3>
+            <p class="text-foreground-muted mt-1 text-sm leading-6">{p.wann}</p>
+            <p class="text-foreground-secondary mt-4 text-[0.95rem] leading-7">{p.text}</p>
+            <p class="text-foreground-muted mt-5 text-xs font-semibold tracking-[0.18em] uppercase">Ihr bekommt</p>
+            <ul class="mt-2 space-y-2">
+              {p.ergebnis.map((e) => (
+                <li class="text-foreground-secondary flex gap-2.5 text-sm leading-6">
+                  <Icon name="check-circle" size="sm" class="text-brand-500 mt-0.5 shrink-0" />
+                  <span>{e}</span>
+                </li>
+              ))}
+            </ul>
+            <p class="border-border/70 text-foreground-muted mt-auto border-t pt-4 text-sm">
+              <span class="text-foreground font-semibold">{p.dauer}</span>
+            </p>
+          </article>
+        ))
+      }
+    </div>
+    <div data-reveal class="mx-auto mt-8 grid max-w-4xl gap-4 sm:grid-cols-2">
+      {
+        ausbau.map((a) => (
+          <div class="border-border/70 bg-background-secondary flex gap-4 rounded-2xl border border-dashed p-5">
+            <span class="text-brand-600 dark:text-brand-300 mt-0.5 shrink-0">
+              <Icon name={a.icon} size="sm" />
+            </span>
+            <div>
+              <p class="text-foreground-muted text-[0.65rem] font-semibold tracking-[0.18em] uppercase">Ausbaustufe</p>
+              <h3 class="font-display text-foreground mt-1 text-base font-bold tracking-tight">{a.titel}</h3>
+              <p class="text-foreground-secondary mt-1 text-sm leading-6">{a.text}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <p data-reveal class="text-foreground-secondary mx-auto mt-8 max-w-3xl text-center text-[0.95rem] leading-7">
+      Erst das Review, dann entscheidet ihr. Beheben könnt ihr selbst, euer Dienstleister oder wir.
+    </p>
+  </div>
+</section>
+
+<!-- STACK: Laufleiste mit Logos -->
+<StackLeiste />
+
+<!-- 02 ABLAUF -->
+<section class="bg-background-secondary border-border relative border-y py-16 lg:py-28">
+  <div class="relative z-10 container max-w-6xl">
+    <SectionHeader
+      size="md"
+      number="02"
+      eyebrow="So läuft ein Check"
+      title="Vier Schritte. Tage, nicht Wochen."
+      lead="Ihr braucht dafür einen Zugang zum Code und zu einer Testumgebung und etwa drei Stunden eurer Zeit. Bei einer Anwendung mittlerer Größe liegt der Bericht nach zwei bis fünf Tagen vor."
+    />
+    <ol class="relative mt-14 grid gap-4 md:grid-cols-4">
+      <span class="bg-border absolute top-[1.35rem] right-[12%] left-[12%] hidden h-px md:block" aria-hidden="true"></span>
+      {
+        ablauf.map((s, i) => (
+          <li data-reveal class="relative">
+            <span
+              class:list={[
+                'relative z-10 mx-auto flex h-11 w-11 items-center justify-center rounded-full font-mono text-sm font-bold md:mx-0',
+                i === 2
+                  ? 'bg-brand-500 text-white shadow-[0_10px_24px_-10px_var(--color-brand-500)]'
+                  : 'border-brand-300 bg-card text-brand-600 border-2',
+              ]}
+            >
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div class="border-border bg-card mt-4 rounded-2xl border p-5 text-center md:text-left">
+              <h3 class="font-display text-foreground text-lg font-bold tracking-tight">{s.titel}</h3>
+              <p class="text-brand-600 dark:text-brand-300 mt-0.5 text-xs font-semibold">{s.meta}</p>
+              <p class="text-foreground-secondary mt-2 text-sm leading-6">{s.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<!-- WAS DER CHECK NICHT IST -->
+<section class="bg-background relative py-12 lg:py-16">
+  <div class="relative z-10 container max-w-6xl">
+    <div data-reveal class="border-border bg-card mx-auto max-w-4xl rounded-[1.6rem] border p-6 sm:p-8">
+      <p class="text-foreground-muted text-xs font-semibold tracking-[0.18em] uppercase">Was der Check nicht ist</p>
+      <ul class="mt-4 space-y-3">
+        {
+          nichtDabei.map((n) => (
+            <li class="text-foreground-secondary flex gap-3 text-[0.95rem] leading-7">
+              <Icon name="x-circle" size="sm" class="text-foreground-muted mt-1 shrink-0" />
+              <span>{n}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- VERTRAUEN -->
+<VertrauensBand
+  fakten={[
+    { icon: 'shield', titel: 'Nach OWASP ASVS 5.0', text: 'Der Standard, nicht unsere Checkliste.' },
+    { icon: 'code', titel: 'Studierte Informatiker', text: 'Zehn Jahre Software gebaut und betrieben.' },
+    { icon: 'check-circle', titel: 'CRA im eigenen Haus', text: 'Unsere Software fällt selbst darunter.' },
+    { icon: 'phone', titel: 'Erstgespräch unverbindlich', text: '30 Minuten, keine Vorbereitung.' },
+  ]}
+/>
+
+<!-- 03 WER PRÜFT -->
+<section class:list={['bg-background relative overflow-x-clip py-16 lg:py-28', istFunnel && 'hidden lg:block']}>
+  <div class="relative z-10 container max-w-6xl">
+    <SectionHeader size="md" number="03" eyebrow="Wer prüft" title="Leute, die so etwas selbst bauen." />
+    <div class="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-12">
+      <div data-reveal class="text-foreground-secondary space-y-4 text-[0.95rem] leading-7">
+        <p>
+          Wir sind keine Prüfstelle und kein Pentest-Shop. Wir sind ein Softwarehaus, das seit zehn
+          Jahren Anwendungen für Betriebe baut und betreibt, früher für Konzerne wie bonprix und
+          Statista, heute für den Mittelstand. Wir wissen, wo in gewachsenem und in schnell gebautem
+          Code die Fehler sitzen, weil wir beides selbst geschrieben haben. Und wir wissen, was ein
+          Tool braucht, das aus dem Fachbereich kommt und jetzt produktiv ist: jemanden, der es
+          trägt.
+        </p>
+        <p>
+          Wir liefern selbst Software, für die der Cyber Resilience Act gilt. Die Stückliste, den
+          Meldeprozess und die Risikobewertung, die wir euch empfehlen, führen wir für unsere eigenen
+          Produkte, in demselben Repository wie den Code.
+        </p>
+        <p class="text-foreground font-semibold">
+          Jeder Bericht trägt den Standard und das geprüfte Level. Das kann ein Auditor nachlesen.
+          Eine Hausliste mit 18 Punkten kann er nicht.
+        </p>
+      </div>
+      {
+        !istFunnel && (
+          <ErstgespraechKarte
+            schmal
+            zitat="Nach dreißig Minuten wisst ihr, wo ihr steht und was als Nächstes dran ist."
+            text="Ihr erzählt, was läuft und wer es gebaut hat. Ich frage nach Rollen, Daten und Betrieb und sage euch, was ich an eurer Stelle als Erstes anschauen würde. Unverbindlich, ohne Vorbereitung."
+            href={contactLinks.cal}
+          />
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Blog: Artikel zu dieser Tür, nur auf der indexierten Seite -->
+{!istFunnel && <BlogQuerverweis tuer="check" />}
+
+<!-- KONTAKT: nur im Funnel (zweites Quiz ab lg). Auf der Seite reicht die Erstgespräch-Karte bei „Wer prüft“ (Marten, 2026-10-20). -->
+<section id="kontakt" class:list={['kontakt-sec border-border relative scroll-mt-20 overflow-x-clip border-t py-24 lg:py-32', istFunnel ? 'hidden lg:block' : 'hidden']}>
+  <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div class="bg-brand-400/15 absolute -bottom-40 -left-24 h-[34rem] w-[34rem] rounded-full blur-[150px]"></div>
+    <div class="bg-grid-pattern absolute inset-0 [mask-image:linear-gradient(to_top,black,transparent_85%)] opacity-[0.06]"></div>
+  </div>
+  {
+    istFunnel ? (
+      <div class="relative z-10 container grid max-w-6xl gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch lg:gap-16">
+        <div class="af-rise flex flex-col">
+          <p class="text-brand-600 dark:text-brand-300 font-mono text-xs font-semibold tracking-[0.2em] uppercase">Nächster Schritt</p>
+          <h2 lang="de" class="font-display text-foreground mt-4 text-3xl font-bold tracking-tight text-balance sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
+            Erstgespräch vereinbaren.
+          </h2>
+          <p class="text-foreground-secondary mt-5 text-lg leading-8">
+            Drei kurze Fragen und eure Kontaktdaten, mehr braucht es nicht. So kennen wir eure Ausgangslage schon vor dem Termin.
+          </p>
+          <ol class="kontakt-ablauf mt-9 mb-8 space-y-6">
+            {
+              [
+                { titel: 'Fragen beantworten', text: 'Worum es geht, was der Anlass ist, wie groß ihr seid. Dauert eine Minute.' },
+                { titel: 'Wir melden uns', text: 'Werktags, persönlich, mit einem Terminvorschlag.' },
+                { titel: 'Erstgespräch', text: '30 Minuten, online, kostenlos. Danach wisst ihr, wo ihr steht und was als Nächstes dran ist.' },
+              ].map((schritt, i) => (
+                <li class="relative flex gap-4">
+                  <span class="bg-card border-brand-300 text-brand-600 dark:text-brand-300 relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div class="pt-1">
+                    <p class="font-display text-foreground font-bold tracking-tight">{schritt.titel}</p>
+                    <p class="text-foreground-secondary mt-1 text-[0.95rem] leading-7">{schritt.text}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+          <div class="border-border mt-auto flex items-center gap-4 border-t pt-8">
+            <Picture src={founderPortrait} alt="Marten Prieß" widths={[56, 112]} sizes="56px" formats={['avif', 'webp']} class="h-14 w-14 shrink-0 rounded-full object-cover" loading="lazy" />
+            <p class="text-sm leading-6">
+              <span class="text-foreground block font-semibold">Marten Prieß</span>
+              <span class="text-foreground-secondary">Gründer von RocketBase, meldet sich persönlich.</span>
+            </p>
+          </div>
+        </div>
+        <div data-quiz>
+          <FunnelQuiz client:visible {...quizProps} markRequired />
+        </div>
+      </div>
+    ) : (
+      <div class="relative z-10 container max-w-3xl text-center">
+        <p class="text-brand-600 dark:text-brand-300 font-mono text-xs font-semibold tracking-[0.2em] uppercase">Nächster Schritt</p>
+        <h2 lang="de" class="font-display text-foreground mt-4 text-3xl font-bold tracking-tight text-balance sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
+          Einen Termin aussuchen, fertig.
+        </h2>
+        <p class="text-foreground-secondary mx-auto mt-5 max-w-xl text-lg leading-8">
+          30 Minuten, online, kostenlos. Code-Zugang braucht ihr dafür noch nicht. Danach wisst ihr, wo ihr
+          steht und was als Nächstes dran ist.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Button size="lg" href={contactLinks.cal} target="_blank">
+            Erstgespräch buchen
+            <Icon name="arrow-up-right" size="sm" />
+          </Button>
+          <Button variant="outline" size="lg" href="/kontakt/">
+            Nachricht schreiben
+            <Icon name="arrow-right" size="sm" />
+          </Button>
+        </div>
+        <div class="mt-10 flex items-center justify-center gap-4">
+          <Picture src={founderPortrait} alt="Marten Prieß" widths={[56, 112]} sizes="56px" formats={['avif', 'webp']} class="h-14 w-14 shrink-0 rounded-full object-cover" loading="lazy" />
+          <p class="text-left text-sm leading-6">
+            <span class="text-foreground block font-semibold">Marten Prieß</span>
+            <span class="text-foreground-secondary">Gründer von RocketBase, führt das Gespräch selbst.</span>
+          </p>
+        </div>
+      </div>
+    )
+  }
+</section>

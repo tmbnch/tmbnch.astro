@@ -1,0 +1,136 @@
+---
+/**
+ * GridShift – Hero-Hintergrund für die Standardsoftware-Ablösung.
+ * Motiv: Ein starres, gleichförmiges Raster (links = der Standard, "für alle
+ * gemacht") löst sich nach rechts in freiere, fließende Linien auf
+ * (rechts = die individuelle Lösung, "für euch gebaut"). Dezente Drift-Animation.
+ * Dark-ready über oklch-Tokens (brand-indigo).
+ */
+---
+
+<div class="hero-gridshift pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+  <div class="hero-gridshift-backdrop absolute inset-0"></div>
+
+  <svg
+    class="absolute inset-0 h-full w-full"
+    viewBox="0 0 1440 720"
+    preserveAspectRatio="xMidYMid slice"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <radialGradient id="gridshiftGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0%" stop-color="var(--gs-glow-start)" />
+        <stop offset="100%" stop-color="var(--gs-glow-end)" />
+      </radialGradient>
+      <linearGradient id="gridshiftFade" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="white" stop-opacity="0.9" />
+        <stop offset="55%" stop-color="white" stop-opacity="0.5" />
+        <stop offset="100%" stop-color="white" stop-opacity="0" />
+      </linearGradient>
+      <mask id="gridshiftMask">
+        <rect width="1440" height="720" fill="url(#gridshiftFade)" />
+      </mask>
+    </defs>
+
+    <!-- Atmosphärischer Glow rechts (wo die individuelle Lösung entsteht) -->
+    <circle cx="1180" cy="300" r="360" fill="url(#gridshiftGlow)" opacity="0.6" />
+
+    <!-- Starres Raster links, ausgeblendet nach rechts -->
+    <g stroke="var(--gs-grid)" stroke-width="1" mask="url(#gridshiftMask)">
+      <line x1="0" y1="120" x2="760" y2="120" />
+      <line x1="0" y1="240" x2="760" y2="240" />
+      <line x1="0" y1="360" x2="760" y2="360" />
+      <line x1="0" y1="480" x2="760" y2="480" />
+      <line x1="0" y1="600" x2="760" y2="600" />
+      <line x1="120" y1="0" x2="120" y2="720" />
+      <line x1="240" y1="0" x2="240" y2="720" />
+      <line x1="360" y1="0" x2="360" y2="720" />
+      <line x1="480" y1="0" x2="480" y2="720" />
+      <line x1="600" y1="0" x2="600" y2="720" />
+      <line x1="720" y1="0" x2="720" y2="720" />
+    </g>
+
+    <!-- Fließende Linien rechts (die individuelle Lösung) -->
+    <g stroke="var(--gs-flow)" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.7" class="hero-gridshift-flow">
+      <path d="M 720 120 C 900 120, 980 180, 1180 170 S 1400 150, 1440 160" class="gs-flow-1" />
+      <path d="M 720 240 C 920 240, 1000 300, 1200 280 S 1420 260, 1440 270" class="gs-flow-2" />
+      <path d="M 720 360 C 900 360, 1020 340, 1220 380 S 1410 400, 1440 390" class="gs-flow-3" />
+      <path d="M 720 480 C 920 480, 1000 540, 1180 510 S 1400 490, 1440 500" class="gs-flow-2" />
+      <path d="M 720 600 C 900 600, 1020 560, 1240 590 S 1420 610, 1440 600" class="gs-flow-1" />
+    </g>
+
+    <!-- Knotenpunkte am Übergang Standard → individuell -->
+    <g fill="var(--gs-node)">
+      <circle cx="720" cy="120" r="3.5" class="hero-gridshift-pulse gs-p1" />
+      <circle cx="720" cy="240" r="3.5" class="hero-gridshift-pulse gs-p2" />
+      <circle cx="720" cy="360" r="3.5" class="hero-gridshift-pulse gs-p3" />
+      <circle cx="720" cy="480" r="3.5" class="hero-gridshift-pulse gs-p2" />
+      <circle cx="720" cy="600" r="3.5" class="hero-gridshift-pulse gs-p1" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .hero-gridshift {
+    --gs-glow-start: oklch(70% 0.12 274 / 0.28);
+    --gs-glow-end: oklch(70% 0.12 274 / 0);
+    --gs-grid: oklch(55% 0.04 274 / 0.18);
+    --gs-flow: oklch(58% 0.16 274 / 0.55);
+    --gs-node: oklch(58% 0.2 274 / 0.85);
+    --gs-bg-top: oklch(97% 0.004 274);
+    --gs-bg-mid: oklch(94% 0.008 274);
+    --gs-bg-bottom: oklch(98% 0.002 274);
+  }
+
+  :global(.dark) .hero-gridshift {
+    --gs-glow-start: oklch(62% 0.2 274 / 0.4);
+    --gs-glow-end: oklch(62% 0.2 274 / 0);
+    --gs-grid: oklch(72% 0.05 274 / 0.12);
+    --gs-flow: oklch(78% 0.14 274 / 0.7);
+    --gs-node: oklch(85% 0.1 274 / 0.95);
+    --gs-bg-top: oklch(22% 0.02 274);
+    --gs-bg-mid: oklch(17% 0.018 274);
+    --gs-bg-bottom: oklch(13% 0.012 274);
+  }
+
+  .hero-gridshift-backdrop {
+    background:
+      radial-gradient(ellipse at 85% 35%, var(--gs-glow-start), transparent 60%),
+      linear-gradient(160deg, var(--gs-bg-top) 0%, var(--gs-bg-mid) 55%, var(--gs-bg-bottom) 100%);
+  }
+
+  .hero-gridshift-flow path {
+    stroke-dasharray: 6 10;
+    animation: gridshift-drift linear infinite;
+    will-change: stroke-dashoffset;
+  }
+  .gs-flow-1 { animation-duration: 9s; }
+  .gs-flow-2 { animation-duration: 12s; }
+  .gs-flow-3 { animation-duration: 10.5s; }
+
+  @keyframes gridshift-drift {
+    to { stroke-dashoffset: -160; }
+  }
+
+  .hero-gridshift-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: gridshift-pulse ease-in-out infinite;
+    will-change: opacity, transform;
+  }
+  .gs-p1 { animation-duration: 4s; animation-delay: 0s; }
+  .gs-p2 { animation-duration: 5.4s; animation-delay: -1.4s; }
+  .gs-p3 { animation-duration: 4.7s; animation-delay: -2.6s; }
+
+  @keyframes gridshift-pulse {
+    0%, 100% { opacity: 0.45; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-gridshift-flow path,
+    .hero-gridshift-pulse {
+      animation: none;
+    }
+  }
+</style>

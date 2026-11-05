@@ -1,0 +1,288 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface TestimonialItem {
+  quote: string;
+  author: string;
+  position: string;
+  client: string;
+  portrait?: ImageMetadata;
+}
+
+interface Props {
+  items: TestimonialItem[];
+  autoRotateMs?: number;
+  id?: string;
+}
+
+const { items, autoRotateMs = 7000, id = 'testimonial-carousel' } = Astro.props;
+
+const initials = (name: string) =>
+  name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+---
+
+{items.length > 0 && (
+  <div
+    id={id}
+    class="relative"
+    role="region"
+    aria-roledescription="carousel"
+    aria-label="Stimmen von Kundinnen und Kunden"
+    tabindex="0"
+    data-testimonial-carousel
+    data-auto-rotate-ms={autoRotateMs}
+  >
+    <div
+      class="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      data-testimonial-track
+    >
+      {items.map((item, i) => (
+        <div
+          class="min-w-full snap-center"
+          role="group"
+          aria-roledescription="slide"
+          aria-label={`${i + 1} von ${items.length}`}
+          data-testimonial-slide
+        >
+          <figure class="bg-card border-border relative rounded-2xl border p-6 shadow-sm sm:p-7">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 32 32"
+              class="text-brand-500/30 mb-4 h-7 w-7"
+              fill="currentColor"
+            >
+              <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4Zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4Z" />
+            </svg>
+            <blockquote>
+              <p class="text-foreground-secondary text-sm leading-6 sm:text-base sm:leading-7">
+                {item.quote}
+              </p>
+            </blockquote>
+            <figcaption class="border-border mt-5 flex items-center gap-3 border-t pt-4">
+              <div class="border-border bg-background-secondary flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border">
+                {item.portrait ? (
+                  <Image
+                    src={item.portrait}
+                    alt={item.author}
+                    widths={[48, 72, 96]}
+                    sizes="40px"
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span class="text-foreground-muted text-xs font-semibold">
+                    {initials(item.author)}
+                  </span>
+                )}
+              </div>
+              <div class="min-w-0 text-xs sm:text-sm">
+                <p class="text-foreground font-semibold">{item.author}</p>
+                <p class="text-foreground-muted">
+                  {item.position} · {item.client}
+                </p>
+              </div>
+            </figcaption>
+          </figure>
+        </div>
+      ))}
+    </div>
+
+    {items.length > 1 && (
+      <div class="mt-6 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          aria-label="Vorherige Stimme"
+          class="border-border bg-card text-foreground-secondary hover:border-brand-300 hover:text-brand-600 focus-visible:ring-brand-500 flex h-10 w-10 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2"
+          data-testimonial-prev
+        >
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+
+        <div class="flex items-center gap-2" data-testimonial-dots>
+          {items.map((_, i) => (
+            <button
+              type="button"
+              aria-label={`Stimme ${i + 1} anzeigen`}
+              aria-current={i === 0}
+              data-testimonial-dot
+              data-index={i}
+              class:list={[
+                'h-2 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
+                i === 0 ? 'w-6 bg-brand-500' : 'w-2 bg-border hover:bg-brand-300',
+              ]}
+            />
+          ))}
+        </div>
+
+        <button
+          type="button"
+          aria-label="Nächste Stimme"
+          class="border-border bg-card text-foreground-secondary hover:border-brand-300 hover:text-brand-600 focus-visible:ring-brand-500 flex h-10 w-10 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2"
+          data-testimonial-next
+        >
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+    )}
+  </div>
+)}
+
+<script>
+  function initTestimonialCarousels() {
+    document
+      .querySelectorAll<HTMLElement>('[data-testimonial-carousel]')
+      .forEach((root) => {
+        if (root.dataset.carouselInit) return;
+        root.dataset.carouselInit = 'true';
+
+        const track = root.querySelector<HTMLElement>('[data-testimonial-track]');
+        const slides = Array.from(
+          root.querySelectorAll<HTMLElement>('[data-testimonial-slide]'),
+        );
+        const dots = Array.from(
+          root.querySelectorAll<HTMLButtonElement>('[data-testimonial-dot]'),
+        );
+        const prevBtn = root.querySelector<HTMLButtonElement>('[data-testimonial-prev]');
+        const nextBtn = root.querySelector<HTMLButtonElement>('[data-testimonial-next]');
+        const rotateMs = Number(root.dataset.autoRotateMs || 7000);
+
+        if (!track || slides.length === 0) return;
+
+        let active = 0;
+        let paused = false;
+        let timer: number | null = null;
+
+        const activeDotClasses = ['w-6', 'bg-brand-500'];
+        const idleDotClasses = ['w-2', 'bg-border', 'hover:bg-brand-300'];
+
+        function setActive(i: number) {
+          active = ((i % slides.length) + slides.length) % slides.length;
+          dots.forEach((dot, idx) => {
+            dot.setAttribute('aria-current', String(idx === active));
+            if (idx === active) {
+              dot.classList.remove(...idleDotClasses);
+              dot.classList.add(...activeDotClasses);
+            } else {
+              dot.classList.remove(...activeDotClasses);
+              dot.classList.add(...idleDotClasses);
+            }
+          });
+        }
+
+        function scrollToActive() {
+          const slide = slides[active];
+          if (slide && track) {
+            track.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
+          }
+        }
+
+        function go(i: number) {
+          setActive(i);
+          scrollToActive();
+        }
+
+        function next() {
+          go(active + 1);
+        }
+
+        function prev() {
+          go(active - 1);
+        }
+
+        function start() {
+          if (slides.length <= 1) return;
+          stop();
+          timer = window.setInterval(() => {
+            if (!paused) next();
+          }, rotateMs);
+        }
+
+        function stop() {
+          if (timer !== null) {
+            window.clearInterval(timer);
+            timer = null;
+          }
+        }
+
+        // Scroll-based active update (touch/swipe)
+        let scrollRaf = 0;
+        track.addEventListener(
+          'scroll',
+          () => {
+            if (scrollRaf) cancelAnimationFrame(scrollRaf);
+            scrollRaf = requestAnimationFrame(() => {
+              const center = track.scrollLeft + track.clientWidth / 2;
+              let bestIdx = 0;
+              let bestDist = Infinity;
+              slides.forEach((el, i) => {
+                const c = el.offsetLeft + el.clientWidth / 2;
+                const d = Math.abs(c - center);
+                if (d < bestDist) {
+                  bestDist = d;
+                  bestIdx = i;
+                }
+              });
+              if (bestIdx !== active) setActive(bestIdx);
+            });
+          },
+          { passive: true },
+        );
+
+        prevBtn?.addEventListener('click', () => {
+          paused = true;
+          prev();
+        });
+        nextBtn?.addEventListener('click', () => {
+          paused = true;
+          next();
+        });
+        dots.forEach((dot) => {
+          dot.addEventListener('click', () => {
+            paused = true;
+            const i = Number(dot.dataset.index || 0);
+            go(i);
+          });
+        });
+
+        root.addEventListener('pointerenter', () => {
+          paused = true;
+        });
+        root.addEventListener('pointerleave', () => {
+          paused = false;
+        });
+        root.addEventListener('focusin', () => {
+          paused = true;
+        });
+        root.addEventListener('focusout', () => {
+          paused = false;
+        });
+
+        root.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            paused = true;
+            next();
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            paused = true;
+            prev();
+          }
+        });
+
+        start();
+      });
+  }
+
+  initTestimonialCarousels();
+  document.addEventListener('astro:page-load', initTestimonialCarousels);
+</script>

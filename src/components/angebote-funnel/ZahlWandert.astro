@@ -1,0 +1,917 @@
+---
+/**
+ * „Eine Zahl, einmal eingegeben“: drei Karten, durch die dieselbe Zahl wandert, und zwar live.
+ *   1 Eure Rechnung: Anlagen mal Zeit mal Satz. Die Anlagen lassen sich mit − / + ändern.
+ *   2 Euer Angebot: dieselbe Zahl steht in der Angebotszeile, niemand tippt sie ab.
+ *   3 Beim Kunden: die Angebotsseite. Notdienst lässt sich abwählen, die Summe rechnet nach,
+ *     der Knopf „Ja, so machen wir das“ sagt zu.
+ *
+ * Steht direkt nach „Kommt euch das bekannt vor?“: der Aha-Moment, wie es beim Kunden ankommt.
+ *
+ * Bühne statt Reihe: die Karten liegen versetzt auf einer getönten Fläche, zwischen ihnen
+ * ein Strom, in dem ein Punkt fließt. Nach jeder Änderung schießt der Punkt sichtbar von
+ * Karte zu Karte und trägt die neue Zahl weiter. Desktop treppenförmig nebeneinander,
+ * Handy im Zickzack untereinander, leicht schräg wie hingelegte Zettel.
+ *
+ * Läuft beim Hereinscrollen an (`data-szene`, lib/szene.ts): Karte für Karte, Zahl für Zahl.
+ * Jede Änderung läuft denselben Weg noch einmal: erst die Rechnung, dann das Angebot, dann der
+ * Kunde. Gerechnet wird im Browser, die Formel steht in der Karte. Ohne JS steht das Beispiel
+ * mit 85 Anlagen fest da.
+ */
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+const ANLAGEN = 85;
+const STUNDEN_JE_ANLAGE = 1.2;
+const SATZ = 89;
+const ANFAHRT = 1920;
+const NOTDIENST = 322;
+const eur = (n: number) => `${Math.round(n).toLocaleString('de-DE')} €`;
+const wartung = ANLAGEN * STUNDEN_JE_ANLAGE * SATZ;
+---
+
+<div
+  class="zw"
+  data-szene
+  data-zw
+  data-stunden={STUNDEN_JE_ANLAGE}
+  data-satz={SATZ}
+  data-anfahrt={ANFAHRT}
+  data-notdienst={NOTDIENST}
+>
+  <ol class="zw-reihe grid gap-0 lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-start">
+    <!-- 1 Eure Rechnung -->
+    <li class="zw-karte zw-k1 rounded-3xl p-4 sm:p-5">
+      <p class="zw-kopf">
+        <span class="zw-nr">1</span>
+        Eure Rechnung
+        <span class="zw-live"><i></i>rechnet live</span>
+      </p>
+      <div class="zw-sheet mt-3 rounded-2xl p-3">
+        <div class="zw-zeile zw-zeile-input">
+          <span>Anlagen</span>
+          <span class="zw-stepper" role="group" aria-label="Anzahl Anlagen">
+            <button type="button" class="zw-btn" data-zw-minus aria-label="Weniger Anlagen">
+              <Icon name="minus" size="xs" />
+            </button>
+            <b class="zw-wert zw-wert-a" data-zw-anlagen>{ANLAGEN}</b>
+            <button type="button" class="zw-btn" data-zw-plus aria-label="Mehr Anlagen">
+              <Icon name="plus" size="xs" />
+            </button>
+          </span>
+        </div>
+        <div class="zw-zeile">
+          <span>Zeit je Anlage</span><b class="zw-wert zw-wert-b">1,2 h</b>
+        </div>
+        <div class="zw-zeile"><span>Stundensatz</span><b class="zw-wert zw-wert-c">89 €</b></div>
+        <div class="zw-zeile zw-summe">
+          <span>Ergibt</span><b class="zw-zahl zw-zahl-1" data-zw-wartung>{eur(wartung)}</b>
+        </div>
+      </div>
+      <p class="zw-text">
+        Anlagen mal Zeit mal Satz. Ändert die Anlagen, der Rest läuft von selbst.
+      </p>
+    </li>
+
+    <li class="zw-pfeil zw-pfeil-1" aria-hidden="true">
+      <span class="zw-strom"><i class="zw-strom-punkt"></i></span>
+    </li>
+
+    <!-- 2 Euer Angebot -->
+    <li class="zw-karte zw-k2 rounded-3xl p-4 sm:p-5">
+      <p class="zw-kopf">
+        <span class="zw-nr">2</span>
+        Euer Angebot
+      </p>
+      <div class="zw-doc mt-3 rounded-2xl p-3">
+        <div class="zw-doc-kopf">
+          <i></i><i></i>
+          <span>Angebot 26-107 · Entwurf</span>
+        </div>
+        <div class="zw-pos">
+          <span>Wartung Anlagen, 2 × im Jahr</span><b class="zw-zahl zw-zahl-2" data-zw-wartung
+            >{eur(wartung)}</b
+          >
+        </div>
+        <div class="zw-pos zw-pos-leise"><span>Anfahrt, 24 Termine</span><b>{eur(ANFAHRT)}</b></div>
+        <div class="zw-pos zw-pos-leise" data-zw-notdienst-zeile>
+          <span>Notdienst, Pauschale</span><b>{eur(NOTDIENST)}</b>
+        </div>
+        <div class="zw-db">
+          <span class="zw-dot"></span>
+          Bleibt übrig: 31 %
+        </div>
+      </div>
+      <p class="zw-text">Dieselbe Zahl, direkt in der Angebotszeile. Niemand tippt sie ab.</p>
+    </li>
+
+    <li class="zw-pfeil zw-pfeil-2" aria-hidden="true">
+      <span class="zw-strom"><i class="zw-strom-punkt"></i></span>
+    </li>
+
+    <!-- 3 Beim Kunden -->
+    <li class="zw-karte zw-k3 rounded-3xl p-4 sm:p-5">
+      <p class="zw-kopf">
+        <span class="zw-nr">3</span>
+        Beim Kunden
+      </p>
+      <div class="zw-seite mt-3 rounded-2xl p-3">
+        <div class="zw-url"><i></i>angebot.euer-betrieb.de/26-107</div>
+        <div class="zw-pos">
+          <span>Wartung Anlagen</span><b class="zw-zahl zw-zahl-3" data-zw-wartung>{eur(wartung)}</b
+          >
+        </div>
+        <div class="zw-pos zw-pos-leise"><span>Anfahrt</span><b>{eur(ANFAHRT)}</b></div>
+        <label class="zw-pos zw-pos-leise zw-option">
+          <span class="zw-check-wrap">
+            <input type="checkbox" class="zw-check-input" checked data-zw-notdienst />
+            <span class="zw-check" aria-hidden="true"></span>
+            Notdienst, optional
+          </span>
+          <b>{eur(NOTDIENST)}</b>
+        </label>
+        <div class="zw-pos zw-gesamt">
+          <span>Summe</span><b class="zw-zahl zw-zahl-4" data-zw-summe
+            >{eur(wartung + ANFAHRT + NOTDIENST)}</b
+          >
+        </div>
+        <button type="button" class="zw-ja" data-zw-ja>
+          <span class="zw-ja-vor"><Icon name="check" size="xs" />Ja, so machen wir das</span>
+          <span class="zw-ja-nach"><Icon name="check-circle" size="xs" />Zugesagt</span>
+        </button>
+        <p class="zw-ja-info">Liegt jetzt bei euch im System.</p>
+      </div>
+      <p class="zw-text">Der Kunde wählt, sieht die Summe und sagt per Klick zu. Probiert es.</p>
+    </li>
+  </ol>
+</div>
+
+<style>
+  .zw-karte {
+    position: relative;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow:
+      0 1px 0 color-mix(in oklch, #fff 60%, transparent) inset,
+      0 30px 70px -36px oklch(30% 0.1 265 / 0.55);
+    display: flex;
+    flex-direction: column;
+  }
+  /* Karte 1 und 3 sind zum Anfassen: feiner Markenrand */
+  .zw-k1,
+  .zw-k3 {
+    border-color: color-mix(in oklch, var(--color-brand-400) 45%, var(--color-border));
+  }
+  .zw-kopf {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-foreground);
+  }
+  .zw-nr {
+    display: inline-flex;
+    width: 1.6rem;
+    height: 1.6rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--color-brand-500);
+    color: #fff;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+  }
+  .zw-live {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-foreground-muted);
+  }
+  .zw-live i {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: oklch(68% 0.15 150);
+    box-shadow: 0 0 0 3px color-mix(in oklch, oklch(68% 0.15 150) 25%, transparent);
+    animation: zw-puls 2s ease-in-out infinite;
+  }
+  @keyframes zw-puls {
+    50% {
+      box-shadow: 0 0 0 6px color-mix(in oklch, oklch(68% 0.15 150) 0%, transparent);
+    }
+  }
+  .zw-text {
+    margin-top: auto;
+    padding-top: 0.85rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--color-foreground-secondary);
+  }
+  .zw-sheet,
+  .zw-doc,
+  .zw-seite {
+    background: color-mix(in oklch, var(--color-foreground) 3%, var(--color-card));
+    border: 1px solid var(--color-border);
+    font-size: 0.8rem;
+  }
+  .zw-doc-kopf {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 0.35rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.66rem;
+    color: var(--color-foreground-muted);
+  }
+  .zw-doc-kopf i {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--color-foreground) 18%, transparent);
+  }
+  .zw-doc-kopf span {
+    margin-left: 0.3rem;
+  }
+  .zw-zeile,
+  .zw-pos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.35rem 0;
+    color: var(--color-foreground-secondary);
+  }
+  .zw-zeile + .zw-zeile,
+  .zw-pos + .zw-pos,
+  .zw-pos + .zw-option,
+  .zw-option + .zw-pos {
+    border-top: 1px dashed var(--color-border);
+  }
+  .zw-zeile b,
+  .zw-pos b {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-weight: 600;
+    color: var(--color-foreground);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .zw-summe,
+  .zw-gesamt {
+    color: var(--color-foreground);
+    font-weight: 600;
+  }
+  .zw-pos-leise {
+    opacity: 0.75;
+  }
+  .zw-pos-leise[data-aus] {
+    opacity: 0.35;
+    text-decoration: line-through;
+  }
+  .zw-zahl {
+    display: inline-block;
+    padding: 0.05rem 0.4rem;
+    border-radius: 0.4rem;
+    background: color-mix(in oklch, var(--color-brand-500) 14%, transparent);
+    color: var(--color-brand-700);
+  }
+  :global(.dark) .zw-zahl {
+    color: var(--color-brand-200);
+  }
+  .zw-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .zw-stepper b {
+    min-width: 2.2rem;
+    text-align: center;
+  }
+  .zw-btn {
+    display: inline-flex;
+    width: 1.6rem;
+    height: 1.6rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    border: 1px solid color-mix(in oklch, var(--color-brand-400) 55%, var(--color-border));
+    background: var(--color-card);
+    color: var(--color-brand-600);
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      transform 0.15s ease;
+  }
+  .zw-btn:hover {
+    background: color-mix(in oklch, var(--color-brand-500) 10%, var(--color-card));
+  }
+  .zw-btn:active {
+    transform: scale(0.92);
+  }
+  .zw-btn:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  .zw-db {
+    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-foreground-secondary);
+  }
+  .zw-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: oklch(68% 0.15 150);
+    box-shadow: 0 0 0 3px color-mix(in oklch, oklch(68% 0.15 150) 25%, transparent);
+  }
+  .zw-url {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.66rem;
+    color: var(--color-foreground-muted);
+  }
+  .zw-url i {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: oklch(68% 0.15 150);
+  }
+  .zw-option {
+    cursor: pointer;
+    user-select: none;
+  }
+  .zw-check-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .zw-check-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .zw-check {
+    display: inline-block;
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 0.25rem;
+    border: 1px solid color-mix(in oklch, var(--color-brand-400) 60%, var(--color-border));
+    background: var(--color-card);
+    transition: background 0.15s ease;
+  }
+  .zw-check-input:checked + .zw-check {
+    background: var(--color-brand-500)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E")
+      center / 70% no-repeat;
+    border-color: var(--color-brand-500);
+  }
+  .zw-check-input:focus-visible + .zw-check {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  .zw-ja {
+    margin-top: 0.6rem;
+    width: 100%;
+    display: grid;
+    padding: 0.55rem;
+    border-radius: 0.7rem;
+    border: 0;
+    background: var(--color-brand-500);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 24px -12px var(--color-brand-500);
+    transition:
+      background 0.2s ease,
+      transform 0.15s ease;
+  }
+  .zw-ja:hover {
+    background: var(--color-brand-400);
+  }
+  .zw-ja:active {
+    transform: scale(0.98);
+  }
+  .zw-ja:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+  }
+  .zw-ja > span {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: opacity 0.25s ease;
+  }
+  .zw-ja-nach {
+    opacity: 0;
+  }
+  .zw-ja[data-zu] {
+    background: oklch(55% 0.14 150);
+    cursor: default;
+  }
+  .zw-ja[data-zu] .zw-ja-vor {
+    opacity: 0;
+  }
+  .zw-ja[data-zu] .zw-ja-nach {
+    opacity: 1;
+  }
+
+  /* Hinweis unter dem Knopf, erscheint nach der Zusage */
+  .zw-ja-info {
+    margin-top: 0.4rem;
+    text-align: center;
+    font-size: 0.7rem;
+    color: oklch(50% 0.12 150);
+    opacity: 0;
+    translate: 0 -4px;
+    transition:
+      opacity 0.3s ease,
+      translate 0.3s ease;
+  }
+  :global(.dark) .zw-ja-info {
+    color: oklch(78% 0.12 150);
+  }
+  .zw-ja[data-zu] + .zw-ja-info {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /*
+   * Bühne: getönte Fläche mit feinem Raster, darauf die Karten.
+   * Handy: Zickzack, jede Karte etwas schmaler, abwechselnd links und rechts, leicht schräg.
+   * Desktop: Treppe, Karte 2 und 3 je ein Stück tiefer.
+   */
+  /*
+   * Frei in der Section, kein Kasten: Raster und Leuchten laufen weich über den Rand
+   * hinaus in den Abschnitt aus. Die Karten schweben darauf.
+   */
+  .zw {
+    position: relative;
+    isolation: isolate;
+  }
+  .zw::before,
+  .zw::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .zw::before {
+    inset: -18% -12%;
+    background-image:
+      linear-gradient(
+        color-mix(in oklch, var(--color-foreground) 6%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in oklch, var(--color-foreground) 6%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, #000 30%, transparent 75%);
+  }
+  .zw::after {
+    inset: -10% 0;
+    background:
+      radial-gradient(
+        40% 45% at 22% 40%,
+        color-mix(in oklch, var(--color-brand-400) 22%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        38% 45% at 82% 70%,
+        color-mix(in oklch, var(--color-brand-300) 22%, transparent),
+        transparent 70%
+      );
+    filter: blur(20px);
+  }
+  .zw-reihe {
+    position: relative;
+  }
+  .zw-k1 {
+    margin-right: 9%;
+    rotate: -1deg;
+  }
+  .zw-k2 {
+    margin-left: 9%;
+    rotate: 0.8deg;
+  }
+  .zw-k3 {
+    margin-right: 4%;
+    margin-left: 4%;
+    rotate: -0.5deg;
+  }
+  .zw-karte {
+    transition:
+      rotate 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      translate 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.4s ease;
+  }
+  .zw-karte:focus-within {
+    rotate: 0deg;
+  }
+  @media (hover: hover) {
+    .zw-karte:hover {
+      rotate: 0deg;
+      box-shadow: 0 34px 70px -38px oklch(30% 0.08 265 / 0.6);
+    }
+  }
+
+  /* Strom zwischen den Karten: Handy senkrecht, Desktop waagerecht */
+  .zw-pfeil {
+    display: flex;
+    justify-content: center;
+    height: 2.75rem;
+  }
+  .zw-strom {
+    position: relative;
+    width: 2px;
+    height: 100%;
+    background: repeating-linear-gradient(
+      to bottom,
+      color-mix(in oklch, var(--color-brand-400) 70%, transparent) 0 4px,
+      transparent 4px 8px
+    );
+  }
+  .zw-strom-punkt {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 0.55rem;
+    height: 0.55rem;
+    margin: -0.275rem 0 0 -0.275rem;
+    border-radius: 999px;
+    background: var(--color-brand-500);
+    box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-brand-500) 22%, transparent);
+    animation: zw-fliess-v 2.6s ease-in-out infinite;
+  }
+  .zw-pfeil-2 .zw-strom-punkt {
+    animation-delay: 1.3s;
+  }
+  .zw .zw-pfeil[data-tick] .zw-strom-punkt {
+    animation: zw-schuss-v 0.5s cubic-bezier(0.5, 0, 0.3, 1) both;
+    width: 0.8rem;
+    height: 0.8rem;
+    margin: -0.4rem 0 0 -0.4rem;
+    box-shadow:
+      0 0 0 6px color-mix(in oklch, var(--color-brand-500) 28%, transparent),
+      0 0 18px var(--color-brand-500);
+  }
+  @keyframes zw-fliess-v {
+    0% {
+      top: 0;
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.9;
+    }
+    85% {
+      opacity: 0.9;
+    }
+    100% {
+      top: 100%;
+      opacity: 0;
+    }
+  }
+  @keyframes zw-schuss-v {
+    from {
+      top: 0;
+      opacity: 1;
+    }
+    to {
+      top: 100%;
+      opacity: 1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .zw {
+      padding-bottom: 4rem;
+    }
+    .zw-k1,
+    .zw-k2,
+    .zw-k3 {
+      margin: 0;
+      rotate: 0deg;
+    }
+    .zw-k2 {
+      translate: 0 2rem;
+    }
+    .zw-k3 {
+      translate: 0 4rem;
+    }
+    .zw-pfeil {
+      align-self: center;
+      height: auto;
+      width: 3.25rem;
+      padding: 0 0.25rem;
+    }
+    .zw-pfeil-1 {
+      translate: 0 1rem;
+    }
+    .zw-pfeil-2 {
+      translate: 0 3rem;
+    }
+    .zw-strom {
+      width: 100%;
+      height: 2px;
+      background: repeating-linear-gradient(
+        to right,
+        color-mix(in oklch, var(--color-brand-400) 70%, transparent) 0 4px,
+        transparent 4px 8px
+      );
+    }
+    .zw-strom-punkt {
+      top: 50%;
+      left: 0;
+      animation-name: zw-fliess-h;
+    }
+    .zw .zw-pfeil[data-tick] .zw-strom-punkt {
+      animation-name: zw-schuss-h;
+    }
+    @media (hover: hover) {
+      .zw-karte:hover {
+        translate: 0 -4px;
+      }
+      .zw-k2:hover {
+        translate: 0 calc(2rem - 4px);
+      }
+      .zw-k3:hover {
+        translate: 0 calc(4rem - 4px);
+      }
+    }
+  }
+  @keyframes zw-fliess-h {
+    0% {
+      left: 0;
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.9;
+    }
+    85% {
+      opacity: 0.9;
+    }
+    100% {
+      left: 100%;
+      opacity: 0;
+    }
+  }
+  @keyframes zw-schuss-h {
+    from {
+      left: 0;
+      opacity: 1;
+    }
+    to {
+      left: 100%;
+      opacity: 1;
+    }
+  }
+
+  /* ---- Ablauf der Szene beim Hereinscrollen ---- */
+  :global(html.szenen-ready) .zw[data-szene]:not([data-szene='an']) .zw-karte {
+    opacity: 0;
+    scale: 0.94;
+  }
+  :global(html.szenen-ready)
+    .zw[data-szene]:not([data-szene='an'])
+    :is(.zw-pfeil, .zw-zahl, .zw-wert, .zw-ja) {
+    opacity: 0;
+  }
+  .zw[data-szene='an'] .zw-karte {
+    animation: zw-auf 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .zw[data-szene='an'] .zw-k2 {
+    animation-delay: 1.1s;
+  }
+  .zw[data-szene='an'] .zw-k3 {
+    animation-delay: 2.2s;
+  }
+  .zw[data-szene='an'] .zw-wert {
+    animation: zw-ein 0.35s ease both;
+  }
+  .zw[data-szene='an'] .zw-wert-a {
+    animation-delay: 0.35s;
+  }
+  .zw[data-szene='an'] .zw-wert-b {
+    animation-delay: 0.5s;
+  }
+  .zw[data-szene='an'] .zw-wert-c {
+    animation-delay: 0.65s;
+  }
+  .zw[data-szene='an'] .zw-zahl {
+    animation: zw-zahl 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .zw[data-szene='an'] .zw-zahl-1 {
+    animation-delay: 0.85s;
+  }
+  .zw[data-szene='an'] .zw-pfeil-1 {
+    animation: zw-ein 0.4s ease both;
+    animation-delay: 1s;
+  }
+  .zw[data-szene='an'] .zw-zahl-2 {
+    animation-delay: 1.6s;
+  }
+  .zw[data-szene='an'] .zw-pfeil-2 {
+    animation: zw-ein 0.4s ease both;
+    animation-delay: 2.1s;
+  }
+  .zw[data-szene='an'] .zw-zahl-3 {
+    animation-delay: 2.7s;
+  }
+  .zw[data-szene='an'] .zw-zahl-4 {
+    animation-delay: 3s;
+  }
+  .zw[data-szene='an'] .zw-ja {
+    animation: zw-auf 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: 3.4s;
+  }
+  /* Einlauf ist durch (oder jemand hat geklickt): keine Einlauf-Animation mehr, sonst
+     startet sie neu, sobald ein Tick-Zustand wieder entfernt wird */
+  .zw[data-gelaufen] :is(.zw-karte, .zw-pfeil, .zw-zahl, .zw-wert, .zw-ja) {
+    animation: none;
+    opacity: 1;
+    scale: 1;
+  }
+  /* Nach einer Änderung: die Zahl springt noch einmal, der Pfeil leuchtet kurz auf */
+  .zw .zw-zahl[data-tick] {
+    animation: zw-tick 0.5s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+  }
+  /* Nur opacity und scale: translate gehört der Treppe auf dem Desktop */
+  @keyframes zw-auf {
+    from {
+      opacity: 0;
+      scale: 0.94;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+  @keyframes zw-ein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes zw-zahl {
+    0% {
+      opacity: 0;
+      scale: 0.7;
+    }
+    60% {
+      opacity: 1;
+      scale: 1.12;
+    }
+    100% {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+  @keyframes zw-tick {
+    0% {
+      scale: 1;
+      background: color-mix(in oklch, var(--color-brand-500) 14%, transparent);
+    }
+    40% {
+      scale: 1.14;
+      background: color-mix(in oklch, var(--color-brand-500) 32%, transparent);
+    }
+    100% {
+      scale: 1;
+      background: color-mix(in oklch, var(--color-brand-500) 14%, transparent);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .zw :is(.zw-karte, .zw-pfeil, .zw-zahl, .zw-wert, .zw-ja) {
+      animation: none !important;
+      opacity: 1 !important;
+      scale: 1 !important;
+    }
+    .zw-strom-punkt,
+    .zw-live i {
+      animation: none !important;
+    }
+    .zw-strom-punkt {
+      opacity: 0;
+    }
+    .zw-ja-nach {
+      opacity: 0 !important;
+    }
+    .zw-ja[data-zu] .zw-ja-vor {
+      opacity: 0 !important;
+    }
+    .zw-ja[data-zu] .zw-ja-nach {
+      opacity: 1 !important;
+    }
+  }
+</style>
+
+<script>
+  import { szenenStarten } from '@/lib/szene';
+
+  document.querySelectorAll<HTMLElement>('[data-zw]').forEach((root) => {
+    const stunden = Number(root.dataset.stunden);
+    const satz = Number(root.dataset.satz);
+    const anfahrt = Number(root.dataset.anfahrt);
+    const notdienst = Number(root.dataset.notdienst);
+    const anlagenEl = root.querySelector<HTMLElement>('[data-zw-anlagen]');
+    const wartungEls = [...root.querySelectorAll<HTMLElement>('[data-zw-wartung]')];
+    const summeEl = root.querySelector<HTMLElement>('[data-zw-summe]');
+    const notdienstBox = root.querySelector<HTMLInputElement>('[data-zw-notdienst]');
+    const notdienstZeile = root.querySelector<HTMLElement>('[data-zw-notdienst-zeile]');
+    const ja = root.querySelector<HTMLButtonElement>('[data-zw-ja]');
+    const pfeile = [...root.querySelectorAll<HTMLElement>('.zw-pfeil')];
+    if (!anlagenEl || !summeEl) return;
+
+    let anlagen = Number(anlagenEl.textContent) || 85;
+    const eur = (n: number) => `${Math.round(n).toLocaleString('de-DE')} €`;
+    const bewegt = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Ein Element kurz „ticken“ lassen: Attribut neu setzen, damit die Animation neu startet.
+    const tick = (el: HTMLElement | undefined, nach: number) => {
+      if (!el) return;
+      window.setTimeout(() => {
+        el.removeAttribute('data-tick');
+        void el.offsetWidth;
+        el.setAttribute('data-tick', '');
+        // Nach dem Durchlauf zurück in den Ruhezustand, damit der Punkt wieder fließt
+        const alt = Number(el.dataset.tickTimer);
+        if (alt) window.clearTimeout(alt);
+        el.dataset.tickTimer = String(
+          window.setTimeout(() => el.removeAttribute('data-tick'), 600)
+        );
+      }, nach);
+    };
+
+    // Die Zahl läuft nach jeder Änderung denselben Weg: Rechnung, Pfeil, Angebot, Pfeil, Kunde, Summe.
+    const rechnen = (quelle: 'anlagen' | 'option') => {
+      const wartung = anlagen * stunden * satz;
+      const mitNotdienst = notdienstBox ? notdienstBox.checked : true;
+      const summe = wartung + anfahrt + (mitNotdienst ? notdienst : 0);
+      const schritt = bewegt ? 220 : 0;
+
+      if (quelle === 'anlagen') {
+        wartungEls.forEach((el, i) => {
+          window.setTimeout(() => (el.textContent = eur(wartung)), i * 2 * schritt);
+          tick(el, i * 2 * schritt);
+        });
+        tick(pfeile[0], schritt);
+        tick(pfeile[1], 3 * schritt);
+        window.setTimeout(() => (summeEl.textContent = eur(summe)), 5 * schritt);
+        tick(summeEl, 5 * schritt);
+      } else {
+        summeEl.textContent = eur(summe);
+        tick(summeEl, 0);
+      }
+      if (notdienstZeile) notdienstZeile.toggleAttribute('data-aus', !mitNotdienst);
+      // Eine Änderung hebt die Zusage wieder auf, wie beim echten Angebot.
+      ja?.removeAttribute('data-zu');
+    };
+
+    // Einlauf als erledigt markieren: nach dem Durchlauf oder beim ersten Eingriff
+    const gelaufen = () => root.setAttribute('data-gelaufen', '');
+    root.addEventListener('szene:an', () => window.setTimeout(gelaufen, 4200));
+    root.addEventListener('pointerdown', gelaufen, { once: true });
+    root.addEventListener('keydown', gelaufen, { once: true });
+
+    root.querySelector('[data-zw-minus]')?.addEventListener('click', () => {
+      anlagen = Math.max(20, anlagen - 5);
+      anlagenEl.textContent = String(anlagen);
+      rechnen('anlagen');
+    });
+    root.querySelector('[data-zw-plus]')?.addEventListener('click', () => {
+      anlagen = Math.min(250, anlagen + 5);
+      anlagenEl.textContent = String(anlagen);
+      rechnen('anlagen');
+    });
+    notdienstBox?.addEventListener('change', () => rechnen('option'));
+    ja?.addEventListener('click', () => ja.setAttribute('data-zu', ''));
+  });
+
+  szenenStarten();
+</script>

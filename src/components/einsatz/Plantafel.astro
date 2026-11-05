@@ -1,0 +1,154 @@
+---
+/**
+ * Plantafel nach der Lösung für einen Metallbaubetrieb: Mitarbeiter nach Arbeitsgang gruppiert,
+ * zwei Wochen, Aufträge als Blöcke, Urlaub und Berufsschule automatisch aus der
+ * Abwesenheitsplanung. Der Knopf simuliert eine Krankmeldung: der betroffene Auftrag wird
+ * als unbesetzt markiert, und die Tafel zeigt, wer im selben Arbeitsgang Luft hat.
+ */
+import '@/components/angebote/frame.css';
+import '@/components/zahlen/zahlen.css';
+import './einsatz.css';
+
+interface Props {
+  url?: string;
+}
+const { url = 'app.euer-betrieb.de/auftragsplanung' } = Astro.props;
+
+const tage = ['Mo 13', 'Di 14', 'Mi 15', 'Do 16', 'Fr 17', 'Mo 20', 'Di 21', 'Mi 22', 'Do 23', 'Fr 24'];
+const HEUTE = 2;
+// Auf dem Handy zeigt die Tafel nur KW 16 - dort spielt die Krankmeldung.
+// Woche 2 wird per CSS ausgeblendet, damit Markup und Skript identisch bleiben.
+const WOCHE1 = 5;
+
+type Block = { von: number; bis: number; nr: string; text: string; std?: string; affected?: boolean };
+type Abs = { von: number; bis: number; art: 'U' | 'S' | 'K'; sick?: boolean };
+type Person = { name: string; color: string; blocks: Block[]; abs?: Abs[]; suggest?: Block };
+type Gruppe = { gang: string; color: string; personen: Person[] };
+
+const gruppen: Gruppe[] = [
+  {
+    gang: '04 Schweißen',
+    color: 'var(--e-weld)',
+    personen: [
+      { name: 'Arne', color: '', blocks: [{ von: 0, bis: 1, nr: '04', text: 'Deichstraße', std: '25-578' }, { von: 2, bis: 4, nr: '04', text: 'Speicherstadt', std: '26-025' }, { von: 5, bis: 8, nr: '04', text: 'Elbchaussee 3/4', std: '25-1122' }] },
+      { name: 'Ingo', color: '', blocks: [{ von: 0, bis: 4, nr: '04', text: 'Deichstraße 115', std: '25-578', affected: true }, { von: 5, bis: 9, nr: '04', text: 'Elbchaussee Nord', std: '25-1122' }], abs: [{ von: 2, bis: 4, art: 'K', sick: true }] },
+      { name: 'Jens', color: '', blocks: [{ von: 5, bis: 9, nr: '04', text: 'Hafenstraße 14', std: '25-224' }], abs: [{ von: 0, bis: 4, art: 'U' }] },
+      { name: 'Jörn', color: '', blocks: [{ von: 0, bis: 1, nr: '04', text: 'Mühlenstraße', std: '25-1046' }, { von: 6, bis: 9, nr: '04', text: 'Industriestraße', std: '26-361' }], suggest: { von: 2, bis: 4, nr: '04', text: 'Deichstraße 115 übernehmen?' } },
+    ],
+  },
+  {
+    gang: '05 Schleifen',
+    color: 'var(--e-weld)',
+    personen: [{ name: 'Nis', color: '', blocks: [{ von: 1, bis: 2, nr: '05', text: 'Deichstraße' }, { von: 4, bis: 4, nr: '05', text: 'Elbch.' }, { von: 6, bis: 8, nr: '05', text: 'Speicherstadt', std: '26-025' }] }],
+  },
+  {
+    gang: '08 Montage',
+    color: 'var(--e-zinc)',
+    personen: [
+      { name: 'Kjell', color: '', blocks: [{ von: 0, bis: 1, nr: '07', text: 'Deichstraße' }, { von: 2, bis: 7, nr: '08', text: 'Reepschlägerstraße', std: '26-107' }] },
+      { name: 'Gerd', color: '', blocks: [{ von: 3, bis: 4, nr: '07', text: 'Elbchaussee' }, { von: 5, bis: 9, nr: '08', text: 'Störtebeker-Gymnasium', std: '26-046' }] },
+      { name: 'Jannik', color: '', blocks: [{ von: 0, bis: 0, nr: '06', text: 'Hof' }, { von: 2, bis: 5, nr: '08', text: 'Elbchaussee 3/4', std: '25-1122' }, { von: 7, bis: 9, nr: '08', text: 'Kogge', std: '26-104' }], abs: [{ von: 1, bis: 1, art: 'S' }, { von: 6, bis: 6, art: 'S' }] },
+    ],
+  },
+];
+
+const pos = (von: number, bis: number) => `left: calc(${von * 10}% + 2px); width: calc(${(bis - von + 1) * 10}% - 4px)`;
+const absColor = { U: 'var(--e-vac)', S: 'var(--e-school)', K: 'var(--e-sick)' } as const;
+const absLabel = { U: 'Urlaub', S: 'Berufsschule', K: 'krank' } as const;
+---
+
+<figure class="af-frame z-app" data-board>
+  <div class="af-bar" aria-hidden="true">
+    <span class="af-dots"><span></span><span></span><span></span></span>
+    <span class="af-url">{url}</span>
+    <span class="af-dots invisible"><span></span><span></span><span></span></span>
+  </div>
+  <div class="p-3 sm:p-5">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <p class="text-sm font-bold">Auftragsplanung · KW 16 bis 17</p>
+        <p class="z-label">Nach Arbeitsgang gruppiert, Abwesenheiten aus dem Urlaubsplan</p>
+      </div>
+      <button type="button" class="e-btn" data-tone="sick" aria-pressed="false" data-krank-btn>
+        <span class="e-btn-dot"></span>
+        <span data-text-off>Ingo meldet sich krank, Mi bis Fr</span>
+        <span data-text-on hidden>Krankmeldung zurücknehmen</span>
+      </button>
+    </div>
+
+    <div class="mt-3 sm:overflow-x-auto">
+      <div class="e-board sm:min-w-[40rem]">
+        <div class="grid grid-cols-[3.5rem_minmax(0,1fr)] border-b sm:grid-cols-[6.5rem_minmax(0,1fr)]" style="border-color: var(--z-line)">
+          <span></span>
+          <div class="e-days">
+            {tage.map((t, i) => (
+              <span class:list={['py-1.5 text-center text-[0.66rem] font-semibold', i >= WOCHE1 && 'e-wk2', i === HEUTE ? 'text-[color:var(--z-blue)]' : 'z-muted']}>{t}</span>
+            ))}
+          </div>
+        </div>
+        {gruppen.map((g) => (
+          <div>
+            <p class="flex items-center gap-2 border-b py-1 pl-1 text-[0.66rem] font-bold tracking-wide uppercase" style="border-color: var(--z-line); background: var(--z-panel)">
+              <span class="z-dot" style={`background:${g.color}`} />
+              {g.gang}
+            </p>
+            {g.personen.map((p) => (
+              <div class="grid grid-cols-[3.5rem_minmax(0,1fr)] border-b sm:grid-cols-[6.5rem_minmax(0,1fr)]" style="border-color: var(--z-line)">
+                <span class="flex items-center pl-2 text-[0.72rem] font-semibold sm:text-[0.75rem]">{p.name}</span>
+                <div class="e-lane">
+                  {tage.map((_, i) => (
+                    <i class:list={[i >= WOCHE1 && 'e-wk2']} data-today={i === HEUTE ? '' : undefined} />
+                  ))}
+                  {p.blocks.map((b) => (
+                    <span class="e-block" style={`${pos(b.von, b.bis)}; background:${g.color}`} data-affected={b.affected ? '' : undefined}>
+                      <b>{b.nr}</b>
+                      <span class="truncate">{b.text}</span>
+                      {b.std && <small class="hidden truncate xl:inline">{b.std}</small>}
+                    </span>
+                  ))}
+                  {p.suggest && (
+                    <span class="e-block e-sick" style={`${pos(p.suggest.von, p.suggest.bis)}; background: color-mix(in oklch, var(--z-blue) 14%, transparent); color: var(--z-blue)`} data-suggest>
+                      <b>{p.suggest.nr}</b>
+                      <span class="truncate">{p.suggest.text}</span>
+                    </span>
+                  )}
+                  {(p.abs ?? []).map((a) => (
+                    <span class:list={['e-abs', a.sick && 'e-sick']} style={`${pos(a.von, a.bis)}; background:${absColor[a.art]}`} title={absLabel[a.art]}>
+                      {Array.from({ length: a.bis - a.von + 1 }, () => a.art).join('  ')}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="e-hint mt-3 flex-wrap items-center gap-2 rounded-xl px-3 py-2 text-[0.75rem]" style="background: color-mix(in oklch, var(--e-sick) 9%, transparent)">
+      <span class="font-bold" style="color: var(--e-sick)">Deichstraße 115 ist Mi bis Fr unbesetzt.</span>
+      <span class="z-muted">Jörn hat im selben Arbeitsgang Luft. Ein Klick, und der Auftrag ist umgeplant.</span>
+    </div>
+
+    <p class="z-label mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+      <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--e-weld)"></span>Werkstatt</span>
+      <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--e-zinc)"></span>Montage</span>
+      <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--e-vac)"></span>Urlaub</span>
+      <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--e-school)"></span>Berufsschule</span>
+      <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--e-sick)"></span>krank</span>
+    </p>
+  </div>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-board]').forEach((root) => {
+    const btn = root.querySelector<HTMLButtonElement>('[data-krank-btn]');
+    btn?.addEventListener('click', () => {
+      const on = root.dataset.krank !== 'true';
+      root.dataset.krank = on ? 'true' : 'false';
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.querySelector<HTMLElement>('[data-text-off]')!.hidden = on;
+      btn.querySelector<HTMLElement>('[data-text-on]')!.hidden = !on;
+    });
+  });
+</script>

@@ -1,0 +1,317 @@
+/*
+ * Nachbauten der Ablösungs-Seite (/standardsoftware-abloesung/). Basis-Tokens aus zahlen/zahlen.css.
+ * Zustände hängen am Wurzelelement: data-stand (Landschaft), data-tab (Datenübernahme).
+ */
+.z-app {
+  --ab-export: oklch(60% 0.19 25);
+  --ab-neu: oklch(58% 0.15 150);
+  --ab-sync: oklch(58% 0.14 260);
+  --ab-alt: oklch(93% 0.01 265);
+  --ab-bleibt: oklch(96% 0.03 150);
+}
+:where(.dark) .ls-new-box {
+  fill: oklch(27% 0.04 260);
+}
+:where(.dark) .z-app {
+  --ab-alt: oklch(30% 0.012 265);
+  --ab-bleibt: oklch(30% 0.04 150);
+}
+
+/* ---------- Landschaft ---------- */
+.ls-svg text {
+  font-family: inherit;
+}
+.ls-t {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--z-text);
+}
+.ls-big {
+  font-size: 17px;
+}
+.ls-s {
+  font-size: 11.5px;
+  fill: var(--z-muted);
+}
+.ls-node rect {
+  fill: var(--af-url, #fff);
+  stroke: var(--z-line);
+  stroke-width: 1.5;
+}
+.ls-alt rect {
+  fill: var(--ab-alt);
+  stroke: color-mix(in oklch, var(--z-muted) 45%, transparent);
+}
+.ls-bleibt rect {
+  fill: var(--ab-bleibt);
+  stroke: color-mix(in oklch, var(--ab-neu) 45%, transparent);
+}
+.ls-insel rect {
+  stroke-dasharray: 5 4;
+}
+.ls-node,
+.ls-edge,
+.ls-new,
+.ls-mod,
+.ls-stamp,
+.ls-svg [data-hide],
+.ls-svg [data-show] {
+  transition: opacity 0.45s ease;
+}
+.ls-edge {
+  fill: none;
+  stroke-width: 1.8;
+}
+.ls-export {
+  stroke: var(--ab-export);
+  stroke-dasharray: 6 5;
+  animation: ls-flow 1.2s linear infinite;
+}
+.ls-grau {
+  stroke: var(--z-muted);
+  stroke-dasharray: 3 5;
+}
+.ls-neu {
+  stroke: var(--ab-neu);
+  stroke-width: 2.4;
+}
+.ls-sync {
+  stroke: var(--ab-sync);
+  stroke-width: 2;
+  stroke-dasharray: 2 5;
+  animation: ls-flow 0.9s linear infinite;
+}
+.ls-arr {
+  fill: var(--z-muted);
+}
+@keyframes ls-flow {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+.ls-done {
+  font-size: 10.5px;
+  font-weight: 700;
+  fill: var(--ab-neu);
+  opacity: 0;
+}
+.ls-folgt {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--z-muted);
+  opacity: 0;
+}
+.ls-new-box {
+  fill: oklch(97% 0.018 260);
+  stroke: var(--z-blue);
+  stroke-width: 2;
+}
+.ls-mod rect {
+  fill: var(--af-url, #fff);
+  stroke: color-mix(in oklch, var(--z-blue) 35%, transparent);
+}
+.ls-mod circle {
+  fill: var(--ab-neu);
+}
+.ls-mod-t {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--z-text);
+}
+.ls-stamp rect {
+  fill: color-mix(in oklch, var(--ab-export) 10%, var(--af-url, #fff));
+  stroke: var(--ab-export);
+  stroke-width: 2;
+}
+.ls-stamp text {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--ab-export);
+}
+.ls-ghost rect {
+  fill: none;
+  stroke: color-mix(in oklch, var(--z-blue) 40%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 6;
+}
+.ls-ghost text {
+  opacity: 0.6;
+}
+/* Zustandslogik */
+[data-stand='0'] [data-hide~='0'],
+[data-stand='1'] [data-hide~='1'],
+[data-stand='2'] [data-hide~='2'] {
+  opacity: 0;
+}
+[data-stand='1'] [data-dim~='1'],
+[data-stand='2'] [data-dim~='2'] {
+  opacity: 0.3;
+}
+[data-stand='1'] [data-dim~='1'] .ls-done,
+[data-stand='2'] [data-dim~='2'] .ls-done {
+  opacity: 1;
+}
+[data-stand='1'] [data-show~='1'],
+[data-stand='2'] [data-show~='2'] {
+  opacity: 1;
+}
+[data-stand='1'] .ls-mod[data-dim~='1'] {
+  opacity: 0.45;
+}
+.ls-key {
+  display: inline-block;
+  width: 1.4rem;
+  height: 0;
+  border-top: 2px dashed var(--ab-export);
+}
+.ls-key-neu {
+  border-top: 2.5px solid var(--ab-neu);
+}
+.ls-key-sync {
+  border-top: 2px dotted var(--ab-sync);
+}
+
+/* ---------- Ablöseplan ---------- */
+.ap-grid {
+  background-image: linear-gradient(to right, var(--z-grid) 1px, transparent 1px);
+  background-size: calc(100% / var(--ap-monate, 12)) 100%;
+}
+.ap-bar {
+  position: absolute;
+  top: 0.3rem;
+  bottom: 0.3rem;
+  border-radius: 0.45rem;
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ap-bau {
+  background: repeating-linear-gradient(135deg, color-mix(in oklch, var(--z-blue) 22%, transparent) 0 6px, color-mix(in oklch, var(--z-blue) 12%, transparent) 6px 12px);
+  color: var(--z-blue);
+}
+.ap-live {
+  background: var(--ab-neu);
+  color: white;
+}
+.ap-alt {
+  background: color-mix(in oklch, var(--z-muted) 30%, transparent);
+  color: var(--z-text);
+}
+.ap-lesen {
+  background: repeating-linear-gradient(135deg, color-mix(in oklch, var(--z-muted) 22%, transparent) 0 6px, transparent 6px 12px);
+  color: var(--z-muted);
+  border: 1px dashed color-mix(in oklch, var(--z-muted) 50%, transparent);
+}
+.ap-ws {
+  background: var(--z-blue);
+  color: white;
+}
+.ap-ms {
+  position: absolute;
+  top: 50%;
+  width: 1.05rem;
+  height: 1.05rem;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-radius: 0.2rem;
+  background: var(--af-url, #fff);
+  border: 2.5px solid var(--z-amber);
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease;
+}
+.ap-ms:hover {
+  transform: translate(-50%, -50%) rotate(45deg) scale(1.15);
+}
+.ap-ms[aria-pressed='true'] {
+  background: var(--z-amber);
+  box-shadow: 0 0 0 5px color-mix(in oklch, var(--z-amber) 25%, transparent);
+}
+.ap-ms:focus-visible {
+  outline: 2px solid var(--z-blue);
+  outline-offset: 3px;
+}
+.ap-ms-red {
+  border-color: var(--ab-export);
+}
+.ap-ms-red[aria-pressed='true'] {
+  background: var(--ab-export);
+  box-shadow: 0 0 0 5px color-mix(in oklch, var(--ab-export) 25%, transparent);
+}
+.ap-stichtag {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 2px dashed var(--ab-export);
+}
+.ap-detail[hidden] {
+  display: none;
+}
+
+/* ---------- Datenübernahme ---------- */
+.du-src {
+  border: 1px solid var(--z-line);
+  border-radius: 0.7rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--z-panel);
+}
+.du-flow {
+  position: relative;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--z-blue) 0 6px, transparent 6px 11px);
+  background-size: 22px 2px;
+  animation: du-flow 0.8s linear infinite;
+}
+@keyframes du-flow {
+  to {
+    background-position: 22px 0;
+  }
+}
+.du-panel[hidden] {
+  display: none;
+}
+.du-map td,
+.du-map th {
+  padding: 0.45rem 0.55rem;
+  border-bottom: 1px solid var(--z-line);
+  text-align: left;
+  vertical-align: top;
+}
+.du-old {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  color: var(--z-muted);
+}
+.du-ok {
+  color: var(--ab-neu);
+  font-weight: 700;
+}
+.du-warn {
+  color: oklch(60% 0.16 60);
+  font-weight: 700;
+}
+.du-bar {
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--z-track);
+  overflow: hidden;
+}
+.du-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ab-neu);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ls-export,
+  .ls-sync,
+  .du-flow {
+    animation: none;
+  }
+}

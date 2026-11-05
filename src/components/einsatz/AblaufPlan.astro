@@ -1,0 +1,201 @@
+---
+/**
+ * Ablaufplanung eines Auftrags (nach der Lösung für einen Metallbaubetrieb): Fertigungsschritte
+ * mit unterschiedlicher Dauer, verbunden durch Pfeile, auf Arbeitstagen. Der Knopf simuliert
+ * eine Verzögerung bei der Verzinkerei: alle Folgeschritte rutschen mit, bis der zugesagte
+ * Montagetermin nicht mehr hält. Feste Pixelbreite, auf schmalen Bildschirmen horizontal scrollbar.
+ */
+import '@/components/angebote/frame.css';
+import '@/components/zahlen/zahlen.css';
+import './einsatz.css';
+
+interface Props {
+  url?: string;
+}
+const { url = 'app.euer-betrieb.de/auftraege/26-107/ablauf' } = Astro.props;
+
+const tage = ['Mo 13.', 'Di 14.', 'Mi 15.', 'Do 16.', 'Fr 17.', 'Mo 20.', 'Di 21.', 'Mi 22.', 'Do 23.', 'Fr 24.', 'Mo 27.', 'Di 28.'];
+const tageKurz = ['13.', '14.', '15.', '16.', '17.', '20.', '21.', '22.', '23.', '24.', '27.', '28.'];
+
+/*
+ * Dieselbe Zeichnung zweimal: breit für den Desktop, schmal fürs Handy. Auf 375 px
+ * stehen rund 300 px zur Verfügung - würde man die Desktop-Fassung dorthin skalieren,
+ * läge die Schrift bei 4 px. Deshalb eine eigene Geometrie mit kurzer Namensspalte,
+ * schmalen Tagesspalten und größerer Schrift, aber identischen Daten.
+ */
+type Geo = {
+  LABEL: number;
+  COL: number;
+  ROW: number;
+  BAR: number;
+  TOP: number;
+  FS_TAG: number;
+  FS_NAME: number;
+  FS_BAR: number;
+  FS_MARK: number;
+  tage: string[];
+};
+const GEO_DESKTOP: Geo = { LABEL: 168, COL: 52, ROW: 40, BAR: 24, TOP: 34, FS_TAG: 10.5, FS_NAME: 11.5, FS_BAR: 10, FS_MARK: 9, tage };
+// W = 76 + 19 * 12 = 304, also rund 1:1 in der 303 px breiten Karte:
+// die font-size-Werte entsprechen damit direkt gerenderten Pixeln.
+const GEO_MOBIL: Geo = { LABEL: 104, COL: 16.5, ROW: 30, BAR: 19, TOP: 32, FS_TAG: 9.5, FS_NAME: 10.5, FS_BAR: 9.5, FS_MARK: 10, tage: tageKurz };
+
+type Schritt = { nr: string; name: string; start: number; dauer: number; status: 'fertig' | 'laeuft' | 'geplant'; extern?: boolean };
+const schritte: Schritt[] = [
+  { nr: '01', name: 'Sägen', start: 0, dauer: 0.5, status: 'fertig' },
+  { nr: '02', name: 'Bohren', start: 0.5, dauer: 0.5, status: 'fertig' },
+  { nr: '04', name: 'Schweißen', start: 1, dauer: 1.5, status: 'fertig' },
+  { nr: '05', name: 'Schleifen', start: 2.5, dauer: 0.5, status: 'fertig' },
+  { nr: '06', name: 'Verzinken', start: 3, dauer: 2, status: 'laeuft', extern: true },
+  { nr: '08', name: 'Vorb. Beschichten', start: 5, dauer: 1, status: 'geplant' },
+  { nr: '10', name: 'Beschichten', start: 6, dauer: 2, status: 'geplant', extern: true },
+  { nr: '12', name: 'Hof fertig', start: 8, dauer: 0.5, status: 'geplant' },
+  { nr: '13', name: 'Montage', start: 8.5, dauer: 1, status: 'geplant' },
+];
+const VERZUG = 2; // Tage, die die Verzinkerei länger braucht
+const zusage = 9.5; // Montage beim Kunden zugesagt bis Fr 24., Feierabend
+
+const lage = (g: Geo, verzugAn: boolean) =>
+  schritte.map((s, i) => {
+    const start = s.start + (verzugAn && i > 4 ? VERZUG : 0);
+    const dauer = s.dauer + (verzugAn && i === 4 ? VERZUG : 0);
+    const y = g.TOP + i * g.ROW + (g.ROW - g.BAR) / 2;
+    return { ...s, start, dauer, x: g.LABEL + start * g.COL, w: dauer * g.COL, y };
+  });
+
+const pfeile = (g: Geo, bars: ReturnType<typeof lage>) =>
+  bars.slice(0, -1).map((a, i) => {
+    const b = bars[i + 1];
+    const xe = a.x + a.w;
+    const x0 = Math.min(xe - 5, b.x - 10);
+    const y0 = a.y + g.BAR;
+    const y1 = b.y + g.BAR / 2;
+    return `M ${x0} ${y0} V ${y1} H ${b.x - 2}`;
+  });
+
+const plan = (g: Geo) => ({
+  g,
+  W: g.LABEL + g.COL * tage.length,
+  H: g.TOP + schritte.length * g.ROW + 8,
+  normal: lage(g, false),
+  verzug: lage(g, true),
+});
+const varianten = [
+  { ...plan(GEO_MOBIL), id: 'm', cls: 'sm:hidden' },
+  { ...plan(GEO_DESKTOP), id: 'd', cls: 'hidden sm:block' },
+];
+const desktop = plan(GEO_DESKTOP);
+
+const fmtTag = (t: number) => tage[Math.min(Math.ceil(t) - 1, tage.length - 1)];
+const montageNormal = fmtTag(desktop.normal[8].start + desktop.normal[8].dauer);
+const montageVerzug = fmtTag(desktop.verzug[8].start + desktop.verzug[8].dauer);
+---
+
+<figure class="af-frame z-app" data-ablauf>
+  <div class="af-bar" aria-hidden="true">
+    <span class="af-dots"><span></span><span></span><span></span></span>
+    <span class="af-url">{url}</span>
+    <span class="af-dots invisible"><span></span><span></span><span></span></span>
+  </div>
+  <div class="p-3 sm:p-5">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <p class="text-sm font-bold">Auftrag 26-107 · Geländer Dachterrasse Haus C</p>
+        <p class="z-label">Bauleitung Hr. Hansen · Montage beim Kunden zugesagt bis Fr 24.04.</p>
+      </div>
+      <button type="button" class="e-btn" aria-pressed="false" data-verzug-btn>
+        <span class="e-btn-dot"></span>
+        <span data-text-off>Verzinkerei meldet 2 Tage Verzug</span>
+        <span data-text-on hidden>Verzug zurücknehmen</span>
+      </button>
+    </div>
+
+    {varianten.map((d) => (
+      <div class:list={['mt-3', d.cls]}>
+        <svg viewBox={`0 0 ${d.W} ${d.H}`} class="block h-auto w-full" role="img" aria-label="Ablaufplan mit neun Fertigungsschritten von Sägen bis Montage, verbunden durch Pfeile. Beispieldaten.">
+          <defs>
+            <marker id={`e-arrow-${d.id}`} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L8 4 L0 8 z" fill="var(--z-muted)" />
+            </marker>
+            <pattern id={`e-hatch-${d.id}`} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width="6" height="6" fill="var(--e-late)" />
+              <line x1="0" y1="0" x2="0" y2="6" stroke="var(--e-late-dark)" stroke-width="2.5" />
+            </pattern>
+          </defs>
+
+          {d.g.tage.map((t, i) => (
+            <g>
+              <rect x={d.g.LABEL + i * d.g.COL} y={d.g.TOP - 4} width={d.g.COL} height={d.H - d.g.TOP + 4} fill={i >= 10 ? 'var(--z-panel)' : 'transparent'} />
+              <line x1={d.g.LABEL + i * d.g.COL} x2={d.g.LABEL + i * d.g.COL} y1={d.g.TOP - 4} y2={d.H} stroke="var(--z-line)" />
+              <text x={d.g.LABEL + i * d.g.COL + d.g.COL / 2} y={18} text-anchor="middle" font-size={d.g.FS_TAG} font-weight="600" fill="var(--z-muted)">{t}</text>
+            </g>
+          ))}
+          <line x1={d.g.LABEL} x2={d.W} y1={d.g.TOP - 4} y2={d.g.TOP - 4} stroke="var(--z-line)" />
+          <line x1={d.g.LABEL + 2 * d.g.COL + d.g.COL * 0.6} x2={d.g.LABEL + 2 * d.g.COL + d.g.COL * 0.6} y1={d.g.TOP - 4} y2={d.H} stroke="var(--z-blue)" stroke-width="1.5" />
+          <text x={d.g.LABEL + 2 * d.g.COL + d.g.COL * 0.6 + 4} y={d.g.TOP + 6} font-size={d.g.FS_MARK} font-weight="700" fill="var(--z-blue)">heute</text>
+          <line x1={d.g.LABEL + zusage * d.g.COL} x2={d.g.LABEL + zusage * d.g.COL} y1={d.g.TOP - 4} y2={d.H} stroke="var(--z-red)" stroke-dasharray="4 3" stroke-width="1.5" />
+          <text x={d.g.LABEL + zusage * d.g.COL - 4} y={d.H - 4} text-anchor="end" font-size={d.g.FS_MARK} font-weight="700" fill="var(--z-red)">Zusage Kunde</text>
+
+          {schritte.map((sch, i) => (
+            <text x={8} y={d.g.TOP + i * d.g.ROW + d.g.ROW / 2 + 4} font-size={d.g.FS_NAME} fill="var(--z-text)">
+              <tspan font-weight="700" fill="var(--z-muted)">{sch.nr}</tspan>
+              <tspan dx="6">{sch.name}</tspan>
+              {sch.extern && d.id === 'd' && <tspan dx="5" font-size={d.g.FS_MARK} fill="var(--z-muted)">extern</tspan>}
+            </text>
+          ))}
+
+          {[{ bars: d.normal, cls: 'e-state-normal' }, { bars: d.verzug, cls: 'e-state-verzug' }].map((state) => (
+            <g class={state.cls}>
+              {pfeile(d.g, state.bars).map((pd) => (
+                <path d={pd} fill="none" stroke="var(--z-muted)" stroke-width="1.3" marker-end={`url(#e-arrow-${d.id})`} />
+              ))}
+              {state.bars.map((b, i) => {
+                const spaet = state.cls === 'e-state-verzug' && i >= 4;
+                const fill = b.status === 'fertig' ? 'var(--e-done)' : b.status === 'laeuft' ? 'var(--z-blue)' : 'var(--e-plan)';
+                // Platz für "1,5 T" plus Innenabstand; darunter zeigt der Balken nur das Häkchen.
+                const mindestBreite = d.g.FS_BAR * 3.4;
+                return (
+                  <g>
+                    <rect x={b.x + 1} y={b.y} width={b.w - 2} height={d.g.BAR} rx="6" fill={spaet && i === 4 ? `url(#e-hatch-${d.id})` : fill} stroke={spaet && i > 4 ? 'var(--e-late)' : 'none'} stroke-width="1.5" />
+                    {b.w > mindestBreite && (
+                      <text x={b.x + 7} y={b.y + d.g.BAR / 2 + 3.5} font-size={d.g.FS_BAR} font-weight="700" fill={b.status === 'geplant' ? 'var(--z-text)' : 'white'}>
+                        {b.dauer.toLocaleString('de-DE')} T
+                      </text>
+                    )}
+                    {b.status === 'fertig' && mindestBreite >= b.w && <text x={b.x + b.w / 2} y={b.y + d.g.BAR / 2 + 3.5} text-anchor="middle" font-size={d.g.FS_BAR + 1} font-weight="700" fill="white">✓</text>}
+                  </g>
+                );
+              })}
+            </g>
+          ))}
+        </svg>
+      </div>
+    ))}
+
+    <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+      <p class="z-label flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--e-done)"></span>erledigt</span>
+        <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--z-blue)"></span>läuft</span>
+        <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--e-plan)"></span>geplant</span>
+        <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--e-late)"></span>verschoben</span>
+      </p>
+      <p class="e-status" data-status>
+        <span class="e-status-ok">Montage fertig: {montageNormal} · hält die Zusage</span>
+        <span class="e-status-late">Montage fertig: {montageVerzug} · 2 Tage nach Zusage, Bauleitung informiert</span>
+      </p>
+    </div>
+  </div>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ablauf]').forEach((root) => {
+    const btn = root.querySelector<HTMLButtonElement>('[data-verzug-btn]');
+    btn?.addEventListener('click', () => {
+      const on = root.dataset.verzug !== 'true';
+      root.dataset.verzug = on ? 'true' : 'false';
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.querySelector<HTMLElement>('[data-text-off]')!.hidden = on;
+      btn.querySelector<HTMLElement>('[data-text-on]')!.hidden = !on;
+    });
+  });
+</script>

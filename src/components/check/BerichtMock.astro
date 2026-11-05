@@ -1,0 +1,112 @@
+---
+/**
+ * Der Prüfbericht als Motiv der Tür 5: Kopf mit Meilenstein und Zählung wie in den echten Berichten
+ * (kein ASVS-Level, keine Prozent), Ampel über die Prüffelder,
+ * drei Befunde. Kein Nachbau eines echten Berichts, nur die Form, damit der Besucher sieht,
+ * was er am Ende in der Hand hat. Zahlen sind erfunden und absichtlich unspektakulär.
+ */
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+const kapitel = [
+  { name: 'Anmeldung & Session', stand: 'ok' },
+  { name: 'Zugriffsrechte', stand: 'offen' },
+  { name: 'Eingaben & API', stand: 'ok' },
+  { name: 'Konfiguration & Schlüssel', stand: 'offen' },
+  { name: 'Abhängigkeiten', stand: 'teils' },
+  { name: 'Gleichzeitige Zugriffe', stand: 'teils' },
+] as const;
+
+const befunde = [
+  { id: 'B-003', schwere: 'hoch', text: 'Nutzer sieht Projekte anderer Mandanten über geänderte ID in der URL.' },
+  { id: 'B-007', schwere: 'hoch', text: 'API-Schlüssel des Mailversands liegt im Repository.' },
+  { id: 'B-012', schwere: 'mittel', text: '14 Abhängigkeiten mit bekannten Schwachstellen, 2 davon erreichbar.' },
+] as const;
+---
+
+<div class="bericht border-border bg-card relative mx-auto max-w-md rounded-[1.6rem] border p-5 shadow-[0_22px_55px_rgba(34,43,74,0.12)] sm:p-6">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <p class="text-foreground-muted text-[0.65rem] font-semibold tracking-[0.2em] uppercase">Prüfbericht</p>
+      <p class="font-display text-foreground mt-1 text-base font-bold tracking-tight">Kundenportal, Stand 14.11.2026</p>
+      <p class="text-foreground-secondary mt-0.5 text-xs">Vor dem Go-live · 2 kritisch · 5 hoch · 14 mittel</p>
+    </div>
+    <span class="border-brand-300/70 bg-brand-500/5 text-brand-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border">
+      <Icon name="shield" size="sm" />
+    </span>
+  </div>
+
+  <ul class="mt-5 grid grid-cols-2 gap-x-4 gap-y-2">
+    {
+      kapitel.map((k, i) => (
+        <li class="flex items-center gap-2 text-xs" style={`--i: ${i}`}>
+          <span class:list={['bericht-dot h-2 w-2 shrink-0 rounded-full', `ist-${k.stand}`]} />
+          <span class="text-foreground-secondary truncate">{k.name}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="border-border/70 mt-5 border-t pt-4">
+    <p class="text-foreground-muted text-[0.65rem] font-semibold tracking-[0.2em] uppercase">Befunde, zuerst</p>
+    <ul class="mt-2 space-y-2">
+      {
+        befunde.map((b, i) => (
+          <li class="bericht-befund flex gap-2.5 text-xs leading-5" style={`--i: ${i + 6}`}>
+            <span class:list={['mt-0.5 shrink-0 rounded px-1.5 py-px font-mono text-[0.6rem] font-bold uppercase', `schwere-${b.schwere}`]}>
+              {b.schwere}
+            </span>
+            <span class="text-foreground-secondary">
+              <span class="text-foreground font-semibold">{b.id}</span> {b.text}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <p class="border-border/70 text-foreground-muted mt-4 border-t pt-3 text-[0.7rem] leading-5">
+    Jeder Befund mit Einstufung, Fundstelle und Vorschlag. Dazu Management-Summary und Papier zum Betrieb.
+  </p>
+</div>
+
+<style>
+  .bericht-dot.ist-ok {
+    background: oklch(68% 0.17 150);
+  }
+  .bericht-dot.ist-teils {
+    background: oklch(80% 0.16 85);
+  }
+  .bericht-dot.ist-offen {
+    background: oklch(62% 0.2 25);
+  }
+  .schwere-hoch {
+    color: oklch(45% 0.18 25);
+    background: oklch(62% 0.2 25 / 0.14);
+  }
+  .schwere-mittel {
+    color: oklch(50% 0.14 85);
+    background: oklch(80% 0.16 85 / 0.2);
+  }
+  :global(.dark) .schwere-hoch {
+    color: oklch(80% 0.14 25);
+  }
+  :global(.dark) .schwere-mittel {
+    color: oklch(85% 0.12 85);
+  }
+  /* Kapitel und Befunde laufen nacheinander ein, sobald die Szene an ist (data-szene am Elternelement). */
+  :global(html.szenen-ready) :global([data-szene]:not([data-szene='an'])) .bericht li {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  .bericht li {
+    transition:
+      opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      translate 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--i, 0) * 90ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bericht li {
+      transition: none;
+    }
+  }
+</style>

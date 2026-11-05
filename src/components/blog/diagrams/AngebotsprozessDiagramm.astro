@@ -1,0 +1,191 @@
+---
+/**
+ * Angebotsprozess: Dokumenten-Schleife gegen durchgehenden digitalen Ablauf.
+ *
+ * Der Punkt des Diagramms ist nicht "digital ist moderner", sondern die
+ * Rückkopplung: Im PDF-Weg führt jede Rückfrage zurück ins Erstellen, und
+ * dieser Kreis kostet bei jeder Runde Bearbeitungszeit auf beiden Seiten.
+ *
+ * Farben kommen aus den Design-Tokens (CSS-Variablen), damit das Diagramm in
+ * hellem und dunklem Theme ohne Sonderbehandlung funktioniert.
+ */
+---
+
+<figure class="not-prose my-10" data-reveal="fade-up">
+  <div class="border-border bg-background-secondary overflow-x-auto rounded-2xl border p-6 sm:p-8">
+    <svg
+      viewBox="0 0 720 380"
+      role="img"
+      aria-labelledby="angebot-titel angebot-desc"
+      class="mx-auto block h-auto w-full min-w-[34rem] max-w-[45rem]"
+    >
+      <title id="angebot-titel">Angebotsprozess als PDF gegenüber digitalem Angebot</title>
+      <desc id="angebot-desc">
+        Oben der Dokumentenweg: Anfrage, Kalkulation, PDF erstellen, per Mail senden, warten.
+        Rückfragen führen zurück zum Erstellen - eine Schleife, die sich pro Runde wiederholt.
+        Unten der digitale Weg: Vorqualifizierung, Kalkulation, Angebot als Seite. Der Kunde
+        wählt Optionen und gibt Rückmeldung direkt am Angebot, die Zusage erzeugt den Auftrag.
+      </desc>
+
+      <defs>
+        <marker id="pfeil" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--foreground-subtle, #9297a8)" />
+        </marker>
+        <marker id="pfeil-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500, #6372a5)" />
+        </marker>
+        <marker id="pfeil-warn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--foreground-muted, #6b7186)" />
+        </marker>
+      </defs>
+
+      <!-- ===================== Dokumentenweg ===================== -->
+      <text x="0" y="16" class="dg-label">Als PDF</text>
+
+      <g class="dg-node">
+        <rect x="0" y="30" width="118" height="46" rx="10" />
+        <text x="59" y="58">Anfrage</text>
+      </g>
+      <g class="dg-node">
+        <rect x="150" y="30" width="118" height="46" rx="10" />
+        <text x="209" y="58">Kalkulieren</text>
+      </g>
+      <g class="dg-node">
+        <rect x="300" y="30" width="118" height="46" rx="10" />
+        <text x="359" y="58">PDF erstellen</text>
+      </g>
+      <g class="dg-node">
+        <rect x="450" y="30" width="118" height="46" rx="10" />
+        <text x="509" y="58">Mail senden</text>
+      </g>
+      <g class="dg-node is-muted">
+        <rect x="600" y="30" width="118" height="46" rx="10" />
+        <text x="659" y="58">Warten</text>
+      </g>
+
+      <path d="M 118 53 H 146" class="dg-line" marker-end="url(#pfeil)" />
+      <path d="M 268 53 H 296" class="dg-line" marker-end="url(#pfeil)" />
+      <path d="M 418 53 H 446" class="dg-line" marker-end="url(#pfeil)" />
+      <path d="M 568 53 H 596" class="dg-line" marker-end="url(#pfeil)" />
+
+      <!-- Rückkopplung: Rückfrage führt zurück ins Erstellen -->
+      <path d="M 659 80 V 108 Q 659 122 645 122 H 373 Q 359 122 359 108 V 82" class="dg-line dg-loop" marker-end="url(#pfeil-warn)" />
+      <text x="509" y="140" class="dg-note">Jede Rückfrage: neu rechnen, neu exportieren, neu senden</text>
+
+      <!-- Trennlinie -->
+      <line x1="0" y1="178" x2="720" y2="178" class="dg-divider" />
+
+      <!-- ===================== Digitaler Weg ===================== -->
+      <text x="0" y="212" class="dg-label dg-label-brand">Als digitales Angebot</text>
+
+      <g class="dg-node is-brand">
+        <rect x="0" y="226" width="132" height="46" rx="10" />
+        <text x="66" y="254">Vorqualifiziert</text>
+      </g>
+      <g class="dg-node is-brand">
+        <rect x="164" y="226" width="118" height="46" rx="10" />
+        <text x="223" y="254">Kalkulieren</text>
+      </g>
+      <g class="dg-node is-brand">
+        <rect x="314" y="226" width="132" height="46" rx="10" />
+        <text x="380" y="254">Angebot als Seite</text>
+      </g>
+      <g class="dg-node is-brand is-strong">
+        <rect x="478" y="226" width="118" height="46" rx="10" />
+        <text x="537" y="254">Zusage</text>
+      </g>
+      <g class="dg-node is-brand">
+        <rect x="628" y="226" width="90" height="46" rx="10" />
+        <text x="673" y="254">Auftrag</text>
+      </g>
+
+      <path d="M 132 249 H 160" class="dg-line is-brand" marker-end="url(#pfeil-brand)" />
+      <path d="M 282 249 H 310" class="dg-line is-brand" marker-end="url(#pfeil-brand)" />
+      <path d="M 446 249 H 474" class="dg-line is-brand" marker-end="url(#pfeil-brand)" />
+      <path d="M 596 249 H 624" class="dg-line is-brand" marker-end="url(#pfeil-brand)" />
+
+      <!-- Kundeninteraktion direkt am Angebot, kein Rücksprung ins Erstellen -->
+      <path d="M 380 276 V 300" class="dg-line is-brand" marker-end="url(#pfeil-brand)" />
+      <text x="380" y="320" class="dg-note is-brand">Kunde wählt Optionen, fragt nach, sieht die Summe sofort</text>
+      <text x="380" y="342" class="dg-note">Derselbe Link bleibt gültig - keine Versionsstände</text>
+    </svg>
+  </div>
+  <figcaption class="text-foreground-muted mt-3 text-sm leading-6">
+    Der Unterschied ist nicht die Optik, sondern die Schleife: Im Dokumentenweg führt jede
+    Rückfrage zurück ins Erstellen. Digital passiert die Klärung am Angebot selbst.
+  </figcaption>
+</figure>
+
+<style>
+  /* Farben aus den Design-Tokens, damit helles und dunkles Theme ohne
+     Sonderregeln funktionieren. */
+  .dg-node rect {
+    fill: var(--card, #fff);
+    stroke: var(--border, #e2e4ed);
+    stroke-width: 1.5;
+  }
+  .dg-node text {
+    fill: var(--foreground, #171b26);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+  .dg-node.is-muted rect {
+    fill: var(--background-secondary, #f2f3f8);
+    stroke-dasharray: 4 3;
+  }
+  .dg-node.is-muted text {
+    fill: var(--foreground-muted, #6b7186);
+  }
+  .dg-node.is-brand rect {
+    stroke: var(--brand-500, #6372a5);
+  }
+  .dg-node.is-strong rect {
+    fill: var(--brand-50, #edeff7);
+    stroke-width: 2;
+  }
+
+  .dg-line {
+    stroke: var(--foreground-subtle, #9297a8);
+    stroke-width: 1.6;
+    fill: none;
+  }
+  .dg-line.is-brand {
+    stroke: var(--brand-500, #6372a5);
+  }
+  .dg-loop {
+    stroke: var(--foreground-muted, #6b7186);
+    stroke-dasharray: 5 4;
+  }
+
+  .dg-divider {
+    stroke: var(--border, #e2e4ed);
+    stroke-width: 1;
+  }
+
+  .dg-label {
+    fill: var(--foreground-muted, #6b7186);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .dg-label-brand {
+    fill: var(--brand-600, #4c5c93);
+  }
+
+  .dg-note {
+    fill: var(--foreground-muted, #6b7186);
+    font-size: 12.5px;
+    text-anchor: middle;
+  }
+  .dg-note.is-brand {
+    fill: var(--brand-600, #4c5c93);
+    font-weight: 600;
+  }
+
+  :global(.dark) .dg-node rect {
+    fill: var(--card, #191e29);
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+/**
+ * Füllt die versteckten Herkunfts-Felder des Kontaktformulars.
+ *
+ * <p>Eigene Komponente und kein Code in der Seite, weil es das Formular zweimal gibt
+ * (`kontakt.astro` und die englische `[...contact].astro`). Zwei Kopien wären hier der
+ * bekannte Bug-Vektor: Wer die Herkunft anfasst und nur eine Seite anpasst, verliert sie auf
+ * der anderen stillschweigend — genau so ist das Kontaktformular überhaupt erst aus dem
+ * CRM-Pfad gefallen.
+ *
+ * <p>Separates Modul-Script statt des `define:vars`-Blocks der Seiten: Ein Script mit
+ * `define:vars` ist kein Modul und darf nicht importieren, `sammleAttribution` und
+ * `leseBriefRef` liegen aber in `src/lib`. Die Felder werden beim Laden gefüllt, also bevor
+ * jemand absenden kann; das Absenden selbst bleibt beim Script der Seite.
+ */
+---
+
+<div class="hidden" aria-hidden="true">
+  <input type="hidden" name="funnel" id="contact-funnel" value="" />
+  <input type="hidden" name="utm" id="contact-utm" value="" />
+  <input type="hidden" name="letterRef" id="contact-letter-ref" value="" />
+  <input type="hidden" name="page" id="contact-page" value="" />
+  <input type="hidden" name="renderedAt" id="contact-rendered-at" value="" />
+</div>
+
+<script>
+  import { ergaenzeMetaCookies, sammleAttribution } from '@/lib/leadTracking';
+  import { leseBriefRef } from '@/lib/briefRef';
+  import { streckeAusPfad } from '@/lib/funnelTracking';
+
+  function fuelleHerkunft() {
+    const setze = (id: string, wert: string) => {
+      const feld = document.getElementById(id);
+      if (feld instanceof HTMLInputElement) feld.value = wert;
+    };
+
+    setze('contact-funnel', streckeAusPfad());
+    setze('contact-utm', JSON.stringify(ergaenzeMetaCookies(sammleAttribution())));
+    setze('contact-letter-ref', leseBriefRef());
+    setze('contact-page', window.location.href);
+    // Beim Laden stempeln, nicht beim Absenden — sonst wäre die gemessene Dauer immer null,
+    // und die Spam-Heuristik der Function läse jede Anfrage als „kein JavaScript".
+    setze('contact-rendered-at', String(Date.now()));
+  }
+
+  fuelleHerkunft();
+  document.addEventListener('astro:after-swap', fuelleHerkunft);
+</script>

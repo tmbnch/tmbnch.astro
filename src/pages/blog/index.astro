@@ -1,0 +1,497 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Navbar from '@/components/landing/Navbar.astro';
+import LandingFooter from '@/components/landing/LandingFooter.astro';
+import PolygonLuminary from '@/components/hero-backgrounds/PolygonLuminary.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import { getCollection } from 'astro:content';
+import { defaultLocale } from '@/i18n/config';
+import { useTranslations } from '@/i18n/index';
+import { getReadingTime } from '@/lib/utils';
+import { tueren, type TuerId } from '@/data/tueren';
+
+const locale = defaultLocale;
+const t = useTranslations(locale);
+
+const allPosts = await getCollection('blog', ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
+
+const posts = allPosts
+  .filter((post) => post.data.locale === locale)
+  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+
+// First featured post (newest) is rendered big; the rest is ordered as:
+// remaining featured posts (newest first) → non-featured posts (newest first).
+const featuredPost = posts.find((post) => post.data.featured);
+
+const remainingFeatured = posts.filter(
+  (post) => post.data.featured && post.id !== featuredPost?.id,
+);
+const nonFeatured = posts.filter((post) => !post.data.featured);
+const otherPosts = [...remainingFeatured, ...nonFeatured];
+
+// Filter nach Tür (Frontmatter `doors`). Nur Türen, zu denen es Artikel gibt.
+const filterTueren = (Object.keys(tueren) as TuerId[])
+  .map((id) => ({ id, ...tueren[id], anzahl: posts.filter((p) => p.data.doors.includes(id)).length }))
+  .filter((t) => t.anzahl > 0);
+const eyebrow = (post: (typeof posts)[number]) =>
+  post.data.doors.length ? post.data.doors.map((d) => tueren[d].titel).join(' · ') : post.data.tags[0];
+const monatJahr = (d: Date) => d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+const getPostUrl = (postId: string) => {
+  const slug = postId.replace(`${locale}/`, '');
+  return `/blog/${slug}/`;
+};
+---
+
+<BaseLayout
+  title={t('blog.title')}
+  description={t('blog.description')}
+>
+  <Navbar slot="header" />
+
+  <!-- Hero Section -->
+  <section class="border-border bg-background-secondary relative overflow-hidden border-b py-20 md:py-28">
+    <PolygonLuminary />
+
+    <div class="relative z-10 mx-auto max-w-6xl px-6">
+      <div class="max-w-3xl">
+        <div class="mb-4 inline-flex items-center rounded-full border border-border bg-background px-3 py-1 shadow-sm">
+          <Icon name="book" size="sm" class="text-brand-500 mr-2" />
+          <span class="text-xs font-medium text-foreground-secondary">{t('blog.allPosts')}</span>
+        </div>
+
+        <h1 class="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl mb-6">
+          {t('blog.title')}
+        </h1>
+
+        <p class="text-xl text-foreground-muted leading-relaxed" set:html={t('blog.descriptionHtml')}></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Posts Grid -->
+  <section class="py-16 bg-background-secondary" data-blog-filter>
+    <div class="mx-auto max-w-6xl px-6">
+      {filterTueren.length > 0 && (
+        <div class="mb-10">
+          <div role="group" aria-label="Nach Thema filtern">
+            <div class="mb-4 flex items-center justify-between gap-4">
+              <p class="text-brand-600 text-xs font-semibold tracking-[0.22em] uppercase">Nach Thema filtern</p>
+              <button type="button" class="blog-all" data-filter="" aria-pressed="true">
+                Alle Beiträge <span class="blog-chip-n">{posts.length}</span>
+              </button>
+            </div>
+            <div class="blog-rail" data-rail>
+              <button type="button" class="blog-rail-pfeil blog-rail-pfeil--links" data-rail-pfeil="-1" aria-label="Vorherige Themen" hidden>
+                <Icon name="chevron-left" size="sm" />
+              </button>
+              <div class="blog-filter" data-rail-spur>
+                {filterTueren.map((t) => (
+                  <button type="button" class="blog-chip" data-filter={t.id} aria-pressed="false">
+                    <span class="blog-chip-icon">
+                      <Icon name={t.icon} size="sm" />
+                    </span>
+                    <span class="blog-chip-titel">{t.titel}</span>
+                    <span class="blog-chip-n">{t.anzahl}</span>
+                  </button>
+                ))}
+              </div>
+              <button type="button" class="blog-rail-pfeil blog-rail-pfeil--rechts" data-rail-pfeil="1" aria-label="Weitere Themen" hidden>
+                <Icon name="chevron-right" size="sm" />
+              </button>
+            </div>
+          </div>
+          {filterTueren.map((t) => (
+            <a href={t.href} class="blog-door group" data-door-hint={t.id} hidden>
+              <span class="bg-brand-500/10 text-brand-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                <Icon name={t.icon} size="sm" />
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="text-foreground block text-sm font-bold">{t.titel}</span>
+                <span class="text-foreground-secondary block text-sm">{t.text}</span>
+              </span>
+              <span class="text-brand-600 inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold transition-transform group-hover:translate-x-1">
+                Zur Lösung <Icon name="arrow-right" size="xs" />
+              </span>
+            </a>
+          ))}
+        </div>
+      )}
+      {posts.length === 0 ? (
+        <div class="text-center py-16">
+          <div class="mx-auto w-16 h-16 rounded-full bg-background flex items-center justify-center mb-4">
+            <Icon name="file-text" size="lg" class="text-foreground-muted" />
+          </div>
+          <p class="text-foreground-muted text-lg">{t('blog.noPosts')}</p>
+        </div>
+      ) : (
+        <div class="space-y-10">
+          {featuredPost && (
+            <article data-doors={featuredPost.data.doors.join(' ')} class="group overflow-hidden rounded-[2rem] border border-border bg-card shadow-[0_22px_55px_rgba(34,43,74,0.08)] transition-[transform,box-shadow] duration-500 hover:shadow-[0_30px_70px_rgba(34,43,74,0.12)] hover:border-border-strong will-change-transform [backface-visibility:hidden]">
+              <a href={getPostUrl(featuredPost.id)} class="grid gap-0 md:grid-cols-2 md:items-stretch">
+                {featuredPost.data.image ? (
+                  <div class="overflow-hidden">
+                    <Picture
+                      src={featuredPost.data.image}
+                      alt={featuredPost.data.imageAlt ?? featuredPost.data.title}
+                      widths={[480, 720, 960, 1200]}
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      formats={['avif', 'webp']}
+                      class="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04] md:aspect-auto md:h-full"
+                      loading="eager"
+                    />
+                  </div>
+                ) : (
+                  <div class="flex aspect-[16/10] flex-col justify-between bg-[linear-gradient(160deg,rgba(243,245,249,0.96),rgba(229,234,242,0.92))] p-8 md:aspect-auto md:min-h-[22rem] dark:bg-[linear-gradient(160deg,rgba(36,43,57,0.92),rgba(26,31,42,0.9))]">
+                    <p class="text-brand-600 text-xs font-semibold tracking-[0.22em] uppercase">
+                      Empfohlen
+                    </p>
+                    <p class="font-display text-foreground text-3xl leading-snug font-bold tracking-tight">
+                      {featuredPost.data.title}
+                    </p>
+                  </div>
+                )}
+
+                <div class="flex flex-col justify-center p-8 lg:p-12">
+                  <p class="text-brand-600 text-xs font-semibold tracking-[0.22em] uppercase">
+                    Empfohlener Beitrag
+                  </p>
+                  <h2 class="font-display text-foreground mt-4 text-2xl font-bold leading-snug lg:text-3xl">
+                    {featuredPost.data.title}
+                  </h2>
+                  <p class="text-foreground-secondary mt-4 text-base leading-7 line-clamp-4 lg:line-clamp-5">
+                    {featuredPost.data.description}
+                  </p>
+
+                  <div class="mt-6 flex flex-wrap items-center gap-3 text-xs text-foreground-subtle">
+                    <time datetime={featuredPost.data.publishedAt.toISOString()}>
+                      {monatJahr(featuredPost.data.publishedAt)}
+                    </time>
+                    <span>·</span>
+                    <span>{getReadingTime(featuredPost.body ?? '')} Min. Lesezeit</span>
+                  </div>
+
+                  <div class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 transition-transform duration-300 group-hover:translate-x-1">
+                    Beitrag lesen
+                    <Icon name="arrow-right" size="sm" />
+                  </div>
+                </div>
+              </a>
+            </article>
+          )}
+
+          {otherPosts.length > 0 && (
+            <div class="grid gap-6 md:grid-cols-2">
+              {otherPosts.map((post) => (
+                <article data-doors={post.data.doors.join(' ')} class="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-border bg-card shadow-sm transition-[transform,box-shadow,border-color] duration-300 hover:shadow-[0_20px_45px_rgba(34,43,74,0.1)] hover:border-border-strong will-change-transform [backface-visibility:hidden]">
+                  <a href={getPostUrl(post.id)} class="flex h-full flex-col">
+                    {post.data.image ? (
+                      <div class="overflow-hidden">
+                        <Picture
+                          src={post.data.image}
+                          alt={post.data.imageAlt ?? post.data.title}
+                          widths={[480, 720, 960]}
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          formats={['avif', 'webp']}
+                          class="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : (
+                      <div class="flex aspect-[16/10] flex-col justify-between bg-[linear-gradient(160deg,rgba(243,245,249,0.96),rgba(229,234,242,0.92))] p-7 dark:bg-[linear-gradient(160deg,rgba(36,43,57,0.92),rgba(26,31,42,0.9))]">
+                        <p class="text-brand-600 text-xs font-semibold tracking-[0.22em] uppercase">{eyebrow(post)}</p>
+                        <p class="font-display text-foreground text-2xl leading-snug font-bold tracking-tight">
+                          {post.data.title}
+                        </p>
+                      </div>
+                    )}
+
+                    <div class="flex flex-1 flex-col p-6 lg:p-7">
+                      <p class="text-brand-600 text-xs font-semibold tracking-[0.22em] uppercase">{eyebrow(post)}</p>
+                      <h2 class="text-foreground mt-3 text-xl font-semibold leading-snug lg:text-2xl">
+                        {post.data.title}
+                      </h2>
+                      <p class="text-foreground-secondary mt-3 text-sm leading-7 line-clamp-3">
+                        {post.data.description}
+                      </p>
+                      <div class="mt-auto pt-6">
+                        <div class="flex flex-wrap items-center gap-3 text-xs text-foreground-subtle">
+                          <time datetime={post.data.publishedAt.toISOString()}>
+                            {monatJahr(post.data.publishedAt)}
+                          </time>
+                          <span>·</span>
+                          <span>{getReadingTime(post.body ?? '')} Min. Lesezeit</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <LandingFooter slot="footer" />
+</BaseLayout>
+
+<style>
+  .blog-filter {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .blog-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 0.85rem 0.7rem 0.7rem;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .blog-chip:hover {
+    border-color: color-mix(in oklch, var(--color-brand-400) 60%, var(--color-border));
+    box-shadow: 0 10px 24px rgba(34, 43, 74, 0.07);
+    transform: translateY(-1px);
+  }
+  .blog-chip:focus-visible,
+  .blog-all:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  .blog-chip[aria-pressed='true'] {
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 1px var(--color-brand-500), 0 10px 24px color-mix(in oklch, var(--color-brand-500) 18%, transparent);
+  }
+  .blog-chip-icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.7rem;
+    background: color-mix(in oklch, var(--color-brand-500) 10%, transparent);
+    color: var(--color-brand-600);
+    transition: background 0.2s, color 0.2s;
+  }
+  .blog-chip[aria-pressed='true'] .blog-chip-icon {
+    background: var(--color-brand-500);
+    color: white;
+  }
+  .blog-chip-titel {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.3;
+  }
+  .blog-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.45rem 0.35rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-foreground-secondary);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .blog-all:hover {
+    border-color: var(--color-brand-400);
+    color: var(--color-foreground);
+  }
+  .blog-all[aria-pressed='true'] {
+    background: var(--color-brand-500);
+    border-color: var(--color-brand-500);
+    color: white;
+  }
+  .blog-chip-n {
+    min-width: 1.4rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--color-foreground) 7%, transparent);
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: var(--color-foreground-muted);
+  }
+  .blog-chip[aria-pressed='true'] .blog-chip-n {
+    background: color-mix(in oklch, var(--color-brand-500) 14%, transparent);
+    color: var(--color-brand-600);
+  }
+  .blog-all[aria-pressed='true'] .blog-chip-n {
+    background: rgba(255, 255, 255, 0.22);
+    color: white;
+  }
+  @media (max-width: 1023px) {
+    .blog-filter {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .blog-rail {
+    position: relative;
+  }
+  .blog-rail-pfeil {
+    display: none;
+  }
+  @media (max-width: 640px) {
+    /* Auf dem Handy wird das Raster zur wischbaren Leiste mit Pfeilen. */
+    .blog-filter {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 2.25rem;
+      scrollbar-width: none;
+      padding: 0.25rem;
+      margin: -0.25rem;
+    }
+    .blog-filter::-webkit-scrollbar {
+      display: none;
+    }
+    .blog-chip {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      gap: 0.5rem;
+      padding: 0.4rem 0.5rem 0.4rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.8125rem;
+      white-space: nowrap;
+    }
+    .blog-chip:hover {
+      transform: none;
+    }
+    .blog-chip-icon {
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 999px;
+    }
+    .blog-rail-pfeil {
+      position: absolute;
+      top: 50%;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: var(--color-card);
+      color: var(--color-foreground);
+      box-shadow: 0 6px 16px rgba(34, 43, 74, 0.12);
+      transform: translateY(-50%);
+    }
+    .blog-rail-pfeil[hidden] {
+      display: none;
+    }
+    .blog-rail-pfeil--links {
+      left: -0.5rem;
+    }
+    .blog-rail-pfeil--rechts {
+      right: -0.5rem;
+    }
+    /* Ausblenden zum Rand hin, solange es in die Richtung weitergeht. */
+    .blog-rail::before,
+    .blog-rail::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .blog-rail::before {
+      left: -0.25rem;
+      background: linear-gradient(to right, var(--color-background-secondary), transparent);
+    }
+    .blog-rail::after {
+      right: -0.25rem;
+      background: linear-gradient(to left, var(--color-background-secondary), transparent);
+    }
+    .blog-rail[data-links]::before,
+    .blog-rail[data-rechts]::after {
+      opacity: 1;
+    }
+  }
+  .blog-door {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: 1rem;
+    border: 1px solid color-mix(in oklch, var(--color-brand-400) 45%, var(--color-border));
+    background: var(--color-card);
+  }
+  article[data-doors][hidden],
+  .blog-door[hidden] {
+    display: none !important;
+  }
+  @media (max-width: 640px) {
+    .blog-door {
+      flex-wrap: wrap;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-blog-filter]');
+  if (root) {
+    const chips = root.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const apply = (id: string) => {
+      chips.forEach((c) => c.setAttribute('aria-pressed', c.dataset.filter === id ? 'true' : 'false'));
+      root.querySelectorAll<HTMLElement>('article[data-doors]').forEach((a) => {
+        a.hidden = !!id && !(a.dataset.doors ?? '').split(' ').includes(id);
+      });
+      root.querySelectorAll<HTMLElement>('[data-door-hint]').forEach((h) => (h.hidden = h.dataset.doorHint !== id));
+      const url = new URL(location.href);
+      if (id) url.searchParams.set('thema', id);
+      else url.searchParams.delete('thema');
+      history.replaceState(null, '', url);
+    };
+    chips.forEach((c) => c.addEventListener('click', () => apply(c.dataset.filter ?? '')));
+
+    // Leiste auf dem Handy: Pfeile nur zeigen, wenn es in die Richtung weitergeht.
+    const rail = root.querySelector<HTMLElement>('[data-rail]');
+    const spur = root.querySelector<HTMLElement>('[data-rail-spur]');
+    if (rail && spur) {
+      const pfeile = rail.querySelectorAll<HTMLButtonElement>('[data-rail-pfeil]');
+      const update = () => {
+        const links = spur.scrollLeft > 4;
+        const rechts = spur.scrollLeft + spur.clientWidth < spur.scrollWidth - 4;
+        rail.toggleAttribute('data-links', links);
+        rail.toggleAttribute('data-rechts', rechts);
+        pfeile[0].hidden = !links;
+        pfeile[1].hidden = !rechts;
+      };
+      pfeile.forEach((p) =>
+        p.addEventListener('click', () =>
+          spur.scrollBy({ left: Number(p.dataset.railPfeil) * spur.clientWidth * 0.7, behavior: 'smooth' }),
+        ),
+      );
+      spur.addEventListener('scroll', update, { passive: true });
+      new ResizeObserver(update).observe(spur);
+    }
+
+    const start = new URL(location.href).searchParams.get('thema');
+    const startChip = start ? root.querySelector<HTMLElement>(`[data-rail-spur] [data-filter="${CSS.escape(start)}"]`) : null;
+    if (start && root.querySelector(`[data-filter="${CSS.escape(start)}"]`)) apply(start);
+    // Vorausgewähltes Thema in der Leiste sichtbar machen, ohne die Seite zu scrollen.
+    if (spur && startChip) spur.scrollLeft = startChip.offsetLeft - spur.offsetLeft - 36;
+  }
+</script>

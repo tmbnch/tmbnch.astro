@@ -1,0 +1,335 @@
+---
+/**
+ * Ausschnitt „Oberflächen-Entwurf“ aus einem Workshop, als Wireframe in SVG: Angebotsmaske mit
+ * Positionen. Eine Schleife zeigt, wie im Workshop durchgeklickt wird: Cursor fügt eine Position
+ * hinzu, die Summe rechnet mit, dann „An Kunden senden“. Bei reduzierter Bewegung statisch.
+ */
+const rows = [
+  { t: 'Prüfung Anlagen Halle 3', n: '8 Std.', p: '1.360 €' },
+  { t: 'Bericht und Protokoll', n: '3 Std.', p: '450 €' },
+  { t: 'Anfahrt pauschal', n: '1', p: '120 €' },
+];
+---
+
+<svg viewBox="0 0 700 400" class="we block h-auto w-full" role="img" aria-label="Ausschnitt eines Oberflächen-Entwurfs aus einem Workshop: Angebotsmaske mit Positionen und mitlaufender Summe">
+  <!-- Rahmen -->
+  <rect x="1" y="1" width="698" height="398" rx="14" class="we-bg" />
+  <rect x="1" y="1" width="150" height="398" rx="14" class="we-side" />
+  <rect x="140" y="1" width="12" height="398" class="we-side" />
+  <rect x="22" y="24" width="90" height="14" rx="7" class="we-fill-strong" />
+  {[70, 102, 134, 166, 198].map((y, i) => <rect x="22" y={y} width={i === 1 ? 108 : 88} height="20" rx="6" class:list={[i === 1 ? 'we-nav-on' : 'we-fill']} />)}
+
+  <!-- Kopf -->
+  <text x="178" y="44" class="we-h">Angebot 26-041</text>
+  <text x="178" y="64" class="we-sub">Alpenblick Spedition · Prüfung Anlagen</text>
+  <rect x="560" y="28" width="116" height="30" rx="8" class="we-btn" />
+  <text x="618" y="48" text-anchor="middle" class="we-btnt">An Kunden senden</text>
+  <rect x="560" y="28" width="116" height="30" rx="8" class="we-btn-hit" />
+
+  <!-- Tabelle -->
+  <text x="178" y="100" class="we-th">Position</text>
+  <text x="500" y="100" class="we-th" text-anchor="end">Menge</text>
+  <text x="672" y="100" class="we-th" text-anchor="end">Betrag</text>
+  <line x1="178" y1="110" x2="676" y2="110" class="we-line" />
+  {
+    rows.map((r, i) => (
+      <g>
+        <text x="178" y={136 + i * 34} class="we-td">{r.t}</text>
+        <text x="500" y={136 + i * 34} class="we-td" text-anchor="end">{r.n}</text>
+        <text x="672" y={136 + i * 34} class="we-td" text-anchor="end">{r.p}</text>
+        <line x1="178" y1={148 + i * 34} x2="676" y2={148 + i * 34} class="we-line" />
+      </g>
+    ))
+  }
+  <g class="we-new">
+    <rect x="172" y="216" width="508" height="30" rx="6" class="we-newbg" />
+    <text x="178" y="236" class="we-td">Wiederholungsprüfung 2027</text>
+    <text x="500" y="236" class="we-td" text-anchor="end">6 Std.</text>
+    <text x="672" y="236" class="we-td" text-anchor="end">1.020 €</text>
+  </g>
+  <g class="we-add">
+    <rect x="178" y="262" width="118" height="28" rx="7" class="we-addbtn" />
+    <text x="237" y="281" text-anchor="middle" class="we-addt">+ Position</text>
+  </g>
+
+  <!-- Summe -->
+  <rect x="476" y="300" width="200" height="74" rx="10" class="we-sum" />
+  <text x="492" y="324" class="we-sub">Summe netto</text>
+  <text x="660" y="356" text-anchor="end" class="we-total we-total-a">1.930 €</text>
+  <text x="660" y="356" text-anchor="end" class="we-total we-total-b">2.950 €</text>
+
+  <!-- Notiz aus dem Workshop -->
+  <g class="we-note" transform="rotate(-3 300 340)">
+    <text x="236" y="334" class="we-hand">Summe rechnet mit,</text>
+    <text x="236" y="354" class="we-hand">keine Excel mehr!</text>
+    <path d="M 392 338 C 420 336, 440 336, 466 334" class="we-arrow" />
+    <path d="M 458 328 L 467 334 L 458 340" class="we-arrow" />
+  </g>
+
+  <!-- Cursor -->
+  <g class="we-cursor">
+    <path d="M 0 0 L 0 18 L 5 13 L 9 22 L 12 21 L 8 12 L 15 12 Z" class="we-cur" />
+  </g>
+  <circle cx="237" cy="276" r="16" class="we-ripple we-ripple-a" />
+  <circle cx="618" cy="43" r="18" class="we-ripple we-ripple-b" />
+</svg>
+
+<style>
+  .we text {
+    font-family: inherit;
+  }
+  .we-bg {
+    fill: var(--color-card);
+    stroke: var(--color-border);
+  }
+  .we-side {
+    fill: var(--color-background-secondary);
+  }
+  .we-fill {
+    fill: color-mix(in oklch, var(--color-foreground-muted) 18%, transparent);
+  }
+  .we-fill-strong {
+    fill: color-mix(in oklch, var(--color-foreground-muted) 40%, transparent);
+  }
+  .we-nav-on {
+    fill: color-mix(in oklch, var(--color-brand-500) 22%, transparent);
+  }
+  .we-h {
+    font-size: 19px;
+    font-weight: 700;
+    fill: var(--color-foreground);
+  }
+  .we-sub {
+    font-size: 11.5px;
+    fill: var(--color-foreground-muted);
+  }
+  .we-th {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    fill: var(--color-foreground-muted);
+  }
+  .we-td {
+    font-size: 13px;
+    fill: var(--color-foreground);
+  }
+  .we-line {
+    stroke: var(--color-border);
+  }
+  .we-btn {
+    fill: var(--color-brand-500);
+  }
+  .we-btnt {
+    font-size: 11.5px;
+    font-weight: 700;
+    fill: white;
+  }
+  .we-btn-hit {
+    fill: transparent;
+    stroke: var(--color-brand-300);
+    stroke-width: 3;
+    opacity: 0;
+    animation: we-hit 9s infinite;
+  }
+  .we-addbtn {
+    fill: none;
+    stroke: var(--color-brand-400);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 3;
+  }
+  .we-addt {
+    font-size: 12px;
+    font-weight: 700;
+    fill: var(--color-brand-600);
+  }
+  .we-newbg {
+    fill: color-mix(in oklch, oklch(70% 0.15 150) 16%, transparent);
+  }
+  .we-new {
+    opacity: 0;
+    animation: we-new 9s infinite;
+  }
+  .we-sum {
+    fill: var(--color-background-secondary);
+    stroke: var(--color-border);
+  }
+  .we-total {
+    font-size: 24px;
+    font-weight: 800;
+    fill: var(--color-foreground);
+  }
+  .we-total-a {
+    animation: we-a 9s infinite;
+  }
+  .we-total-b {
+    opacity: 0;
+    fill: oklch(55% 0.15 150);
+    animation: we-b 9s infinite;
+  }
+  .we-hand {
+    font-family: 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive !important;
+    font-size: 14px;
+    fill: var(--color-brand-600);
+  }
+  .we-arrow {
+    fill: none;
+    stroke: var(--color-brand-500);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+  .we-cur {
+    fill: var(--color-foreground);
+    stroke: var(--color-card);
+    stroke-width: 1.5;
+  }
+  .we-cursor {
+    animation: we-cursor 9s ease-in-out infinite;
+  }
+  .we-ripple {
+    fill: none;
+    stroke: var(--color-brand-500);
+    stroke-width: 2;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .we-ripple-a {
+    animation: we-rip-a 9s infinite;
+  }
+  .we-ripple-b {
+    animation: we-rip-b 9s infinite;
+  }
+  /* Ablauf: 0-20 % zum Knopf, 22 % Klick, 26 % Zeile da, 32 % Summe neu, 45-62 % zu „Senden“, 64 % Klick, danach Ruhe */
+  @keyframes we-cursor {
+    0% {
+      transform: translate(420px, 380px);
+    }
+    20% {
+      transform: translate(232px, 270px);
+    }
+    24% {
+      transform: translate(232px, 270px);
+    }
+    45% {
+      transform: translate(250px, 280px);
+    }
+    62% {
+      transform: translate(612px, 38px);
+    }
+    70% {
+      transform: translate(612px, 38px);
+    }
+    100% {
+      transform: translate(420px, 380px);
+    }
+  }
+  @keyframes we-rip-a {
+    0%,
+    21% {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    23% {
+      opacity: 0.9;
+    }
+    30% {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes we-rip-b {
+    0%,
+    63% {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    65% {
+      opacity: 0.9;
+    }
+    72% {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes we-new {
+    0%,
+    23% {
+      opacity: 0;
+    }
+    28%,
+    90% {
+      opacity: 1;
+    }
+    96%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes we-a {
+    0%,
+    28% {
+      opacity: 1;
+    }
+    31%,
+    92% {
+      opacity: 0;
+    }
+    97%,
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes we-b {
+    0%,
+    29% {
+      opacity: 0;
+    }
+    33%,
+    90% {
+      opacity: 1;
+    }
+    95%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes we-hit {
+    0%,
+    63% {
+      opacity: 0;
+    }
+    66%,
+    80% {
+      opacity: 1;
+    }
+    86%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .we-cursor,
+    .we-ripple,
+    .we-btn-hit,
+    .we-total-a {
+      animation: none;
+    }
+    .we-new,
+    .we-total-b {
+      animation: none;
+      opacity: 1;
+    }
+    .we-total-a,
+    .we-cursor,
+    .we-ripple {
+      opacity: 0;
+    }
+  }
+</style>

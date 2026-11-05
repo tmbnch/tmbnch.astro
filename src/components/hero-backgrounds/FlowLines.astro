@@ -1,0 +1,118 @@
+---
+/**
+ * FlowLines – Hero-Hintergrund für die Einsatzplanung/Disposition.
+ * Motiv: Mehrere horizontale Bahnen (wie Touren oder Einsatz-Slots auf einem
+ * Planungsboard), auf denen sich Punkte von links nach rechts bewegen –
+ * "vom Auftrag bis zur Abrechnung". Dezent, dark-ready (brand-indigo).
+ */
+---
+
+<div class="hero-flowlines pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+  <div class="hero-flowlines-backdrop absolute inset-0"></div>
+
+  <svg
+    class="absolute inset-0 h-full w-full"
+    viewBox="0 0 1440 720"
+    preserveAspectRatio="xMidYMid slice"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <radialGradient id="flowGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0%" stop-color="var(--fl-glow-start)" />
+        <stop offset="100%" stop-color="var(--fl-glow-end)" />
+      </radialGradient>
+    </defs>
+
+    <circle cx="320" cy="200" r="320" fill="url(#flowGlow)" opacity="0.5" />
+    <circle cx="1180" cy="520" r="300" fill="url(#flowGlow)" opacity="0.4" />
+
+    <!-- Bahnen / Slots -->
+    <g stroke="var(--fl-lane)" stroke-width="1">
+      <line x1="0" y1="150" x2="1440" y2="150" />
+      <line x1="0" y1="270" x2="1440" y2="270" />
+      <line x1="0" y1="390" x2="1440" y2="390" />
+      <line x1="0" y1="510" x2="1440" y2="510" />
+      <line x1="0" y1="630" x2="1440" y2="630" />
+    </g>
+
+    <!-- Slot-Marker (Spalten, wie Tage/Stunden) -->
+    <g stroke="var(--fl-tick)" stroke-width="1">
+      <line x1="240" y1="120" x2="240" y2="660" />
+      <line x1="480" y1="120" x2="480" y2="660" />
+      <line x1="720" y1="120" x2="720" y2="660" />
+      <line x1="960" y1="120" x2="960" y2="660" />
+      <line x1="1200" y1="120" x2="1200" y2="660" />
+    </g>
+
+    <!-- Belegte Slots (Einsatz-Blöcke) -->
+    <g fill="var(--fl-block)" opacity="0.75">
+      <rect x="252" y="138" width="200" height="24" rx="6" />
+      <rect x="500" y="258" width="440" height="24" rx="6" />
+      <rect x="252" y="378" width="200" height="24" rx="6" />
+      <rect x="740" y="498" width="200" height="24" rx="6" />
+      <rect x="980" y="618" width="200" height="24" rx="6" />
+      <rect x="980" y="138" width="200" height="24" rx="6" />
+    </g>
+
+    <!-- Wandernde Punkte auf den Bahnen (Tour-Fortschritt) -->
+    <g fill="var(--fl-dot)">
+      <circle cx="0" cy="150" r="5" class="hero-flowlines-travel fl-t1" />
+      <circle cx="0" cy="390" r="5" class="hero-flowlines-travel fl-t2" />
+      <circle cx="0" cy="630" r="5" class="hero-flowlines-travel fl-t3" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .hero-flowlines {
+    --fl-glow-start: oklch(70% 0.12 274 / 0.24);
+    --fl-glow-end: oklch(70% 0.12 274 / 0);
+    --fl-lane: oklch(55% 0.04 274 / 0.16);
+    --fl-tick: oklch(55% 0.03 274 / 0.1);
+    --fl-block: oklch(62% 0.13 274 / 0.22);
+    --fl-dot: oklch(58% 0.2 274 / 0.9);
+    --fl-bg-top: oklch(98% 0.003 274);
+    --fl-bg-mid: oklch(95% 0.006 274);
+    --fl-bg-bottom: oklch(97% 0.002 274);
+  }
+
+  :global(.dark) .hero-flowlines {
+    --fl-glow-start: oklch(62% 0.2 274 / 0.36);
+    --fl-glow-end: oklch(62% 0.2 274 / 0);
+    --fl-lane: oklch(72% 0.05 274 / 0.1);
+    --fl-tick: oklch(72% 0.04 274 / 0.07);
+    --fl-block: oklch(70% 0.14 274 / 0.28);
+    --fl-dot: oklch(85% 0.1 274 / 0.95);
+    --fl-bg-top: oklch(21% 0.02 274);
+    --fl-bg-mid: oklch(16% 0.016 274);
+    --fl-bg-bottom: oklch(13% 0.012 274);
+  }
+
+  .hero-flowlines-backdrop {
+    background:
+      radial-gradient(ellipse at 22% 28%, var(--fl-glow-start), transparent 58%),
+      linear-gradient(165deg, var(--fl-bg-top) 0%, var(--fl-bg-mid) 55%, var(--fl-bg-bottom) 100%);
+  }
+
+  .hero-flowlines-travel {
+    animation: flowlines-travel linear infinite;
+    will-change: transform, opacity;
+  }
+  .fl-t1 { animation-duration: 11s; animation-delay: 0s; }
+  .fl-t2 { animation-duration: 14s; animation-delay: -4s; }
+  .fl-t3 { animation-duration: 9s; animation-delay: -2s; }
+
+  @keyframes flowlines-travel {
+    0% { transform: translateX(0); opacity: 0; }
+    8% { opacity: 1; }
+    92% { opacity: 1; }
+    100% { transform: translateX(1440px); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-flowlines-travel {
+      animation: none;
+      opacity: 0;
+    }
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+/**
+ * Tür 1: Angebot & Kalkulation. Dieselben Inhalte wie die Anzeigen-Landing
+ * /f/angebote/, aber mit Navigation, indexiert und ohne Quiz: statt dessen
+ * Erstgespräch und Workshop als nächste Schritte. Inhalt in
+ * components/angebote/AngebotePage.astro.
+ */
+import { Image } from 'astro:assets';
+import LandingLayout from '@/layouts/LandingLayout.astro';
+import { angeboteFaqs } from '@/components/angebote/faqs';
+import { createServiceSchema, createFAQSchema } from '@/lib/schema';
+import ZahlWandert from '@/components/angebote-funnel/ZahlWandert.astro';
+import SchlankPage from '@/components/funnel-schlank/SchlankPage.astro';
+import angebotBild from '@/assets/references/angebot-db-demo-1920.png';
+import AngebotEbenen, { type Ebene } from '@/components/angebote-funnel/AngebotEbenen.astro';
+import HeuteChaos from '@/components/angebote/HeuteChaos.astro';
+import editor from '@/assets/angebote/v2-editor-praesentation.webp';
+import bausteine from '@/assets/angebote/v2-bausteine-falk.webp';
+import kundeStart from '@/assets/angebote/kunde-umfang-hd.webp';
+import kundeAnnahme from '@/assets/angebote/kunde-annahme-hd.webp';
+import { angebote, preisFrage } from '@/data/funnelSchlank';
+import { additionalCases, cases } from '@/data/rocketbase';
+
+const serviceSchema = createServiceSchema({
+  name: 'Angebotsbaustein: Angebot und Kalkulation',
+  description: 'Angebote, die nach der eigenen Kalkulationsregel rechnen und beim Kunden als Seite statt PDF ankommen: Deckungsbeitrag vor dem Versand, Zusage per Klick, Nachfassen automatisch. Individuell für den Betrieb aufgebaut.',
+  url: new URL(Astro.url.pathname, Astro.site).toString(),
+  serviceType: 'Individualsoftware für Angebotserstellung und Kalkulation',
+  areaServed: 'DE',
+});
+const faqs = angeboteFaqs.map((f) => (f.q === preisFrage.q ? preisFrage : f));
+const faqSchema = createFAQSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
+
+const ebenen: Ebene[] = [
+  { titel: 'Vorlage und Texte', text: 'Texte und Bilder kommen aus eurer Bibliothek.', image: editor, alt: 'Editor der Angebotsseite mit Abschnitten, Präsentation und Bildauswahl' },
+  { titel: 'Kalkulation', text: 'Jede Position rechnet, wie ihr rechnet. Der Gewinn steht dran.', image: bausteine, alt: 'Angebot mit Positionen, Stunden und Gewinn je Zeile' },
+  { titel: 'Beim Kunden', text: 'Der Kunde sieht das Angebot online in eurem Design.', image: kundeStart, alt: 'Angebotsseite beim Kunden mit Abschnitten und Leistungen' },
+  { titel: 'Zusage', text: 'Der Kunde sagt mit einem Klick zu.', image: kundeAnnahme, alt: 'Zusage auf der Angebotsseite mit wählbaren Leistungen und Summe' },
+];
+const stimme = [...cases, ...additionalCases].find((c) => c.slug === 'bonprix-collection-planning')?.testimonial;
+---
+
+<LandingLayout
+  title="Angebotssoftware nach eurer Kalkulation"
+  description="Software zur Angebotserstellung, die eure Preise rechnet wie eure Excel. Ihr seht den Gewinn vor dem Versand, der Kunde sagt online per Klick zu."
+  lang="de"
+  extraSchemas={[serviceSchema, faqSchema]}
+>
+  <SchlankPage mehrTitel="Eine Zahl wandert von eurer Rechnung bis zum Kunden" tor={angebote} modus="seite" blogTuer="angebot" faqs={faqs} zitat={stimme}>
+  <Image
+    slot="hero"
+    src={angebotBild}
+    alt="Angebot mit Positionen, Stunden und Gewinn je Baustein, Demo-Daten"
+    widths={[640, 960, 1280]}
+    sizes="(min-width: 1024px) 50vw, 100vw"
+    class="border-border w-full rounded-2xl border shadow-xl"
+    loading="eager"
+  />
+  <AngebotEbenen ebenen={ebenen} start={2} />
+  <HeuteChaos slot="heute" szene />
+  <ZahlWandert slot="mehr" />
+</SchlankPage>
+</LandingLayout>

@@ -1,0 +1,152 @@
+---
+/**
+ * Datenübernahme als Nachbau eines Probelaufs: drei Quellen aus verschiedenen Jahrzehnten fließen
+ * in eine Historie. Reiter: Zuordnen (alte Felder auf neue), Bereinigen (Dubletten), Prüfen
+ * (Prüfbericht alt gegen neu). Vorgehen nach dem Projekt bei FKC, Zahlen sind Beispieldaten.
+ */
+import '@/components/angebote/frame.css';
+import '@/components/zahlen/zahlen.css';
+import './abloesung.css';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+const quellen = [
+  { t: 'Branchensoftware', z: '2022 bis heute', n: '3 Jahre' },
+  { t: 'Vorgängersystem', z: '2009 bis 2022', n: 'Access-Datenbank' },
+  { t: 'Rechnungsordner', z: '2003 bis 2009', n: 'Excel und PDF' },
+];
+const reiter = [
+  { id: 'zuordnen', t: 'Zuordnen' },
+  { id: 'bereinigen', t: 'Bereinigen' },
+  { id: 'pruefen', t: 'Prüfen' },
+];
+const zuordnung = [
+  { alt: 'Adr_Firma1 + Adr_Firma2', neu: 'Kunde · Name', hint: 'zusammengeführt' },
+  { alt: 'Proj_Typ (Freitext)', neu: 'Leistungsart', hint: '47 Schreibweisen → 8 Arten' },
+  { alt: 'Zusatzfeld_17', neu: 'Vertrag · Kontingent', hint: 'endlich mit Namen' },
+  { alt: 'Status 1–9', neu: 'Angebot · Auftrag · Abgerechnet', hint: 'neu sortiert' },
+  { alt: 'Stdsatz_alt, Stdsatz_2019', neu: 'Satz je Rolle und Jahr', hint: 'Historie bleibt' },
+];
+const dubletten = [
+  { namen: ['Kupferberg Logistik GmbH', 'Kupferberg Logistik', 'Kupferberg Log. GmbH (alt)'], ziel: 'Kupferberg Logistik GmbH', proj: 41 },
+  { namen: ['Alpenblick Spedition SE', 'Alpenblick Spedition GmbH'], ziel: 'Alpenblick Spedition SE', proj: 27, frage: true },
+  { namen: ['Blauhorn Getränke GmbH & Co. KG', 'Blauhorn Getraenke'], ziel: 'Blauhorn Getränke GmbH & Co. KG', proj: 12 },
+];
+const pruef = [
+  { t: 'Kunden', alt: '2.418', neu: '2.341', ok: true, note: '77 Dubletten zusammengeführt' },
+  { t: 'Projekte', alt: '11.870', neu: '11.870', ok: true, note: '' },
+  { t: 'Rechnungen', alt: '18.402', neu: '18.402', ok: true, note: '' },
+  { t: 'Rechnungssumme', alt: '41.208.770 €', neu: '41.208.770 €', ok: true, note: 'Abweichung 0,00 €' },
+  { t: 'Projekte ohne Kunde', alt: '–', neu: '3', ok: false, note: 'zur Klärung bei euch' },
+];
+---
+
+<figure class="af-frame z-app" data-migration>
+  <div class="af-bar" aria-hidden="true">
+    <span class="af-dots"><span></span><span></span><span></span></span>
+    <span class="af-url">app.euer-betrieb.de/migration/probelauf-2</span>
+    <span class="af-dots invisible"><span></span><span></span><span></span></span>
+  </div>
+  <div class="grid gap-4 p-3 sm:p-5 lg:grid-cols-[15rem_minmax(0,1fr)]">
+    <div>
+      <p class="z-label">Quellen</p>
+      <div class="mt-2 space-y-2">
+        {
+          quellen.map((q) => (
+            <div class="du-src">
+              <p class="text-[0.78rem] font-bold">{q.t}</p>
+              <p class="z-label">{q.z} · {q.n}</p>
+            </div>
+          ))
+        }
+      </div>
+      <div class="du-flow mx-auto mt-4 w-3/4" aria-hidden="true"></div>
+      <div class="z-card mt-4 p-3" style="border-color: color-mix(in oklch, var(--ab-neu) 50%, transparent)">
+        <p class="z-label">Ergebnis</p>
+        <p class="mt-1 text-[0.95rem] font-bold">Eine Historie seit 2003</p>
+        <p class="z-label mt-0.5">Kunden, Projekte, Rechnungen, Sätze</p>
+      </div>
+    </div>
+
+    <div class="z-card min-w-0 p-3 sm:p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="z-seg" role="tablist" aria-label="Schritt">
+          {reiter.map((r, i) => <button type="button" role="tab" data-du-tab={r.id} aria-selected={i === 0 ? 'true' : 'false'}>{r.t}</button>)}
+        </div>
+        <span class="z-label">Probelauf 2 von 3</span>
+      </div>
+
+      <div class="du-panel mt-3 overflow-x-auto" data-du-panel="zuordnen">
+        <table class="du-map w-full min-w-[30rem] text-[0.76rem]">
+          <thead><tr><th class="z-label">Alt</th><th></th><th class="z-label">Neu</th><th class="z-label">Hinweis</th></tr></thead>
+          <tbody>
+            {
+              zuordnung.map((z) => (
+                <tr>
+                  <td class="du-old">{z.alt}</td>
+                  <td class="z-muted">→</td>
+                  <td class="font-semibold">{z.neu}</td>
+                  <td class="z-muted text-[0.7rem]">{z.hint}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="du-panel mt-3 space-y-2.5" data-du-panel="bereinigen" hidden>
+        {
+          dubletten.map((d) => (
+            <div class="grid gap-2 rounded-xl p-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center" style="background: var(--z-panel)">
+              <div class="space-y-0.5">
+                {d.namen.map((n) => <p class="du-old">{n}</p>)}
+              </div>
+              <Icon name="arrow-right" size="xs" class="z-muted hidden sm:block" />
+              <div>
+                <p class="text-[0.8rem] font-semibold">{d.ziel}</p>
+                <p class:list={['text-[0.7rem]', d.frage ? 'du-warn' : 'du-ok']}>{d.frage ? 'Rechtsform geändert? Bitte bestätigen' : `zusammengeführt · ${d.proj} Projekte`}</p>
+              </div>
+            </div>
+          ))
+        }
+        <p class="z-label">77 Dubletten gefunden, 76 automatisch zusammengeführt, 1 zur Rückfrage.</p>
+      </div>
+
+      <div class="du-panel mt-3" data-du-panel="pruefen" hidden>
+        <table class="du-map w-full text-[0.76rem]">
+          <thead><tr><th class="z-label">Prüfung</th><th class="z-label text-right">Alt</th><th class="z-label text-right">Neu</th><th></th></tr></thead>
+          <tbody>
+            {
+              pruef.map((p) => (
+                <tr>
+                  <td>
+                    <span class="font-semibold">{p.t}</span>
+                    {p.note && <span class="z-label block">{p.note}</span>}
+                  </td>
+                  <td class="text-right tabular-nums">{p.alt}</td>
+                  <td class="text-right font-semibold tabular-nums">{p.neu}</td>
+                  <td class:list={['text-right', p.ok ? 'du-ok' : 'du-warn']}>{p.ok ? '✓' : '!'}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <div class="mt-3 flex items-center gap-3">
+          <div class="du-bar flex-1"><span style="width: 96%"></span></div>
+          <span class="z-label">4 von 5 Prüfungen grün</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-migration]').forEach((root) => {
+    const tabs = root.querySelectorAll<HTMLButtonElement>('[data-du-tab]');
+    tabs.forEach((t) =>
+      t.addEventListener('click', () => {
+        tabs.forEach((x) => x.setAttribute('aria-selected', x === t ? 'true' : 'false'));
+        root.querySelectorAll<HTMLElement>('[data-du-panel]').forEach((p) => (p.hidden = p.dataset.duPanel !== t.dataset.duTab));
+      }),
+    );
+  });
+</script>

@@ -1,0 +1,162 @@
+---
+/**
+ * Analytics Component
+ *
+ * Loads analytics scripts based on environment variables.
+ *
+ * Environment variables:
+ * - PUBLIC_PLAUSIBLE_SCRIPT_ID: Plausible per-site script ID (e.g., pa-yhySJdsGHFMqpcbsczFVd) - cookieless, no consent needed
+ * - PUBLIC_LINKEDIN_PARTNER_ID: LinkedIn Insight Tag partner ID - gated behind marketing consent
+ * - PUBLIC_META_PIXEL_ID: Meta (Facebook/Instagram) Pixel / Dataset ID - gated behind marketing consent
+ * - PUBLIC_GA_MEASUREMENT_ID: Google Analytics 4 Measurement ID (e.g., G-XXXXXXXXXX)
+ * - PUBLIC_GTM_ID: Google Tag Manager Container ID (e.g., GTM-XXXXXXX)
+ */
+
+const plausibleScriptId = import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_ID;
+const linkedinPartnerId = import.meta.env.PUBLIC_LINKEDIN_PARTNER_ID;
+const metaPixelId = import.meta.env.PUBLIC_META_PIXEL_ID;
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+const gtmId = import.meta.env.PUBLIC_GTM_ID;
+---
+
+{/* Plausible Analytics - cookieless, no consent required */}
+{plausibleScriptId && (
+  <>
+    <script is:inline async src={`https://plausible.io/js/${plausibleScriptId}.js`}></script>
+    <script is:inline>
+      /* eslint-disable prefer-rest-params */
+      window.plausible = window.plausible || function () { (plausible.q = plausible.q || []).push(arguments); };
+      plausible.init = plausible.init || function (i) { plausible.o = i || {}; };
+      plausible.init();
+    </script>
+  </>
+)}
+
+{/* Google Tag Manager - loads first if configured */}
+{
+  gtmId && (
+    <>
+      <script is:inline define:vars={{ gtmId }}>
+        (function (w, d, s, l, i) {
+          w[l] = w[l] || [];
+          w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+          const f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+          j.async = true;
+          j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+          f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', gtmId);
+      </script>
+    </>
+  )
+}
+
+{/* Google Analytics 4 - only loads if GTM is not configured */}
+{
+  gaId && !gtmId && (
+    <>
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+      <script is:inline define:vars={{ gaId }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(...args){dataLayer.push(args);}
+        gtag('js', new Date());
+        gtag('config', gaId);
+      </script>
+    </>
+  )
+}
+
+{/* LinkedIn Insight Tag - loaded only after marketing consent is granted */}
+{linkedinPartnerId && (
+  <script is:inline define:vars={{ linkedinPartnerId }}>
+    function loadLinkedIn() {
+      if (window.__linkedinLoaded) return;
+      window.__linkedinLoaded = true;
+      window._linkedin_partner_id = linkedinPartnerId;
+      window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+      window._linkedin_data_partner_ids.push(linkedinPartnerId);
+      (function(l) {
+        if (!l) {
+          window.lintrk = function(a, b) { window.lintrk.q.push([a, b]); };
+          window.lintrk.q = [];
+        }
+        const s = document.getElementsByTagName('script')[0];
+        const b = document.createElement('script');
+        b.type = 'text/javascript';
+        b.async = true;
+        b.src = 'https://snap.licdn.com/li.lms-analytics/insight.min.js';
+        s.parentNode.insertBefore(b, s);
+      })(window.lintrk);
+    }
+
+    function checkAndLoadLinkedIn(categories) {
+      if (categories && categories.marketing) {
+        loadLinkedIn();
+      }
+    }
+
+    // Check existing consent state (returning visitor who already consented)
+    if (window.__consentState && window.__consentState.decided) {
+      checkAndLoadLinkedIn(window.__consentState.categories);
+    }
+
+    // Listen for consent updates
+    window.addEventListener('consent-updated', function(e) {
+      checkAndLoadLinkedIn(e.detail && e.detail.categories);
+    });
+  </script>
+)}
+
+{/* Meta Pixel (Facebook/Instagram) - loaded only after marketing consent is granted.
+    The base code buffers fbq() calls, so the FunnelQuiz can safely call
+    fbq('track', 'Lead', ...) even before the library finishes loading. */}
+{metaPixelId && (
+  <script is:inline define:vars={{ metaPixelId }}>
+    function loadMetaPixel() {
+      if (window.__metaPixelLoaded) return;
+      window.__metaPixelLoaded = true;
+
+      // Standard Meta Pixel bootstrap (stubs fbq until insight.js loads).
+      // Bewusst wörtlich der offizielle Snippet von Meta - deshalb hier die
+      // ESLint-Regeln aus, statt ihn umzuschreiben.
+      /* eslint-disable @typescript-eslint/no-unused-expressions, prefer-spread, prefer-rest-params */
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = true;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = true;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+      /* eslint-enable @typescript-eslint/no-unused-expressions, prefer-spread, prefer-rest-params */
+
+      window.fbq('init', metaPixelId);
+      window.fbq('track', 'PageView');
+    }
+
+    function checkAndLoadMeta(categories) {
+      if (categories && categories.marketing) {
+        loadMetaPixel();
+      }
+    }
+
+    // Returning visitor who already granted marketing consent
+    if (window.__consentState && window.__consentState.decided) {
+      checkAndLoadMeta(window.__consentState.categories);
+    }
+
+    // React to consent given/changed in this session
+    window.addEventListener('consent-updated', function (e) {
+      checkAndLoadMeta(e.detail && e.detail.categories);
+    });
+  </script>
+)}

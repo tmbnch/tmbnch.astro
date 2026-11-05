@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Seiten-Vergleich</title>
+<style>
+  :root { --bg:#f4f5f8; --ink:#14182b; --muted:#667; --line:#dde0e8; --brand:#5a6aa0; --rot:#dc2626; }
+  * { box-sizing:border-box; }
+  html,body { height:100%; margin:0; background:var(--bg); color:var(--ink); font:14px/1.4 Inter,system-ui,sans-serif; }
+  body { display:flex; flex-direction:column; }
+  header { display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; padding:8px 12px; background:#fff; border-bottom:1px solid var(--line); }
+  nav { display:flex; flex-wrap:wrap; gap:4px; }
+  button { font:inherit; border:1px solid var(--line); background:#fff; color:var(--ink); padding:5px 10px; border-radius:7px; cursor:pointer; }
+  button[aria-pressed=true] { background:var(--brand); border-color:var(--brand); color:#fff; }
+  .abstand { flex:1; }
+  #notiz { width:100%; color:var(--muted); font-size:13px; }
+  main { flex:1; min-height:0; display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:10px; }
+  .spalte { min-height:0; display:flex; flex-direction:column; align-items:center; }
+  .kopf { width:100%; display:flex; justify-content:space-between; font-weight:600; font-size:12px; padding:0 2px 6px; }
+  .kopf a { color:var(--muted); font-weight:400; }
+  iframe { flex:1; min-height:0; width:100%; border:1px solid var(--line); border-radius:8px; background:#fff; }
+  body.mobil iframe { width:390px; flex:none; height:min(674px, 100%); }
+  #konzept { display:none; flex:1; border:0; width:100%; }
+  body.konzept main { display:none; } body.konzept #konzept { display:block; }
+  body.konzept .nur-vergleich { display:none; }
+</style>
+</head>
+<body>
+<header>
+  <strong>Vergleich</strong>
+  <nav id="tore"></nav>
+  <span class="abstand"></span>
+  <nav class="nur-vergleich">
+    <button id="desk" aria-pressed="false">Desktop</button>
+    <button id="mob" aria-pressed="true">Handy (Instagram)</button>
+    <button id="sync" aria-pressed="true">Scrollen koppeln</button>
+  </nav>
+  <div id="notiz" class="nur-vergleich"></div>
+</header>
+<main>
+  <div class="spalte"><div class="kopf"><span>Vorher: live</span><a id="livelink" target="_blank"></a></div><iframe id="live" title="Live"></iframe></div>
+  <div class="spalte"><div class="kopf"><span>Nachher: lokal</span><a id="lokallink" target="_blank"></a></div><iframe id="lokal" title="Lokal"></iframe></div>
+</main>
+<iframe id="konzept" src="/konzept" title="Konzept"></iframe>
+<script>
+  const SEITEN = {
+    start: { name:'Startseite', pfad:'/', notiz:'Vier Abschnitte raus, einfachere Überschriften.' },
+    t_angebote: { name:'Tür Angebote', pfad:'/angebote/', notiz:'Gleiches Gerüst wie der Funnel, mit Terminbuchung, allen Fragen und Blog-Links.' },
+    t_einsatz: { name:'Tür Einsatz', pfad:'/einsatzplanung/', notiz:'Gleiches Gerüst wie der Funnel.' },
+    t_zahlen: { name:'Tür Zahlen', pfad:'/zahlen/', notiz:'Gleiches Gerüst wie der Funnel.' },
+    t_abl: { name:'Tür Ablösung', pfad:'/standardsoftware-abloesung/', notiz:'Eigene Headline, Vertec und Centric bleiben als Suchbegriffe in Titel und Fragen.' },
+    t_check: { name:'Tür Check', pfad:'/software-check/', notiz:'Gleiches Gerüst, dazu die zwei Pakete.' },
+    arbeitsweise: { name:'Arbeitsweise', pfad:'/arbeitsweise/', notiz:'' },
+    workshop: { name:'Workshop', pfad:'/discovery-workshop/', notiz:'' },
+    leistungen: { name:'Leistungen', pfad:'/leistungen/', notiz:'' },
+    kontakt: { name:'Kontakt', pfad:'/kontakt/', notiz:'' },
+    referenzen: { name:'Referenzen', pfad:'/referenzen/', notiz:'' },
+    fkc: { name:'Referenz FKC', pfad:'/referenzen/fkc-consulting/', notiz:'' },
+  };
+  const LIVE = location.protocol + '//' + location.hostname + ':4401';
+  const LOKAL = location.protocol + '//' + location.hostname + ':4402';
+  const $ = (id) => document.getElementById(id);
+  const zustand = { tor:'angebote', sync:true };
+  const tore = $('tore');
+  const knopf = (id, text) => { const b = document.createElement('button'); b.textContent = text; b.dataset.id = id; b.onclick = () => zeige(id); tore.append(b); };
+  knopf('konzept', 'Konzept');
+  for (const [id, t] of Object.entries(SEITEN)) knopf(id, t.name);
+
+  function zeige(id) {
+    for (const b of tore.children) b.setAttribute('aria-pressed', b.dataset.id === id);
+    document.body.classList.toggle('konzept', id === 'konzept');
+    history.replaceState(null, '', '#' + id);
+    if (id === 'konzept') return;
+    zustand.tor = id;
+    const pfad = SEITEN[id].pfad;
+    $('notiz').textContent = SEITEN[id].notiz;
+    $('livelink').textContent = 'rocketbase.io' + pfad; $('livelink').href = 'https://rocketbase.io' + pfad;
+    $('lokallink').textContent = 'localhost:4330' + pfad; $('lokallink').href = 'http://localhost:4330' + pfad;
+    $('live').src = `${LIVE}${pfad}?seite=live`;
+    $('lokal').src = `${LOKAL}${pfad}?seite=lokal`;
+  }
+  addEventListener('message', (e) => {
+    if (e.data?.typ === 'bereit' && e.data.seite === 'live') $('live').contentWindow.postMessage({ typ:'raus', titel:SEITEN[zustand.tor].raus ?? [] }, '*');
+    if (e.data?.typ !== 'scroll' || !zustand.sync) return;
+    const ziel = e.data.seite === 'live' ? $('lokal') : $('live');
+    ziel.contentWindow.postMessage({ ...e.data, typ:'folge' }, '*');
+  });
+  function breite(mobil) {
+    document.body.classList.toggle('mobil', mobil);
+    $('mob').setAttribute('aria-pressed', mobil); $('desk').setAttribute('aria-pressed', !mobil);
+  }
+  $('desk').onclick = () => breite(false);
+  $('mob').onclick = () => breite(true);
+  $('sync').onclick = () => { zustand.sync = !zustand.sync; $('sync').setAttribute('aria-pressed', zustand.sync); };
+  breite(true);
+  zeige(location.hash.slice(1) || 'konzept');
+</script>
+</body>
+</html>

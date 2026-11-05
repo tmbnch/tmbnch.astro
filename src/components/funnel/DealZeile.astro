@@ -1,0 +1,46 @@
+---
+/**
+ * Die Deal-Zeile im Hero der Funnel-Seiten (/f/*), seit 2026-10-18 statt der Subline: was der
+ * Besucher tun soll, was er dafür bekommt, von wem, und dass es nichts kostet. Mit Martens Foto,
+ * damit der Name in Schritt 4 des Quiz („Wohin darf sich Marten Prieß melden?“) und die Karte am
+ * Seitenende ein Gesicht haben, das der Besucher schon gesehen hat.
+ */
+import { Picture } from 'astro:assets';
+import founderPortrait from '@/assets/rocketbase/founder-marten-priess.jpg';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div
+  data-reveal
+  class:list={[
+    'mx-auto mt-5 flex max-w-md items-center gap-3 text-left sm:mt-7 sm:max-w-lg sm:gap-4 lg:mx-0',
+    className,
+  ]}
+>
+  <Picture
+    src={founderPortrait}
+    alt="Marten Prieß, Gründer von RocketBase"
+    widths={[96, 192]}
+    sizes="3.5rem"
+    formats={['avif', 'webp']}
+    class="deal-avatar h-14 w-14 rounded-full object-cover object-[center_22%]"
+    pictureAttributes={{ class: 'shrink-0' }}
+    loading="eager"
+  />
+  <p class="text-foreground-secondary text-[0.95rem] leading-6 sm:text-base sm:leading-7">
+    <span class="text-foreground font-semibold">Wo steht ihr gerade?</span> Drei Fragen. Danach
+    meldet sich Marten für ein Erstgespräch, in dem er eure Lage einschätzt. 30 Minuten, kostenlos.
+  </p>
+</div>
+
+<style>
+  .deal-avatar {
+    box-shadow:
+      0 0 0 2px var(--color-background),
+      0 0 0 4px color-mix(in oklch, var(--color-brand-400) 55%, transparent);
+  }
+</style>

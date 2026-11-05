@@ -1,0 +1,162 @@
+[build]
+  command = "pnpm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Zeitplan und Pfad stehen als `export const config` in der jeweiligen Function (Netlify
+# Functions v2), nicht hier — `funnel-redeliver` läuft deshalb alle zehn Minuten, ohne dass
+# diese Datei davon weiß. Die CRM-Zustellung nutzt PUBLIC_SALES_API_URL (dieselbe Variable
+# wie der Browser-Pfad), optional überschrieben durch SALES_API_URL, plus SALES_API_TOKEN.
+
+# /angebote/ ist seit 2026-10-07 eine eigene, indexierte Seite (Tür 1 in der Navigation);
+# die Weiterleitung auf die Anzeigen-Landing /f/angebote/ ist deshalb entfallen.
+
+# Entwurfsadresse der Funnel-Seite, zuletzt im Oktober 2026 (Branch new-funnels) genutzt.
+[[redirects]]
+  from = "/f/angebote-neu"
+  to = "/f/angebote/"
+  status = 301
+
+[[redirects]]
+  from = "/f/angebote-neu/"
+  to = "/f/angebote/"
+  status = 301
+
+# Tor 4 heißt seit dem 18.10.2026 „eigene Software" statt „Standardsoftware ablösen" und liegt
+# unter /f/eigene-software/. Zwei Vorgänger zeigen dorthin: die frühere Adresse /f/abloesung/ und
+# die dünne Template-Seite, die bis dahin unter /f/eigene-software/ lag („Fünf Abos – und keins
+# passt richtig?", Angle 3 aus funnels.ts). Begründung in rcktbs-sales, docs/vertrieb/tor-hooks.md.
+[[redirects]]
+  from = "/f/abloesung"
+  to = "/f/eigene-software/"
+  status = 301
+
+[[redirects]]
+  from = "/f/abloesung/"
+  to = "/f/eigene-software/"
+  status = 301
+
+# Alte Startseite, auf die noch ein Link von itsteps.de zeigt.
+[[redirects]]
+  from = "/de"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/de/"
+  to = "/"
+  status = 301
+
+# Mission ist seit dem 31.10.2026 Teil von /arbeitsweise/.
+[[redirects]]
+  from = "/mission"
+  to = "/arbeitsweise/"
+  status = 301
+
+[[redirects]]
+  from = "/mission/"
+  to = "/arbeitsweise/"
+  status = 301
+
+[[redirects]]
+  from = "/imprint"
+  to = "/impressum/"
+  status = 301
+
+[[redirects]]
+  from = "/privacy"
+  to = "/datenschutz/"
+  status = 301
+
+[[redirects]]
+  from = "/contact"
+  to = "/kontakt/"
+  status = 301
+
+[[redirects]]
+  from = "/services"
+  to = "/leistungen/"
+  status = 301
+
+[[redirects]]
+  from = "/work"
+  to = "/arbeitsweise/"
+  status = 301
+
+[[redirects]]
+  from = "/leistungen/*"
+  to = "/leistungen/"
+  status = 301
+
+[[redirects]]
+  from = "/referenzen/bonprix-pim"
+  to = "/referenzen/bonprix/"
+  status = 301
+
+[[redirects]]
+  from = "/referenzen/statista-numera"
+  to = "/referenzen/statista/"
+  status = 301
+
+[[redirects]]
+  from = "/referenzen/metall-pro"
+  to = "/referenzen/schlosserei-diezinger/"
+  status = 301
+
+# Alte, weiterhin indexierte URLs aus der Search Console (Pos. 3,2 bzw. 3,1) -
+# ohne Trailing Slash ergaenzt, damit beide Varianten sauber weiterleiten.
+[[redirects]]
+  from = "/imprint/"
+  to = "/impressum/"
+  status = 301
+
+[[redirects]]
+  from = "/privacy/"
+  to = "/datenschutz/"
+  status = 301
+
+[[redirects]]
+  from = "/contact/"
+  to = "/kontakt/"
+  status = 301
+
+[[redirects]]
+  from = "/services/"
+  to = "/leistungen/"
+  status = 301
+
+[[redirects]]
+  from = "/work/"
+  to = "/arbeitsweise/"
+  status = 301
+
+# Catch-all: unknown routes redirect to landing page
+[[redirects]]
+  from = "/*"
+  to = "/"
+  status = 301
+  force = false

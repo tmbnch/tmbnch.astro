@@ -1,0 +1,144 @@
+---
+/**
+ * Erstgespräch-Karte für die indexierten Tür-Seiten (seit 2026-10-18 nicht mehr im Funnel, dort
+ * führt nur das Quiz zum Gespräch): Marten mit kleinem Bild, ein Zitat in seinen
+ * Worten, der Rahmen (30 Minuten, online, kostenlos, unverbindlich) und der Knopf zum Formular.
+ *
+ * Ersetzt seit 2026-10-16 den Dreischritt „Erstgespräch, Workshop, Baustein“: Auf einer
+ * Anzeigen-Landing soll nur eines passieren, die Kontaktaufnahme. Was danach kommt, klärt Marten
+ * im Gespräch. Die Sektion drumherum (SectionHeader, Hintergrund) stellt jede Seite selbst.
+ *
+ * Zitat und Text sind je Seite verschieden, der Rest ist überall gleich, damit die Karte auf
+ * allen Funnels als dasselbe Element erkannt wird.
+ */
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import { Picture } from 'astro:assets';
+import founderPortrait from '@/assets/rocketbase/founder-marten-priess.jpg';
+import { contactLinks } from '@/data/rocketbase';
+
+interface Props {
+  /** Martens Satz zum Gespräch, in Anführungszeichen gesetzt. */
+  zitat: string;
+  /** Zwei, drei Sätze in der Ich-Form: was passiert, was ihr danach wisst, dass es unverbindlich ist. */
+  text: string;
+  /** Ziel des Knopfs, normalerweise das Formular der Seite. */
+  href?: string;
+  id?: string;
+  class?: string;
+  /**
+   * Steht neben einem anderen Block (ab xl zweispaltig): Die Karte gibt ihr eigenes
+   * Zweispalten-Layout ab xl auf und stapelt Text und Rahmenbox, damit nichts quetscht.
+   */
+  schmal?: boolean;
+}
+
+const { zitat, text, href = '#kontakt', id, class: className, schmal = false } = Astro.props;
+
+const rahmen = [
+  { icon: 'clock', text: '30 Minuten' },
+  { icon: 'monitor', text: 'Online' },
+  { icon: 'check-circle', text: 'Kostenlos' },
+  { icon: 'shield', text: 'Unverbindlich' },
+];
+---
+
+<div
+  id={id}
+  class:list={[
+    'gespraech af-rise mx-auto grid max-w-4xl scroll-mt-28 gap-8 rounded-[2rem] p-6 sm:p-9 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-12 lg:p-12',
+    schmal && 'xl:max-w-none xl:grid-cols-1 xl:gap-6 xl:p-9',
+    className,
+  ]}
+>
+  <!-- Links: Marten und das Gespräch in seinen Worten -->
+  <div>
+    <div class="flex items-center gap-4">
+      <Picture
+        src={founderPortrait}
+        alt="Marten Prieß, Gründer von RocketBase"
+        widths={[96, 192]}
+        sizes="(min-width: 640px) 5rem, 4rem"
+        formats={['avif', 'webp']}
+        class="gespraech-avatar h-16 w-16 shrink-0 rounded-2xl object-cover object-[center_22%] sm:h-20 sm:w-20"
+        loading="lazy"
+      />
+      <div class="min-w-0">
+        <p
+          class="text-brand-600 dark:text-brand-300 font-mono text-[11px] font-semibold tracking-[0.2em] uppercase"
+        >
+          Euer Erstgespräch mit
+        </p>
+        <p
+          class="font-display text-foreground mt-1 text-lg leading-tight font-bold tracking-tight sm:text-xl"
+        >
+          Marten Prieß
+        </p>
+        <p class="text-foreground-secondary text-sm leading-5">Gründer von RocketBase</p>
+      </div>
+    </div>
+
+    <blockquote
+      class="font-display text-foreground mt-7 text-xl leading-snug font-bold tracking-tight text-balance sm:text-2xl lg:text-[1.75rem]"
+    >
+      „{zitat}“
+    </blockquote>
+    <p class="text-foreground-secondary mt-4 text-[0.95rem] leading-7">{text}</p>
+  </div>
+
+  <!-- Rechts (mobil unten): der Rahmen und der Knopf -->
+  <div class="gespraech-seite flex flex-col gap-5 rounded-3xl p-5 sm:p-6">
+    <ul
+      class="grid grid-cols-2 gap-x-4 gap-y-3 lg:grid-cols-1"
+      aria-label="Rahmen des Erstgesprächs"
+    >
+      {
+        rahmen.map((chip) => (
+          <li class="text-foreground flex items-center gap-2.5 text-sm font-medium whitespace-nowrap">
+            <span class="bg-brand-500/10 text-brand-600 dark:text-brand-300 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg">
+              <Icon name={chip.icon} size="xs" />
+            </span>
+            {chip.text}
+          </li>
+        ))
+      }
+    </ul>
+    <div class="border-border mt-auto flex flex-col gap-3 border-t pt-5">
+      <Button
+        size="lg"
+        href={href}
+        fullWidth
+        class="bg-brand-500 hover:bg-brand-400 whitespace-nowrap text-white shadow-[0_14px_34px_-12px_var(--color-brand-500)]"
+      >
+        <Icon name="mail" size="sm" />
+        Kontakt aufnehmen
+      </Button>
+      <p class="text-foreground-muted text-center text-xs leading-5">
+        Oder eine Mail an{' '}
+        <a
+          href={`mailto:${contactLinks.email}`}
+          class="text-brand-600 dark:text-brand-300 font-semibold underline-offset-4 hover:underline"
+        >
+          {contactLinks.email}
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gespraech {
+    background: var(--color-card);
+    border: 1px solid color-mix(in oklch, var(--color-brand-400) 35%, var(--color-border));
+    box-shadow: 0 34px 80px -44px oklch(30% 0.08 265 / 0.6);
+  }
+  .gespraech-avatar {
+    box-shadow:
+      0 0 0 3px var(--color-card),
+      0 0 0 5px color-mix(in oklch, var(--color-brand-400) 55%, transparent);
+  }
+  .gespraech-seite {
+    background: color-mix(in oklch, var(--color-brand-500) 5%, var(--color-background-secondary));
+    border: 1px solid var(--color-border);
+  }
+</style>

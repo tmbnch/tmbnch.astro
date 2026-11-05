@@ -1,0 +1,46 @@
+---
+/**
+ * Anzeigen-Landing für eigene Software (Funnel-Fassung). Inhalt in components/abloesung-funnel/.
+ * Die indexierte Tür-Seite /standardsoftware-abloesung/ hängt an components/abloesung/ und ist
+ * bewusst ausführlicher; hier steht nur, was zur Kontaktaufnahme führt.
+ *
+ * Adresse seit 2026-10-18: /f/eigene-software/. Vorher /f/abloesung/, und unter diesem Slug lag
+ * eine dünne Template-Seite aus funnels.ts („Fünf Abos – und keins passt richtig?"). Beide gehen
+ * per 301 hierher (netlify.toml). Grund für den Wechsel steht in rcktbs-sales unter
+ * docs/vertrieb/tor-hooks.md: Der Einstieg ist die Software, die es noch nicht gibt, nicht das
+ * Ablösen der vorhandenen.
+ *
+ * FunnelLayout: noindex, ohne Navigation, nicht in der Sitemap.
+ * Liegt als statische Datei neben /f/[slug].astro und gewinnt gegen die
+ * dynamische Route; in funnels.ts darf es deshalb keinen Slug „eigene-software" geben.
+ */
+import FunnelLayout from '@/layouts/FunnelLayout.astro';
+import SchlankPage from '@/components/funnel-schlank/SchlankPage.astro';
+import { Image } from 'astro:assets';
+import Abloeseplan from '@/components/abloesung/Abloeseplan.astro';
+import AbloeseplanMobil from '@/components/funnel-schlank/AbloeseplanMobil.astro';
+import HeuteAbloesung from '@/components/abloesung/HeuteAbloesung.astro';
+import kundenstandorte from '@/assets/references/kundenstandorte-uebersicht-demo-1920.png';
+import { eigeneSoftware } from '@/data/funnelSchlank';
+---
+
+<FunnelLayout
+  title="Eigene Software für euren Ablauf: vieles davon ist schon gebaut"
+  description="Braucht ihr eine Software, die es so noch nicht gibt? Wir setzen auf dem auf, was bei anderen Betrieben läuft, und programmieren, was bei euch anders ist. Schritt für Schritt, das alte Programm läuft weiter. Für Betriebe ab etwa 30 Leuten."
+  headerCta
+>
+  <SchlankPage tor={eigeneSoftware}>
+  <Image
+    slot="hero"
+    src={kundenstandorte}
+    alt="Kundenstandorte und Berater auf einer Deutschlandkarte, Demo-Daten"
+    widths={[640, 960, 1280]}
+    sizes="(min-width: 1024px) 50vw, 100vw"
+    class="border-border w-full rounded-2xl border shadow-xl"
+    loading="eager"
+  />
+  <div class="hidden lg:block"><Abloeseplan variante="funnel" /></div>
+  <AbloeseplanMobil class="lg:hidden" />
+  <HeuteAbloesung slot="heute" />
+</SchlankPage>
+</FunnelLayout>

@@ -1,0 +1,8 @@
+{
+  "question": "Wo werden unsere Daten gehostet?",
+  "summary": "Bevorzugt Hetzner in Deutschland - DSGVO-konform ohne vertragliche Sonderkonstruktionen.",
+  "details": "Standort und Auftragsverarbeitungsverträge decken die DSGVO-Anforderungen direkt ab. Wenn es Gründe für eine andere Infrastruktur gibt - bestehende Konzern-Cloud, spezifische Compliance-Anforderungen oder On-Premises - betreiben wir die Lösung auch dort.",
+  "category": "arbeitsweise",
+  "order": 5,
+  "locale": "de"
+}

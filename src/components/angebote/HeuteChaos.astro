@@ -1,0 +1,506 @@
+---
+/**
+ * „So läuft es heute“: fünf lose Mini-Fenster (Excel, Word, PDF, Mail,
+ * Kalender), schief verstreut und mit einer verschlungenen Linie verbunden.
+ * Dateinamen, die man kennt, statt Behauptungen. Ab lg absolut auf einer
+ * Fläche, darunter als Raster. Hover richtet ein Fenster gerade aus.
+ */
+interface Props {
+  class?: string;
+  /** Fenster stapeln sich beim Hereinscrollen (lib/szene.ts). Die Seite muss styles/szene.css laden. */
+  szene?: boolean;
+}
+const { class: className, szene = false } = Astro.props;
+
+const fenster = [
+  {
+    key: 'excel',
+    datei: 'kalkulation_final_v3.xlsx',
+    pain: 'Liegt neben dem System. Versteht eine im Team.',
+    x: 0,
+    y: 6,
+    r: -3,
+  },
+  {
+    key: 'word',
+    datei: 'Angebot_Beispiel_2026.docx',
+    pain: 'Die Summe tippt ihr von Hand ab.',
+    x: 52,
+    y: 0,
+    r: 2,
+  },
+  {
+    key: 'pdf',
+    datei: 'Angebot_v4_NEU.pdf',
+    pain: 'Eine Änderung, und alles von vorn.',
+    x: 6,
+    y: 42,
+    r: 1.5,
+  },
+  {
+    key: 'mail',
+    datei: 'Re: Angebot im Anhang',
+    pain: 'Geöffnet? Keine Ahnung.',
+    x: 52,
+    y: 38,
+    r: -2,
+  },
+  {
+    key: 'kalender',
+    datei: 'Wiedervorlage',
+    pain: 'Nachfassen, wenn jemand dran denkt.',
+    x: 28,
+    y: 76,
+    r: -1,
+  },
+];
+---
+
+<div class:list={['hc relative', className]} data-szene={szene ? '' : undefined}>
+  <svg
+    class="hc-line pointer-events-none absolute inset-0 hidden h-full w-full lg:block"
+    viewBox="0 0 100 100"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M 20 14 C 40 4, 50 30, 72 12 S 60 40, 30 54 S 90 40, 76 52 S 60 92, 50 86"
+      class="hc-path-base"></path>
+    <path
+      d="M 20 14 C 40 4, 50 30, 72 12 S 60 40, 30 54 S 90 40, 76 52 S 60 92, 50 86"
+      class="hc-path-flow"></path>
+  </svg>
+
+  <ul class="hc-grid">
+    {
+      fenster.map((f, i) => (
+        <li
+          class={`hc-win hc-${f.key}`}
+          style={`--x: ${f.x}%; --y: ${f.y}%; --r: ${f.r}deg; --i: ${i}`}
+        >
+          <div class="hc-bar">
+            <span class="hc-app" aria-hidden="true" />
+            <span class="hc-file">{f.datei}</span>
+          </div>
+          <div class="hc-body" aria-hidden="true">
+            {f.key === 'excel' && (
+              <div class="hc-sheet">
+                {['Std.', '24', '16', 'Satz', '170', '#BEZUG!'].map((c) => (
+                  <span class:list={[c === '#BEZUG!' && 'hc-err']}>{c}</span>
+                ))}
+              </div>
+            )}
+            {f.key === 'word' && (
+              <div class="hc-doc">
+                <i style="width: 82%" />
+                <i style="width: 64%" />
+                <span class="hc-typed">
+                  Summe: 7.240 €<b />
+                </span>
+                <i style="width: 72%" />
+              </div>
+            )}
+            {f.key === 'pdf' && (
+              <div class="hc-pdfview">
+                <span class="hc-page">
+                  <i style="width: 70%" />
+                  <i style="width: 50%" />
+                  <i style="width: 60%" />
+                </span>
+                <span class="hc-stamp">veraltet</span>
+              </div>
+            )}
+            {f.key === 'mail' && (
+              <div class="hc-mailbox">
+                <span class="hc-mail-row">
+                  <b>Gesendet</b> Angebot_v4_NEU.pdf
+                </span>
+                <span class="hc-mail-status">Gelesen: ?</span>
+              </div>
+            )}
+            {f.key === 'kalender' && (
+              <div class="hc-cal">
+                {['Mo', 'Di', 'Mi', 'Do', 'Fr'].map((d, j) => (
+                  <span class:list={[j === 3 && 'hc-cal-hit']}>{d}</span>
+                ))}
+                <em>nachfassen?!</em>
+              </div>
+            )}
+          </div>
+          <p class="hc-pain">{f.pain}</p>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  /* App-Farben nur als kleine Akzente, nicht als Fläche */
+  .hc-excel {
+    --app: oklch(60% 0.14 150);
+  }
+  .hc-word {
+    --app: oklch(58% 0.15 255);
+  }
+  .hc-pdf {
+    --app: oklch(60% 0.19 25);
+  }
+  .hc-mail {
+    --app: oklch(72% 0.15 75);
+  }
+  .hc-kalender {
+    --app: oklch(58% 0.15 300);
+  }
+
+  /* Unter lg: kompaktes Raster, zwei Spalten, leicht schräg wie Zettel */
+  .hc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .hc-grid > .hc-win:last-child {
+      grid-column: span 2;
+      justify-self: center;
+      width: calc(50% - 0.375rem);
+    }
+  }
+  @media (max-width: 639px) {
+    .hc-body {
+      display: none;
+    }
+    .hc-pain {
+      padding-top: 0.6rem;
+    }
+    /*
+     * Zweispaltig blieben je Karte rund 113 px für den Dateinamen - "Angebot_
+     * Beispiel_2026.docx" verlor dabei ein Drittel. Ohne die Fensterinhalte
+     * (siehe oben) ist einspaltig ohnehin die ehrlichere Darstellung.
+     */
+    .hc-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    /*
+     * Gleich breite Karten untereinander lesen sich wie eine ordentliche Liste -
+     * das Gegenteil der Aussage. Je Karte eine andere Breite und abwechselnd
+     * links und rechts ausgerichtet, dann wirkt es wieder wie hingeworfene
+     * Zettel. Die Breiten sind bewusst krumm, nicht gerastert.
+     */
+    .hc-grid > .hc-win {
+      grid-column: 1;
+      width: 100%;
+      justify-self: start;
+    }
+    .hc-grid > .hc-win:nth-child(2) {
+      width: 88%;
+      justify-self: end;
+    }
+    .hc-grid > .hc-win:nth-child(3) {
+      width: 80%;
+    }
+    .hc-grid > .hc-win:nth-child(4) {
+      width: 93%;
+      justify-self: end;
+    }
+    .hc-grid > .hc-win:nth-child(5) {
+      width: 85%;
+    }
+    .hc-file {
+      font-size: 12px;
+    }
+  }
+  .hc-win {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.9rem;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 18px 40px -22px oklch(30% 0.06 265 / 0.45);
+    transform: rotate(calc(var(--r) * 0.5));
+    overflow: hidden;
+  }
+  @media (hover: hover) {
+    .hc-win:hover {
+      transform: rotate(0deg) translateY(-4px) scale(1.03);
+      box-shadow: 0 30px 60px -26px oklch(30% 0.08 265 / 0.55);
+      z-index: 5;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hc {
+      height: 27rem;
+    }
+    .hc-grid {
+      display: block;
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+    }
+    .hc-win {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: 46%;
+      transform: rotate(var(--r));
+      animation: hc-drift 7s ease-in-out infinite;
+      animation-delay: calc(var(--i) * -1.3s);
+    }
+    .hc-win:hover {
+      animation-play-state: paused;
+    }
+  }
+  @keyframes hc-drift {
+    50% {
+      translate: 0 -5px;
+    }
+  }
+
+  /*
+   * Szene (lib/szene.ts): Die Fenster stapeln sich beim Hereinscrollen eines nach dem
+   * anderen, zuletzt der Kalender. Über `scale` und `opacity`, weil `translate` auf dem
+   * Desktop von hc-drift belegt ist. Ohne JS steht alles sofort.
+   */
+  :global(html.szenen-ready) .hc[data-szene]:not([data-szene='an']) .hc-win {
+    opacity: 0;
+    scale: 0.9;
+  }
+  .hc-win {
+    transition:
+      opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      scale 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.4s ease;
+    transition-delay: calc(var(--i) * 170ms), calc(var(--i) * 170ms), 0s, 0s;
+  }
+  :global(html.szenen-ready) .hc[data-szene]:not([data-szene='an']) .hc-line {
+    opacity: 0;
+  }
+  .hc-line {
+    transition: opacity 0.8s ease 0.9s;
+  }
+
+  .hc-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    background: color-mix(in oklch, var(--color-foreground) 3%, var(--color-card));
+  }
+  .hc-app {
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 0.2rem;
+    background: var(--app);
+    flex-shrink: 0;
+  }
+  .hc-file {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    color: var(--color-foreground-secondary);
+  }
+  .hc-body {
+    padding: 0.7rem 0.75rem 0.2rem;
+    font-size: 11px;
+    color: var(--color-foreground-secondary);
+  }
+  .hc-pain {
+    padding: 0.35rem 0.75rem 0.7rem;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    font-weight: 600;
+    color: var(--color-foreground);
+  }
+
+  /* Excel */
+  .hc-sheet {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--color-border);
+    border-radius: 0.35rem;
+    overflow: hidden;
+    font-family: var(--font-mono, ui-monospace, monospace);
+  }
+  .hc-sheet span {
+    padding: 0.2rem 0.4rem;
+    border-right: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .hc-sheet span:nth-child(3n) {
+    border-right: 0;
+  }
+  .hc-sheet span:nth-child(n + 4) {
+    border-bottom: 0;
+  }
+  .hc-err {
+    color: oklch(58% 0.2 25);
+    font-weight: 700;
+    background: color-mix(in oklch, oklch(60% 0.2 25) 10%, transparent);
+  }
+
+  /* Word */
+  .hc-doc {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .hc-doc i {
+    display: block;
+    height: 0.3rem;
+    border-radius: 99px;
+    background: color-mix(in oklch, var(--color-foreground) 12%, transparent);
+  }
+  .hc-typed {
+    width: fit-content;
+    padding: 0 0.25rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    background: color-mix(in oklch, oklch(85% 0.16 95) 45%, transparent);
+  }
+  .hc-typed b {
+    display: inline-block;
+    width: 1px;
+    height: 0.75rem;
+    margin-left: 2px;
+    vertical-align: -1px;
+    background: var(--color-foreground);
+    animation: hc-blink 1s steps(1) infinite;
+  }
+  @keyframes hc-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* PDF-Vorschau im Fensterinhalt (nicht die Farbklasse .hc-pdf der Karte) */
+  .hc-pdfview {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .hc-page {
+    display: grid;
+    gap: 0.25rem;
+    width: 3rem;
+    padding: 0.4rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--color-border);
+  }
+  .hc-page i {
+    display: block;
+    height: 0.2rem;
+    border-radius: 99px;
+    background: color-mix(in oklch, var(--color-foreground) 12%, transparent);
+  }
+  .hc-stamp {
+    padding: 0.1rem 0.45rem;
+    border: 1.5px solid var(--app);
+    border-radius: 0.3rem;
+    color: var(--app);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transform: rotate(-8deg);
+  }
+
+  /* Mail (eigene Klasse: .hc-mail ist schon die Karte selbst) */
+  .hc-mailbox {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .hc-mail-row {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hc-mail-row b {
+    color: var(--color-foreground);
+    margin-right: 0.25rem;
+  }
+  .hc-mail-status {
+    width: fit-content;
+    padding: 0.05rem 0.45rem;
+    border-radius: 99px;
+    font-weight: 600;
+    color: var(--color-foreground);
+    background: color-mix(in oklch, var(--app) 22%, transparent);
+  }
+
+  /* Kalender */
+  .hc-cal {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.25rem;
+    text-align: center;
+  }
+  .hc-cal span {
+    padding: 0.2rem 0;
+    border-radius: 0.3rem;
+    background: color-mix(in oklch, var(--color-foreground) 5%, transparent);
+  }
+  .hc-cal-hit {
+    color: #fff;
+    background: var(--app) !important;
+    font-weight: 700;
+  }
+  .hc-cal em {
+    position: absolute;
+    right: 0.25rem;
+    top: -0.55rem;
+    padding: 0.05rem 0.4rem;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 10px;
+    color: oklch(30% 0.05 80);
+    background: oklch(90% 0.13 95);
+    transform: rotate(6deg);
+    box-shadow: 0 4px 10px -4px rgb(0 0 0 / 0.3);
+  }
+
+  /* Linie zwischen den Fenstern */
+  .hc-path-base,
+  .hc-path-flow {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+  }
+  .hc-path-base {
+    stroke: color-mix(in oklch, var(--color-foreground) 10%, transparent);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 6;
+  }
+  .hc-path-flow {
+    stroke: color-mix(in oklch, oklch(60% 0.19 25) 35%, transparent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 1 22;
+    animation: hc-flow 2.2s linear infinite;
+  }
+  @keyframes hc-flow {
+    to {
+      stroke-dashoffset: -46;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hc-win,
+    .hc-path-flow,
+    .hc-typed b {
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  import { szenenStarten } from '@/lib/szene';
+  szenenStarten();
+</script>

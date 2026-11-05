@@ -1,0 +1,29 @@
+---
+/**
+ * Anzeigen-Landing für den Software-Check (Tür 5). Inhalt in components/check/CheckPage.astro,
+ * geteilt mit der indexierten Tür-Seite /software-check/.
+ *
+ * FunnelLayout: noindex, ohne Navigation, nicht in der Sitemap.
+ * Liegt als statische Datei neben /f/[slug].astro und gewinnt gegen die
+ * dynamische Route; in funnels.ts darf es deshalb keinen Slug „software-check“ geben.
+ */
+import FunnelLayout from '@/layouts/FunnelLayout.astro';
+import SchlankPage from '@/components/funnel-schlank/SchlankPage.astro';
+import BerichtMock from '@/components/check/BerichtMock.astro';
+import StackLeiste from '@/components/check/StackLeiste.astro';
+import MusterberichtDownload from '@/components/check/MusterberichtDownload.astro';
+import { softwareCheckFunnel } from '@/data/funnelSchlank';
+---
+
+<FunnelLayout
+  title="Mit KI gebaut? Jetzt soll jemand draufschauen, der es auch selbst könnte."
+  description="Kundenportal, internes Tool oder Produkt mit Software drin: Wir prüfen nach OWASP ASVS und darüber hinaus und schreiben auf, was offen ist. Mit Bericht, den ihr Kunden vorlegen könnt. Für Betriebe ab etwa 30 Leuten."
+  headerCta
+  ctaLabel="Rückruf anfordern"
+>
+  <SchlankPage tor={softwareCheckFunnel}>
+  <BerichtMock slot="hero" />
+  <StackLeiste />
+  <MusterberichtDownload ort="funnel" />
+</SchlankPage>
+</FunnelLayout>

@@ -1,0 +1,404 @@
+---
+/**
+ * Nachbau des Geschäftsführer-Cockpits aus der laufenden Kundenlösung, als HTML/SVG statt
+ * Screenshot: scharf auf jedem Bildschirm, im Dark Mode lesbar, ohne echte Kundendaten.
+ * Zahlen sind Beispieldaten in der Größenordnung eines Dienstleisters mit rund 60 Leuten.
+ */
+import '@/components/angebote/frame.css';
+import './zahlen.css';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+interface Props {
+  url?: string;
+  /** Mobil ohne Berater-Ranking, damit das Bild im Hero nicht zu lang wird. */
+  kompakt?: boolean;
+}
+const { url = 'app.euer-betrieb.de/cockpit/geschaeftsfuehrung', kompakt = false } = Astro.props;
+
+type Kpi = { label: string; value: string; delta: string; up: boolean; spark: number[] };
+const kpis: Kpi[] = [
+  {
+    label: 'Umsatz (abgerechnet)',
+    value: '3,54 Mio. €',
+    delta: '+5 %',
+    up: true,
+    spark: [5, 4.6, 3.6, 5.6, 4.2, 3.9, 5, 3.5],
+  },
+  {
+    label: 'Umsatz (Prognose)',
+    value: '5,21 Mio. €',
+    delta: '+4 %',
+    up: true,
+    spark: [5.9, 3.7, 3.4, 4.4, 4, 4.1, 4.4, 4.4, 4.3, 4.7, 4.4, 4.4],
+  },
+  {
+    label: 'Deckungsbeitrag',
+    value: '1,17 Mio. €',
+    delta: '+9 %',
+    up: true,
+    spark: [3, 3.2, 2.6, 3.4, 3.1, 2.9, 3.3, 3.5],
+  },
+  {
+    label: 'Auslastung',
+    value: '108 %',
+    delta: '+7 pp',
+    up: true,
+    spark: [96, 98, 99, 99, 98, 99, 97, 104, 106, 105, 108, 108],
+  },
+];
+
+const spark = (vals: number[], w = 200, h = 34) => {
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const step = w / (vals.length - 1);
+  return vals
+    .map(
+      (v, i) =>
+        `${(i * step).toFixed(1)},${(h - 4 - ((v - min) / (max - min || 1)) * (h - 10)).toFixed(1)}`
+    )
+    .join(' ');
+};
+
+// Umsatzentwicklung in Mio. €: Ist (Balken) bis August, dazu Plan, Prognose und Vorjahr als Linien.
+const monate = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const ist = [0.5, 0.46, 0.36, 0.56, 0.42, 0.39, 0.5, 0.35];
+const plan = [0.49, 0.43, 0.35, 0.53, 0.41, 0.4, 0.48, 0.45, 0.35, 0.47, 0.41, 0.34];
+const prognose = [0.59, 0.37, 0.34, 0.44, 0.4, 0.41, 0.44, 0.44, 0.43, 0.47, 0.44, 0.44];
+const vorjahr = [0.47, 0.4, 0.4, 0.46, 0.39, 0.38, 0.5, 0.38, 0.36, 0.47, 0.42, 0.39];
+
+const CW = 720;
+const CH = 230;
+const padL = 34;
+const padB = 22;
+const padT = 10;
+const maxV = 0.6;
+const colW = (CW - padL) / 12;
+const y = (v: number) => padT + (1 - v / maxV) * (CH - padT - padB);
+const xMid = (i: number) => padL + colW * i + colW / 2;
+const line = (vals: number[]) =>
+  vals.map((v, i) => `${xMid(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+const ticks = [0, 0.15, 0.3, 0.45, 0.6];
+
+const berater = [
+  {
+    kuerzel: 'OL',
+    name: 'Oliver Lehmann',
+    ist: '195,9 Tsd. €',
+    plan: '37,6 Tsd. €',
+    ausl: '118 %',
+    over: true,
+    sum: '233,6 Tsd. €',
+    months: [8, 7, 8, 8, 9, 9, 10, 9, 8, 5, 5, 5],
+    color: 'oklch(55% 0.15 260)',
+  },
+  {
+    kuerzel: 'SS',
+    name: 'Stefan Stein',
+    ist: '181,9 Tsd. €',
+    plan: '39,2 Tsd. €',
+    ausl: '100 %',
+    over: false,
+    sum: '221,2 Tsd. €',
+    months: [8, 8, 7, 8, 8, 9, 9, 8, 7, 5, 6, 5],
+    color: 'oklch(65% 0.17 45)',
+  },
+  {
+    kuerzel: 'SH',
+    name: 'Simone Hauser',
+    ist: '143,4 Tsd. €',
+    plan: '40,2 Tsd. €',
+    ausl: '78 %',
+    over: false,
+    sum: '183,6 Tsd. €',
+    months: [4, 3, 6, 7, 7, 8, 8, 7, 6, 6, 7, 7],
+    color: 'oklch(60% 0.14 160)',
+  },
+  {
+    kuerzel: 'SR',
+    name: 'Sven Reimers',
+    ist: '162,1 Tsd. €',
+    plan: '20,7 Tsd. €',
+    ausl: '79 %',
+    over: false,
+    sum: '182,8 Tsd. €',
+    months: [8, 8, 8, 8, 9, 8, 9, 6, 6, 4, 4, 4],
+    color: 'oklch(72% 0.15 85)',
+  },
+];
+---
+
+<figure class="af-frame z-app">
+  <div class="af-bar" aria-hidden="true">
+    <span class="af-dots"><span></span><span></span><span></span></span>
+    <span class="af-url">{url}</span>
+    <span class="af-dots invisible"><span></span><span></span><span></span></span>
+  </div>
+
+  <div
+    class="p-3 sm:p-5"
+    role="img"
+    aria-label="Nachbau eines Geschäftsführer-Cockpits mit Umsatz, Prognose, Deckungsbeitrag, Auslastung, Umsatzentwicklung, Forderungen und Berater-Ranking. Beispieldaten."
+  >
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2 sm:mb-4">
+      <div>
+        <p class="text-sm font-bold sm:text-base">Geschäftsführer-Cockpit</p>
+        <p class="z-label">Die wichtigsten Kennzahlen auf einen Blick</p>
+      </div>
+      <div class="z-seg" aria-hidden="true">
+        <button type="button" aria-pressed="true">Geschäftsführung</button>
+        <button type="button" class="hidden sm:inline">Vertrieb</button>
+        <button type="button" class="hidden sm:inline">Team</button>
+        <button type="button">Kunden</button>
+        <button type="button" class="hidden md:inline">Finanzen</button>
+      </div>
+    </div>
+
+    <!-- KPI-Kacheln -->
+    <div class="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+      {
+        kpis.map((k) => (
+          <div class="z-card overflow-hidden">
+            <div class="px-3 pt-2.5 sm:px-3.5">
+              <p class="z-label truncate">{k.label}</p>
+              <p class="mt-1 flex flex-wrap items-baseline gap-x-2">
+                <span
+                  class="text-[0.95rem] font-bold whitespace-nowrap tabular-nums sm:text-lg"
+                  data-kpi-zahl
+                >
+                  {k.value}
+                </span>
+                <span
+                  class:list={[
+                    'text-[0.68rem] font-semibold whitespace-nowrap',
+                    k.up ? 'z-up' : 'z-down',
+                  ]}
+                >
+                  {k.up ? '↗' : '↘'} {k.delta}
+                </span>
+              </p>
+            </div>
+            <svg
+              viewBox="0 0 200 34"
+              class="mt-1 block h-8 w-full"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <rect
+                width="200"
+                height="34"
+                fill="color-mix(in oklch, var(--z-sky) 12%, transparent)"
+              />
+              <polyline
+                points={spark(k.spark)}
+                fill="none"
+                stroke="var(--z-sky)"
+                stroke-width="1.6"
+                vector-effect="non-scaling-stroke"
+              />
+            </svg>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-2 grid gap-2 sm:mt-3 sm:gap-3 lg:grid-cols-[minmax(0,1fr)_17rem]">
+      <!-- Umsatzentwicklung -->
+      <div class="z-card p-3 sm:p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="text-xs font-bold sm:text-sm">
+            Umsatzentwicklung <span class="z-muted font-medium">(in Mio. €)</span>
+          </p>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.65rem] font-medium">
+            <span class="flex items-center gap-1"
+              ><span class="z-dot" style="background: var(--z-blue)"></span>Ist</span
+            >
+            <span class="flex items-center gap-1"
+              ><span class="z-dot" style="background: var(--z-sky)"></span>Plan</span
+            >
+            <span class="flex items-center gap-1"
+              ><span class="z-dot" style="background: var(--z-amber)"></span>Prognose</span
+            >
+            <span class="flex items-center gap-1"
+              ><span class="z-dot" style="background: var(--z-slate)"></span>Vorjahr</span
+            >
+          </div>
+        </div>
+        <svg
+          viewBox={`0 0 ${CW} ${CH}`}
+          class="mt-2 block h-auto w-full"
+          role="img"
+          aria-label="Umsatzentwicklung über zwölf Monate: Balken für den Ist-Umsatz, Linien für Plan, Prognose und Vorjahr. Beispieldaten."
+        >
+          {
+            ticks.map((t) => (
+              <g>
+                <line
+                  x1={padL}
+                  x2={CW}
+                  y1={y(t)}
+                  y2={y(t)}
+                  stroke="var(--z-grid)"
+                  stroke-dasharray="4 4"
+                />
+                <text
+                  x={padL - 6}
+                  y={y(t) + 3.5}
+                  text-anchor="end"
+                  class="zd-ax"
+                  fill="var(--z-muted)"
+                >
+                  {t.toLocaleString('de-DE')}
+                </text>
+              </g>
+            ))
+          }
+          {
+            ist.map((v, i) => (
+              <rect
+                x={xMid(i) - colW * 0.18}
+                y={y(v)}
+                width={colW * 0.36}
+                height={y(0) - y(v)}
+                rx="2"
+                fill="var(--z-blue)"
+              />
+            ))
+          }
+          <line
+            x1={padL + colW * 9}
+            x2={padL + colW * 9}
+            y1={padT}
+            y2={y(0)}
+            stroke="var(--z-muted)"
+            stroke-dasharray="3 4"
+            opacity="0.6"></line>
+          <text x={padL + colW * 9 + 5} y={padT + 9} class="zd-ax" fill="var(--z-muted)">heute</text
+          >
+          <polyline
+            points={line(vorjahr)}
+            fill="none"
+            stroke="var(--z-slate)"
+            stroke-width="1.6"
+            stroke-dasharray="3 4"></polyline>
+          <polyline
+            points={line(plan)}
+            fill="none"
+            stroke="var(--z-sky)"
+            stroke-width="1.8"
+            stroke-dasharray="4 4"></polyline>
+          <polyline
+            points={line(prognose)}
+            fill="none"
+            stroke="var(--z-amber)"
+            stroke-width="2"
+            stroke-dasharray="7 4"></polyline>
+          {prognose.map((v, i) => <circle cx={xMid(i)} cy={y(v)} r="2.6" fill="var(--z-amber)" />)}
+          {plan.map((v, i) => <circle cx={xMid(i)} cy={y(v)} r="2.2" fill="var(--z-sky)" />)}
+          {
+            monate.map((m, i) => (
+              <text
+                x={xMid(i)}
+                y={CH - 6}
+                text-anchor="middle"
+                class:list={['zd-ax', i % 2 === 1 && 'zd-odd']}
+                fill="var(--z-muted)"
+              >
+                {m}
+              </text>
+            ))
+          }
+        </svg>
+      </div>
+
+      <!-- Forderungen -->
+      <div class="z-card flex flex-col gap-2 p-3 sm:p-4">
+        <p class="flex items-center gap-1.5 text-xs font-bold sm:text-sm">
+          <Icon name="inbox" size="xs" class="z-muted" /> Forderungen
+        </p>
+        <div class="z-card px-3 py-2.5">
+          <div class="flex items-center justify-between">
+            <p class="z-label">Offene Forderungen</p>
+            <span
+              class="rounded border px-1.5 text-[0.55rem] font-semibold tracking-wide"
+              style="border-color: var(--z-line); color: var(--z-muted)">BRUTTO</span
+            >
+          </div>
+          <p class="mt-1 text-xl font-bold">456,9 Tsd. €</p>
+        </div>
+        <div class="z-card text-[0.72rem]">
+          {
+            [
+              ['Ø Forderungslaufzeit', '38,4 Tage'],
+              ['Ø Zahlungsdauer', '21,6 Tage'],
+              ['Ø Zahlungsziel', '14 Tage'],
+              ['Älter als 60 Tage', '41,2 Tsd. €'],
+            ].map(([k, v]) => (
+              <p
+                class="flex items-center justify-between border-t px-3 py-2 first:border-t-0"
+                style="border-color: var(--z-line)"
+              >
+                <span class="z-muted">{k}</span>
+                <span class="font-semibold">{v}</span>
+              </p>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Berater-Ranking -->
+    <div class:list={['z-card mt-2 p-3 sm:mt-3 sm:p-4', kompakt && 'hidden sm:block']}>
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <p class="flex items-center gap-1.5 text-xs font-bold sm:text-sm">
+          <Icon name="users" size="xs" class="z-muted" /> Berater nach Umsatz
+        </p>
+        <div class="z-seg" aria-hidden="true">
+          <button type="button" aria-pressed="true">Umsatz</button>
+          <button type="button">DB</button>
+          <button type="button">Stunden</button>
+        </div>
+      </div>
+      <ol class="mt-2">
+        {
+          berater.map((b, i) => (
+            <li
+              class="flex items-center gap-3 border-b py-2 last:border-b-0"
+              style="border-color: var(--z-line)"
+            >
+              <span class="z-dot" style={`background:${b.color}`} />
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-xs font-semibold sm:text-sm">
+                  {i + 1}. {b.name}
+                </p>
+                <p class="z-label">
+                  <span class="whitespace-nowrap">Ist {b.ist}</span> ·{' '}
+                  <span class="whitespace-nowrap">Plan {b.plan}</span>
+                </p>
+              </div>
+              <p class:list={['shrink-0 text-right text-[0.68rem]', b.over ? 'z-over' : 'z-muted']}>
+                <span class="hidden sm:inline">
+                  Auslastung
+                  <br />
+                </span>
+                <span class="font-semibold whitespace-nowrap">{b.ausl}</span>
+              </p>
+              <svg viewBox="0 0 96 26" class="hidden h-7 w-24 shrink-0 sm:block" aria-hidden="true">
+                {b.months.map((m, j) => (
+                  <rect
+                    x={j * 8 + 1}
+                    y={26 - m * 2.4}
+                    width="6"
+                    height={m * 2.4}
+                    rx="1"
+                    fill={j >= 9 ? 'var(--z-sky)' : 'var(--z-blue)'}
+                  />
+                ))}
+              </svg>
+              <p class="w-24 shrink-0 text-right text-xs font-bold sm:text-sm">{b.sum}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</figure>

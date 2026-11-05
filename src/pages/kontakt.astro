@@ -1,0 +1,451 @@
+---
+import { Picture } from 'astro:assets';
+import PageLayout from '@/layouts/PageLayout.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+import Input from '@/components/ui/form/Input/Input.astro';
+import Textarea from '@/components/ui/form/Textarea/Textarea.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import ContactAttribution from '@/components/patterns/ContactAttribution.astro';
+import { defaultLocale } from '@/i18n/config';
+import { getLocalizedPath, useTranslations } from '@/i18n/index';
+import { contactLinks } from '@/data/rocketbase';
+import founderStamp from '@/assets/rocketbase/founder-marten-priess-alt.jpg';
+
+const locale = defaultLocale;
+const t = useTranslations(locale);
+const servicesUrl = getLocalizedPath('services', locale);
+const workshopUrl = getLocalizedPath('discoveryWorkshop', locale);
+
+---
+
+<PageLayout
+  title={t('contact.meta.title')}
+  description={t('contact.meta.description')}
+  lang={locale}
+  routeId="contact"
+>
+  <section class="border-b border-border bg-background-secondary pt-20 pb-20 sm:py-24">
+    <div class="container grid gap-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:gap-12">
+      <div data-reveal="fade-right" class="max-w-3xl">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-600">Kontakt</p>
+        <h1 class="mt-3 font-display text-[2rem] leading-[1.1] font-bold tracking-tight text-foreground sm:mt-4 sm:text-6xl sm:leading-none">
+          In 30 Minuten klären, <span class="text-brand-500">ob und wie wir helfen können</span>
+        </h1>
+        <p class="mt-4 text-base leading-7 text-foreground-secondary sm:mt-6 sm:text-lg sm:leading-8">
+          Hakt ein Ablauf oder stößt ein Programm an Grenzen? Ein kurzes Erstgespräch bringt euch am
+          schnellsten eine ehrliche Einschätzung.
+        </p>
+
+        <div data-reveal class="mt-5 flex flex-wrap items-center gap-4 sm:mt-8">
+          <Button href={contactLinks.cal} target="_blank">
+            Erstgespräch buchen
+            <Icon name="arrow-up-right" size="sm" />
+          </Button>
+          <Button href={servicesUrl} variant="link">
+            Leistungen ansehen
+            <Icon name="arrow-right" size="sm" />
+          </Button>
+        </div>
+
+      </div>
+
+      <div data-reveal="zoom-in" class="relative rounded-[2.25rem] border border-white/10 bg-surface-invert p-8 pt-16 text-on-invert shadow-[0_32px_90px_rgba(22,28,44,0.28)] sm:pt-20 lg:pt-24">
+        <div class="absolute -top-8 left-6 rotate-[-4deg] sm:-top-12 sm:left-8 lg:-top-14">
+          <div class="bg-brand-400/30 absolute -inset-3 -z-10 rounded-full blur-xl" aria-hidden="true" />
+          <div class="overflow-hidden rounded-full border-4 border-surface-invert shadow-[0_14px_36px_rgba(22,28,44,0.5)] h-20 w-20 sm:h-28 sm:w-28 lg:h-32 lg:w-32">
+            <Picture
+              src={founderStamp}
+              alt="Marten Prieß"
+              widths={[128, 192, 256]}
+              sizes="(max-width: 640px) 80px, (max-width: 1024px) 112px, 128px"
+              formats={['avif', 'webp']}
+              class="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        </div>
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-300">Direkter Draht</p>
+        <h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-on-invert">
+          Ihr sprecht direkt mit dem Gründer
+        </h2>
+        <p class="mt-4 text-base leading-7 text-on-invert-secondary">
+          Im Erstgespräch schauen wir, wo ihr steht und welche Wege ihr habt. Passt jemand anderes
+          besser zu eurem Vorhaben, sagen wir das auch.
+        </p>
+
+        <div class="mt-8 grid gap-4">
+          <a
+            href={contactLinks.cal}
+            target="_blank"
+            class="group rounded-[1.5rem] border border-brand-300/40 bg-brand-500/15 p-5 transition-all hover:border-brand-300/70 hover:bg-brand-500/25"
+          >
+            <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-brand-200">
+              <Icon name="clock" size="xs" />
+              Termin buchen
+            </p>
+            <p class="mt-2 flex items-center gap-2 text-base font-semibold text-on-invert">
+              30 Minuten direkt mit Marten Prieß
+              <Icon
+                name="arrow-up-right"
+                size="sm"
+                class="text-brand-200 transition-transform duration-200 group-hover:translate-x-0.5"
+              />
+            </p>
+          </a>
+
+          <a
+            href="#anfrage-stellen"
+            class="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10"
+          >
+            <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-on-invert-muted">
+              <Icon name="mail" size="xs" class="text-brand-300" />
+              Lieber schreiben?
+            </p>
+            <p class="mt-1.5 text-sm text-on-invert-secondary">Direkt zum Anfrageformular</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b border-border py-14 sm:py-24">
+    <div class="container">
+      <div data-reveal="fade-down">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-600">
+          So sieht der Weg aus
+        </p>
+        <h2 class="mt-4 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+          Alles beginnt mit einem Gespräch
+        </h2>
+        <p class="mt-6 max-w-3xl text-lg leading-8 text-foreground-secondary">
+          Jedes Projekt beginnt mit einem unverbindlichen Erstgespräch. Dort entscheiden wir
+          gemeinsam, was danach kommt: ein Workshop, ein direkter Projektstart oder gar nichts.
+        </p>
+      </div>
+
+      <!-- Hero-Karte: Erstgespräch (A) -->
+      <div data-reveal class="mt-12 grid gap-0 overflow-hidden rounded-[2rem] border-2 border-brand-300 bg-card shadow-[0_22px_55px_rgba(99,114,165,0.12)] md:grid-cols-[1.1fr_0.9fr] dark:border-brand-700">
+        <div class="p-8 sm:p-10 lg:p-12">
+          <div class="flex items-center gap-3">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200">
+              <Icon name="clock" size="md" />
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600">
+                Schritt 01
+              </p>
+              <p class="text-sm font-semibold text-foreground">30 Minuten · unverbindlich · kostenfrei</p>
+            </div>
+          </div>
+
+          <h3 class="mt-6 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            Erstgespräch mit Marten Prieß
+          </h3>
+          <p class="mt-4 text-base leading-7 text-foreground-secondary">
+            Ihr erzählt, wo ihr steht. Wir ordnen das ehrlich ein und sagen, was als Nächstes sinnvoll ist.
+          </p>
+
+          <p class="mt-8 text-xs font-semibold uppercase tracking-[0.22em] text-brand-600">
+            Worüber wir sprechen
+          </p>
+          <ul class="mt-4 space-y-3 text-sm leading-6 text-foreground-secondary">
+            <li class="flex gap-3">
+              <Icon name="check-circle" size="sm" class="mt-0.5 shrink-0 text-brand-600" />
+              <span>Kurze gegenseitige Vorstellung</span>
+            </li>
+            <li class="flex gap-3">
+              <Icon name="check-circle" size="sm" class="mt-0.5 shrink-0 text-brand-600" />
+              <span>Welche Programme ihr nutzt und was besser werden soll</span>
+            </li>
+            <li class="flex gap-3">
+              <Icon name="check-circle" size="sm" class="mt-0.5 shrink-0 text-brand-600" />
+              <span>Wo es gerade hakt: Engpässe, doppelte Eingaben, Umwege</span>
+            </li>
+            <li class="flex gap-3">
+              <Icon name="check-circle" size="sm" class="mt-0.5 shrink-0 text-brand-600" />
+              <span>Was die nächsten Schritte sein können</span>
+            </li>
+          </ul>
+
+          <div class="mt-8">
+            <Button href={contactLinks.cal} target="_blank">
+              Erstgespräch buchen
+              <Icon name="arrow-up-right" size="sm" />
+            </Button>
+          </div>
+        </div>
+
+        <div class="relative flex flex-col gap-5 border-t border-border bg-background-secondary p-8 sm:p-10 md:border-l md:border-t-0 dark:bg-background">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600">
+              Mögliche nächste Schritte
+            </p>
+            <p class="mt-2 text-sm leading-6 text-foreground-secondary">
+              Was nach dem Erstgespräch folgen kann, je nachdem, wo ihr steht:
+            </p>
+          </div>
+
+          <ul class="space-y-4 text-sm leading-6 text-foreground-secondary">
+            <li class="flex gap-3">
+              <Icon name="layers" size="sm" class="mt-0.5 shrink-0 text-brand-600" />
+              <span>
+                <strong class="text-foreground">Discovery-Workshop</strong>: wenn euch vor einer Entscheidung Klarheit fehlt. Drei Termine, ein Dokument, ein Festpreis für die Umsetzung. Das Ergebnis gehört euch.
+                <a href={workshopUrl} class="ml-1 inline-flex items-center gap-1 text-brand-600 font-semibold hover:text-brand-500 dark:text-brand-400">
+                  Details
+                  <Icon name="arrow-right" size="xs" />
+                </a>
+              </span>
+            </li>
+            <li class="flex gap-3">
+              <Icon name="monitor" size="sm" class="mt-0.5 shrink-0 text-brand-600" />
+              <span><strong class="text-foreground">Zweiter Termin mit geteiltem Bildschirm</strong>: Wir schauen gemeinsam auf eure heutige Lösung und auf das, was sich ändern soll</span>
+            </li>
+            <li class="flex gap-3">
+              <Icon name="file-text" size="sm" class="mt-0.5 shrink-0 text-brand-600" />
+              <span><strong class="text-foreground">Vorhandene Konzepte durchsprechen</strong>: wenn ihr Anforderungen oder Entwürfe schon skizziert habt</span>
+            </li>
+            <li class="flex gap-3">
+              <Icon name="trending-up" size="sm" class="mt-0.5 shrink-0 text-brand-600" />
+              <span><strong class="text-foreground">Erste grobe Preiseinschätzung</strong>: sobald der Umfang absehbar ist</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="anfrage-stellen" class="scroll-mt-24 relative overflow-hidden border-b border-border py-14 sm:py-28">
+    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_-10%,rgba(99,114,165,0.10),transparent_55%),radial-gradient(circle_at_85%_110%,rgba(99,114,165,0.08),transparent_55%)] dark:bg-[radial-gradient(circle_at_15%_-10%,rgba(99,114,165,0.18),transparent_55%),radial-gradient(circle_at_85%_110%,rgba(99,114,165,0.14),transparent_55%)]" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(99,114,165,0.22),transparent)]" aria-hidden="true"></div>
+    <div class="container relative z-10 grid gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
+      <div data-reveal="fade-right" class="lg:sticky lg:top-28">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-600">Anfrage stellen</p>
+        <h2 class="mt-4 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+          Schreibt uns, worum es geht
+        </h2>
+        <p class="mt-6 text-lg leading-8 text-foreground-secondary">
+          Nutzt das Formular, wenn ihr euer Vorhaben lieber aufschreibt. Bei größeren Themen ist der{' '}
+          <a href={workshopUrl} class="text-brand-600 font-semibold underline decoration-brand-300/60 underline-offset-4 hover:text-brand-700 transition-colors">Discovery-Workshop</a>{' '}
+          oft der bessere Einstieg.
+        </p>
+
+      </div>
+
+      <div data-reveal="zoom-in" class="relative">
+        <div class="absolute inset-x-10 top-6 -z-10 h-56 rounded-full bg-brand-300/20 blur-3xl dark:bg-brand-600/15"></div>
+        <div class="rounded-[2.25rem] border border-border bg-card p-8 shadow-[0_24px_80px_rgba(34,43,74,0.12)] sm:p-10">
+
+          <!-- Success state (hidden until form submitted) -->
+          <div id="form-success" class="hidden flex-col items-center py-12 text-center">
+            <div class="flex h-20 w-20 items-center justify-center rounded-full bg-brand-50 dark:bg-brand-900/30">
+              <Icon name="check-circle" size="lg" class="text-brand-500" />
+            </div>
+            <h3 class="mt-6 font-display text-2xl font-bold tracking-tight text-foreground">
+              Nachricht erhalten.
+            </h3>
+            <p class="mt-3 max-w-sm text-base leading-7 text-foreground-secondary">
+              Vielen Dank für eure Anfrage. Marten meldet sich in der Regel innerhalb eines Werktages.
+            </p>
+            <div class="mt-8 flex flex-wrap justify-center gap-3">
+              <a
+                href={contactLinks.cal}
+                target="_blank"
+                class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 transition-colors"
+              >
+                <Icon name="clock" size="sm" />
+                Direkt Termin buchen
+              </a>
+              <a
+                href="/"
+                class="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-background-secondary transition-colors"
+              >
+                Zur Startseite
+              </a>
+            </div>
+          </div>
+
+          <!-- Form (shown by default) -->
+          <div id="form-container">
+            <div class="border-b border-border pb-6">
+              <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-600">{t('contact.form.title')}</p>
+              <h3 class="mt-3 font-display text-3xl font-bold tracking-tight text-foreground">
+                Worum geht es konkret?
+              </h3>
+              <p class="mt-4 max-w-xl text-base leading-7 text-foreground-secondary">
+                Je genauer ihr euer Ziel, euer heutiges Programm oder euer Problem beschreibt, desto
+                mehr bringt das Erstgespräch.
+              </p>
+            </div>
+
+            <form id="contact-form" action="/api/contact" method="POST" class="mt-8 space-y-6">
+              <div class="grid gap-6 sm:grid-cols-2">
+                <Input
+                  label={t('contact.form.name')}
+                  name="name"
+                  type="text"
+                  placeholder={t('contact.form.namePlaceholder')}
+                  required
+                  autocomplete="name"
+                />
+
+                <Input
+                  label={t('contact.form.email')}
+                  name="email"
+                  type="email"
+                  placeholder={t('contact.form.emailPlaceholder')}
+                  required
+                  autocomplete="email"
+                />
+              </div>
+
+              <Input
+                label={t('contact.form.subject')}
+                name="subject"
+                type="text"
+                placeholder={t('contact.form.subjectPlaceholder')}
+              />
+
+              <Textarea
+                label={t('contact.form.message')}
+                name="message"
+                placeholder={t('contact.form.messagePlaceholder')}
+                rows={7}
+                required
+              />
+
+              <div class="hidden" aria-hidden="true">
+                <input type="text" name="honeypot" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <ContactAttribution />
+
+              <div class="flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <div id="form-message" class="hidden text-sm"></div>
+                <Button type="submit" id="submit-button">
+                  <Icon name="mail" size="sm" />
+                  {t('contact.form.submit')}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-border bg-background-secondary py-14 sm:py-24">
+    <div class="container space-y-10">
+      <div data-reveal="zoom-in" class="max-w-3xl">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-600">Weitere Kanäle</p>
+        <h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          Hier findet ihr uns sonst noch
+        </h2>
+      </div>
+
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <a
+          data-reveal="zoom-in"
+          href={contactLinks.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rounded-[1.6rem] border border-border bg-card p-8 shadow-sm transition-colors hover:border-brand-300"
+        >
+          <Icon name="linkedin" size="md" class="text-brand-500" />
+          <p class="mt-5 text-lg font-semibold text-foreground">LinkedIn</p>
+          <p class="mt-2 text-sm leading-6 text-foreground-secondary">
+            Neuigkeiten und direkter Kontakt über das RocketBase-Profil.
+          </p>
+        </a>
+
+        <a
+          data-reveal="zoom-in"
+          href={contactLinks.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rounded-[1.6rem] border border-border bg-card p-8 shadow-sm transition-colors hover:border-brand-300"
+        >
+          <Icon name="github" size="md" class="text-brand-500" />
+          <p class="mt-5 text-lg font-semibold text-foreground">GitHub</p>
+          <p class="mt-2 text-sm leading-6 text-foreground-secondary">
+            Technischer Hintergrund und unsere Open-Source-Arbeit.
+          </p>
+        </a>
+
+        <a
+          data-reveal="zoom-in"
+          href={contactLinks.instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rounded-[1.6rem] border border-border bg-card p-8 shadow-sm transition-colors hover:border-brand-300"
+        >
+          <Icon name="instagram" size="md" class="text-brand-500" />
+          <p class="mt-5 text-lg font-semibold text-foreground">Instagram</p>
+          <p class="mt-2 text-sm leading-6 text-foreground-secondary">
+            Einblicke in den Alltag hinter den Projekten.
+          </p>
+        </a>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<script
+  define:vars={{
+    sendingText: t('contact.form.sending'),
+    errorText: t('contact.form.error'),
+    submitText: t('contact.form.submit'),
+  }}
+>
+  function initContactForm() {
+    const form = document.getElementById('contact-form');
+    const button = document.getElementById('submit-button');
+    const message = document.getElementById('form-message');
+
+    if (!(form instanceof HTMLFormElement) || !(button instanceof HTMLButtonElement) || !(message instanceof HTMLDivElement)) {
+      return;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      button.disabled = true;
+      button.textContent = sendingText;
+      message.classList.add('hidden');
+
+      try {
+        const formData = new FormData(form);
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          const formContainer = document.getElementById('form-container');
+          const formSuccess = document.getElementById('form-success');
+          if (formContainer && formSuccess) {
+            formContainer.classList.add('hidden');
+            formSuccess.classList.remove('hidden');
+            formSuccess.classList.add('flex');
+          }
+          return;
+        } else {
+          const errors = data.errors ? Object.values(data.errors).flat().join(', ') : errorText;
+          message.textContent = errors;
+          message.className = 'text-sm text-destructive';
+        }
+      } catch {
+        message.textContent = errorText;
+        message.className = 'text-sm text-destructive';
+      } finally {
+        button.disabled = false;
+        button.textContent = submitText;
+        message.classList.remove('hidden');
+      }
+    });
+  }
+
+  initContactForm();
+  document.addEventListener('astro:after-swap', initContactForm);
+</script>

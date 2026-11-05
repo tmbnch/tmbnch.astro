@@ -1,0 +1,381 @@
+---
+/**
+ * „Womit wir arbeiten“: der Kern (das, was fast jede KI-gebaute Anwendung hat) steht fest in der
+ * Mitte, farbig und groß. Alles andere schwebt leicht drumherum, grau, beim Hover farbig.
+ * Vorher war es eine Laufleiste; dort war es Glückssache, ob der Besucher sein Framework gerade
+ * im Bild hat (Marten, 2026-10-20). Ab md schweben die Logos auf festen Positionen, darunter
+ * stehen sie als Reihe unter dem Kern.
+ *
+ * Logos aus dem Paket simple-icons (offizielle Markenpfade, CC0): pnpm add simple-icons
+ */
+import * as icons from 'simple-icons';
+
+interface Props {
+  class?: string;
+  /** Kurzfassung fürs Handy: ein Satz und die Logos. */
+  kompakt?: boolean;
+}
+const { class: className, kompakt = false } = Astro.props;
+
+type Si = { path: string; hex: string; title: string };
+const si = icons as unknown as Record<string, Si | undefined>;
+const logo = (name: string, slug: string) => ({ name, path: si[slug]?.path, hex: si[slug]?.hex });
+
+const kern = [
+  logo('Next.js', 'siNextdotjs'),
+  logo('React', 'siReact'),
+  logo('TypeScript', 'siTypescript'),
+  logo('Supabase', 'siSupabase'),
+  logo('PostgreSQL', 'siPostgresql'),
+];
+
+// Umfeld: Position in Prozent der Bühne (x, y), Schwebe-Dauer und -Versatz je Logo, damit es nicht im Takt wippt.
+const umfeld = [
+  { ...logo('Tailwind', 'siTailwindcss'), x: 6, y: 22 },
+  { ...logo('Prisma', 'siPrisma'), x: 18, y: 86 },
+  { ...logo('Drizzle', 'siDrizzle'), x: 30, y: 12 },
+  { ...logo('Vercel', 'siVercel'), x: 46, y: 92 },
+  { ...logo('Vite', 'siVite'), x: 52, y: 6 },
+  { ...logo('Node', 'siNodedotjs'), x: 66, y: 84 },
+  { ...logo('tRPC', 'siTrpc'), x: 74, y: 10 },
+  { ...logo('shadcn/ui', 'siShadcnui'), x: 94, y: 70 },
+  { ...logo('Claude', 'siClaude'), x: 4, y: 62 },
+  { ...logo('Cursor', 'siCursor'), x: 96, y: 30 },
+  { ...logo('Mistral', 'siMistralai'), x: 14, y: 42 },
+  { ...logo('Ollama', 'siOllama'), x: 86, y: 50 },
+  { ...logo('Docker', 'siDocker'), x: 22, y: 66 },
+  { ...logo('Hetzner', 'siHetzner'), x: 80, y: 72 },
+  { ...logo('Fly.io', 'siFlydotio'), x: 40, y: 24 },
+  { ...logo('Netlify', 'siNetlify'), x: 62, y: 22 },
+  { ...logo('GitHub Actions', 'siGithubactions'), x: 50, y: 76 },
+  { ...logo('Spring Boot', 'siSpringboot'), x: 8, y: 90 },
+  { ...logo('Flutter', 'siFlutter'), x: 92, y: 92 },
+  { ...logo('Electron', 'siElectron'), x: 34, y: 84 },
+  { ...logo('Stripe', 'siStripe'), x: 72, y: 94 },
+  { ...logo('Astro', 'siAstro'), x: 88, y: 12 },
+  { ...logo('Redis', 'siRedis'), x: 30, y: 44 },
+  { ...logo('Sentry', 'siSentry'), x: 70, y: 46 },
+];
+
+const eherNicht = ['Python (Django, FastAPI)', 'PHP (Laravel, WordPress)', '.NET', 'Ruby on Rails', 'Low-Code-Plattformen'];
+---
+
+<section class:list={['stack-sec bg-background relative overflow-x-clip py-14 lg:py-20', className]}>
+  <div class="relative z-10 container max-w-6xl">
+    <header data-reveal class="mx-auto max-w-3xl text-center">
+      <p class="text-brand-600 dark:text-brand-300 font-mono text-xs font-semibold tracking-[0.2em] uppercase">Womit wir arbeiten</p>
+      <h2 class="font-display text-foreground mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
+        Das, was KI-Werkzeuge meistens bauen.
+      </h2>
+      {
+        kompakt ? (
+          <p class="text-foreground-secondary mt-3 text-[0.95rem] leading-7">
+            Genau das bauen und betreiben wir seit Jahren, auch ohne KI.
+          </p>
+        ) : (
+          <p class="text-foreground-secondary mt-4 text-[0.95rem] leading-7">
+            Ob mit Claude Code, Cursor, ChatGPT, Lovable, Bolt oder v0 gebaut: Herauskommt in der Regel
+            TypeScript mit React oder Next.js, dazu Postgres oder Supabase. Genau das bauen und betreiben
+            wir seit Jahren, auch ohne KI.
+          </p>
+        )
+      }
+    </header>
+
+    <!-- Bühne: Kern fest in der Mitte, Umfeld schwebt (ab md), darunter als Reihe -->
+    <div class="buehne relative mx-auto mt-8" data-szene>
+      <ul class="umfeld" aria-label="Weitere Technologien">
+        {
+          umfeld.map((e) => (
+            <li
+              class="umfeld-logo"
+              style={`--x:${e.x}%;--y:${e.y}%;--marke:#${e.hex || '888'}`}
+            >
+              {e.path ? (
+                <>
+                  <svg viewBox="0 0 24 24" width="26" height="26" role="img" aria-label={e.name}><path d={e.path} fill="currentColor" /></svg>
+                  <span class="umfeld-name">{e.name}</span>
+                </>
+              ) : (
+                <span class="pille">{e.name}</span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+
+      <ul class="kern" aria-label="Kern-Technologien">
+        {
+          kern.map((e) => (
+            <li class="kern-logo" style={`--marke:#${e.hex || '888'}`}>
+              {e.path ? (
+                <svg viewBox="0 0 24 24" width="44" height="44" role="img" aria-label={e.name}><path d={e.path} fill="currentColor" /></svg>
+              ) : (
+                <span class="logo-leer">{e.name.slice(0, 2)}</span>
+              )}
+              <span class="kern-name">{e.name}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <ul class="umfeld-reihe" aria-label="Weitere Technologien">
+        {
+          umfeld.map((e) => (
+            <li class="reihe-logo" style={`--marke:#${e.hex || '888'}`} title={e.name}>
+              {e.path ? <svg viewBox="0 0 24 24" width="20" height="20" role="img" aria-label={e.name}><path d={e.path} fill="currentColor" /></svg> : <span class="pille pille-klein">{e.name}</span>}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <p data-reveal class:list={['text-foreground-muted mx-auto mt-10 max-w-3xl text-center text-sm leading-6', kompakt && 'hidden']}>
+      <span class="text-foreground-secondary font-semibold">Eher nicht bei uns:</span> {eherNicht.join(' · ')}.
+      Bei Stacks, die wir nicht täglich betreiben, sagen wir das gleich im ersten Gespräch und empfehlen jemand anderen.
+    </p>
+  </div>
+</section>
+
+<style>
+  .buehne {
+    min-height: 11rem;
+  }
+  @media (min-width: 768px) {
+    .buehne {
+      min-height: 34rem;
+      display: grid;
+      place-items: center;
+    }
+  }
+  @media (min-width: 1280px) {
+    .buehne {
+      min-height: 38rem;
+    }
+  }
+
+  /* Kern */
+  .kern {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem 2.25rem;
+    padding: 1.25rem 1.75rem;
+    border-radius: 1.75rem;
+    border: 1px solid var(--color-border);
+    background: color-mix(in oklch, var(--color-card) 88%, transparent);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 24px 60px -32px rgb(20 28 60 / 0.35);
+  }
+  .kern-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--marke);
+    transition: transform 0.3s;
+  }
+  .kern-logo:hover {
+    transform: translateY(-3px);
+  }
+  .kern-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-foreground);
+    white-space: nowrap;
+  }
+  :global(.dark) .kern-logo {
+    color: color-mix(in oklch, var(--marke) 70%, white);
+  }
+
+  /* Umfeld, schwebend */
+  .umfeld {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .umfeld {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+  }
+  .umfeld-logo {
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    translate: -50% -50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-foreground-muted);
+    opacity: 0.75;
+    pointer-events: auto;
+    will-change: transform;
+    /* --naehe 0..1 setzt das Skript: Farbe, Deckung und Größe folgen der Maus */
+    color: color-mix(in oklch, var(--marke) calc(var(--naehe, 0) * 100%), var(--color-foreground-muted));
+    opacity: calc(0.7 + var(--naehe, 0) * 0.3);
+  }
+  :global(.dark) .umfeld-logo:hover {
+    color: color-mix(in oklch, var(--marke) 70%, white);
+  }
+  .umfeld-logo svg {
+    pointer-events: none;
+  }
+  .umfeld-name {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--color-foreground-muted);
+    white-space: nowrap;
+  }
+
+  /* Umfeld als Reihe, unter md */
+  .umfeld-reihe {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem 1.1rem;
+    margin-top: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .umfeld-reihe {
+      display: none;
+    }
+  }
+  .reihe-logo {
+    color: var(--color-foreground-muted);
+  }
+  .logo-leer,
+  .pille {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--color-foreground-secondary);
+    white-space: nowrap;
+  }
+  .pille-klein {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.66rem;
+  }
+  .umfeld-logo:hover .pille {
+    border-color: var(--color-brand-300);
+    color: var(--color-foreground);
+  }
+
+</style>
+
+<script>
+  // Freies Treiben: jedes Logo läuft eine eigene Bahn aus zwei Sinus-Komponenten mit Zufallsphase,
+  // reagiert auf die Maus (Parallaxe, je Logo eigene Tiefe) und weicht ihr aus, wenn sie nah kommt.
+  // Bei prefers-reduced-motion steht alles still.
+  function buehneStarten(buehne: HTMLElement) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const logos = Array.from(buehne.querySelectorAll<HTMLElement>('.umfeld-logo'));
+    if (!logos.length) return;
+
+    type Teil = {
+      el: HTMLElement;
+      ax: number; ay: number; // Amplituden
+      fx: number; fy: number; // Frequenzen
+      px: number; py: number; // Phasen
+      tiefe: number;           // Parallaxe-Faktor
+      vx: number; vy: number;  // Versatz durch die Maus, federt zurück
+      naehe: number;           // 0..1, geglättet
+    };
+    const zufall = (a: number, b: number) => a + Math.random() * (b - a);
+    const teile: Teil[] = logos.map((el) => ({
+      el,
+      ax: zufall(10, 22), ay: zufall(10, 22),
+      fx: zufall(0.08, 0.16), fy: zufall(0.07, 0.15),
+      px: zufall(0, Math.PI * 2), py: zufall(0, Math.PI * 2),
+      tiefe: zufall(0.015, 0.045),
+      vx: 0, vy: 0,
+      naehe: 0,
+    }));
+
+    let mausX = 0, mausY = 0, mausDa = false;
+    let sichtbar = true;
+    const rect = () => buehne.getBoundingClientRect();
+
+    buehne.addEventListener('pointermove', (e) => {
+      const r = rect();
+      mausX = e.clientX - r.left - r.width / 2;
+      mausY = e.clientY - r.top - r.height / 2;
+      mausDa = true;
+    });
+    buehne.addEventListener('pointerleave', () => (mausDa = false));
+    new IntersectionObserver(([e]) => (sichtbar = e.isIntersecting), { rootMargin: '80px' }).observe(buehne);
+
+    const frame = (zeit: number) => {
+      if (sichtbar) {
+        const t = zeit / 1000;
+        const r = rect();
+        for (const p of teile) {
+          // Grundbahn
+          let x = Math.sin(t * p.fx * Math.PI * 2 + p.px) * p.ax;
+          let y = Math.cos(t * p.fy * Math.PI * 2 + p.py) * p.ay;
+          let naehe = 0;
+          if (mausDa) {
+            // Parallaxe: Logos mit mehr Tiefe wandern stärker mit der Maus
+            x += mausX * p.tiefe;
+            y += mausY * p.tiefe;
+            // Abstand Logo zu Maus im Bühnen-Koordinatensystem
+            const lr = p.el.getBoundingClientRect();
+            const lx = lr.left + lr.width / 2 - r.left - r.width / 2;
+            const ly = lr.top + lr.height / 2 - r.top - r.height / 2;
+            const dx = lx - mausX, dy = ly - mausY;
+            const d = Math.hypot(dx, dy);
+            const radius = 240; // bis hierhin reagieren Logos: Farbe, Größe, leichtes Anziehen
+            if (d < radius) {
+              naehe = 1 - d / radius;
+              // Anziehen im äußeren Bereich, Ausweichen im inneren: die Maus hat einen Hof
+              const kern = 70;
+              if (d > kern && d > 0.1) {
+                p.vx -= (dx / d) * naehe * 1.6;
+                p.vy -= (dy / d) * naehe * 1.6;
+              } else if (d > 0.1) {
+                const kraft = (1 - d / kern) * 30;
+                p.vx += (dx / d) * kraft * 0.1;
+                p.vy += (dy / d) * kraft * 0.1;
+              }
+            }
+          }
+          // Feder zurück
+          p.vx *= 0.88;
+          p.vy *= 0.88;
+          p.naehe += (naehe - p.naehe) * 0.12; // weich nachziehen
+          const rot = Math.sin(t * p.fx * Math.PI * 2 + p.px) * 2.5;
+          const groesse = 1 + p.naehe * 0.45;
+          p.el.style.setProperty('--naehe', p.naehe.toFixed(3));
+          p.el.style.zIndex = p.naehe > 0.05 ? '3' : '';
+          p.el.style.transform = `translate(${(x + p.vx).toFixed(2)}px, ${(y + p.vy).toFixed(2)}px) rotate(${rot.toFixed(2)}deg) scale(${groesse.toFixed(3)})`;
+        }
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+
+  function alleStarten() {
+    document.querySelectorAll<HTMLElement>('.buehne').forEach((b) => {
+      if (b.dataset.laeuft) return;
+      b.dataset.laeuft = '1';
+      buehneStarten(b);
+    });
+  }
+  alleStarten();
+  document.addEventListener('astro:after-swap', alleStarten);
+</script>

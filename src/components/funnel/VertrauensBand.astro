@@ -1,0 +1,90 @@
+---
+/**
+ * Dunkles Band mit vier Fakten für alle Funnel-Seiten. Bewusst ohne Zusagen zu Dauer,
+ * Kosten oder Umfang (Philipp, 2026-10-17): Das klärt das Erstgespräch.
+ * Die Fakten laufen beim Hereinscrollen nacheinander ein (data-szene, lib/szene.ts).
+ * Seit 2026-10-20 sechs statt vier: Sicherheit (mit Link auf Tür 5) und KI stehen auf jeder Tür,
+ * damit die Brücke zum Software-Check überall da ist. Funnel-Seiten können eigene Fakten übergeben.
+ */
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+interface Props {
+  fakten?: { icon: string; titel: string; text: string; href?: string }[];
+}
+
+const {
+  fakten = [
+    { icon: 'map-pin', titel: 'Hosting in Deutschland', text: 'Eure Daten bleiben hier.' },
+    { icon: 'database', titel: 'Daten gehören euch', text: 'Jederzeit komplett exportierbar.' },
+    { icon: 'layers', titel: 'Läuft bei Kunden im Alltag', text: 'Kein Prototyp, kein Konzept.' },
+    { icon: 'shield', titel: 'Sicherheit nach Standard', text: 'Geprüft nach OWASP ASVS, geliefert nach CRA.', href: '/software-check/' },
+    { icon: 'zap', titel: 'KI, wo sie Arbeit abnimmt', text: 'Im Produkt und beim Bauen. Nicht als Selbstzweck.' },
+    { icon: 'phone', titel: 'Erstgespräch unverbindlich', text: '30 Minuten, keine Vorbereitung.' },
+  ],
+} = Astro.props;
+---
+
+<section class="band-sec relative overflow-x-clip py-10 lg:py-12" data-szene>
+  <div class="relative z-10 container max-w-6xl">
+    <ul class:list={['grid grid-cols-2 gap-x-6 gap-y-7 lg:gap-8', fakten.length > 4 ? 'lg:grid-cols-3' : 'lg:grid-cols-4']}>
+      {
+        fakten.map((f, i) => (
+          <li class="band-fakt flex gap-3" style={`--i: ${i}`}>
+            <span class="band-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
+              <Icon name={f.icon} size="sm" />
+            </span>
+            <div>
+              <p class="font-display text-sm font-bold tracking-tight text-white sm:text-base">
+                {f.href ? (
+                  <a href={f.href} class="underline decoration-white/30 underline-offset-4 hover:decoration-white">
+                    {f.titel}
+                  </a>
+                ) : (
+                  f.titel
+                )}
+              </p>
+              <p class="mt-0.5 text-xs leading-5 text-white/65 sm:text-sm">{f.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .band-sec {
+    background:
+      radial-gradient(
+        60% 120% at 10% 50%,
+        color-mix(in oklch, var(--color-brand-500) 28%, transparent),
+        transparent 70%
+      ),
+      oklch(18% 0.03 265);
+  }
+  .band-icon {
+    color: var(--color-brand-200);
+    background: color-mix(in oklch, var(--color-brand-400) 22%, transparent);
+    border: 1px solid color-mix(in oklch, var(--color-brand-300) 35%, transparent);
+  }
+  :global(html.szenen-ready) .band-sec:not([data-szene='an']) .band-fakt {
+    opacity: 0;
+    translate: 0 14px;
+  }
+  .band-fakt {
+    transition:
+      opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--i) * 120ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .band-fakt {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { szenenStarten } from '@/lib/szene';
+  szenenStarten();
+</script>

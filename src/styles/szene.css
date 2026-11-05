@@ -1,0 +1,39 @@
+/*
+ * Gemeinsame Szenen-Stile der Funnel-Seiten (lib/szene.ts).
+ * Versteckt wird nur unter html.szenen-ready, also nie ohne JS.
+ */
+
+/* data-szene-kinder: direkte Kinder blenden gestaffelt ein */
+html.szenen-ready [data-szene-kinder]:not([data-szene='an']) > * {
+  opacity: 0;
+  translate: 0 22px;
+}
+[data-szene-kinder] > * {
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--szene-i, 0) * 130ms);
+}
+
+/* data-szene am Visual selbst: steigt auf und wird scharf */
+html.szenen-ready .szene-auf[data-szene]:not([data-szene='an']) {
+  opacity: 0;
+  translate: 0 40px;
+  scale: 0.97;
+}
+.szene-auf[data-szene] {
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    translate 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    scale 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-szene-kinder] > *,
+  .szene-auf[data-szene] {
+    transition: none !important;
+    opacity: 1 !important;
+    translate: none !important;
+    scale: none !important;
+  }
+}

@@ -1,0 +1,219 @@
+---
+/**
+ * Landingpage des Brief-Kanals (/b/[slug]).
+ *
+ * Ziel des QR-Codes auf dem postalisch versendeten Anschreiben. Eine Seite pro
+ * Branchencluster — definiert in src/data/briefLandings.ts.
+ *
+ * Bewusst KEINE Personalisierung pro Empfänger: Die Brief-Kennung hängt als
+ * `?r=` an der URL, wird aber nur getrackt und nie aufgelöst. Wer den Brief
+ * aufhebt und scannt, hat die höchste Hürde bereits genommen — und Firmenname
+ * plus Logo nochmal auf der Seite können nach Überwachung wirken, wenn niemand
+ * um Kontakt gebeten hat.
+ *
+ * Getrennt von /f/[slug] (Anzeigen): dort Quiz-Einstieg und Du-Form, hier ein
+ * vorqualifizierter Leser, der gesiezt wird. Ein gemeinsames Template hätte
+ * `if (kanal === 'brief')` durch jede Textzeile gezogen.
+ */
+import FunnelLayout from '@/layouts/FunnelLayout.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import Blueprint from '@/components/hero-backgrounds/Blueprint.astro';
+import { BriefTermin } from '@/components/brief/BriefTermin';
+import { briefLandings } from '@/data/briefLandings';
+
+export function getStaticPaths() {
+  return briefLandings.map((landing) => ({
+    params: { slug: landing.slug },
+    props: { landing },
+  }));
+}
+
+const { landing } = Astro.props;
+---
+
+<FunnelLayout
+  title={landing.meta.title}
+  description={landing.meta.description}
+  headerNote="Sie haben Post von uns"
+>
+  <!-- HERO -->
+  <section class="relative overflow-hidden pt-12 pb-14 sm:pt-16 lg:pt-20">
+    <Blueprint />
+    <div
+      class="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,var(--color-background)_0%,transparent_75%)] opacity-70"
+      aria-hidden="true"
+    >
+    </div>
+
+    <div class="relative z-10 container max-w-3xl text-center">
+      <p
+        class="text-brand-600 dark:text-brand-300 text-sm font-semibold tracking-[0.22em] uppercase"
+      >
+        {landing.hero.eyebrow}
+      </p>
+      <h1
+        lang="de"
+        class="font-display text-foreground mt-4 text-3xl font-bold tracking-tight text-balance hyphens-auto [-webkit-hyphens:auto] sm:text-4xl lg:text-5xl"
+      >
+        {landing.hero.headline}
+        <span class="text-brand-500 mt-2 block">{landing.hero.headlineAccent}</span>
+      </h1>
+      <p
+        class="text-foreground-secondary mx-auto mt-6 max-w-2xl text-base leading-7 text-pretty sm:text-lg sm:leading-8"
+      >
+        {landing.hero.subline}
+      </p>
+
+      {/* Keine Belegkacheln: Wer hier ankommt, hat die Zahlen gerade im Brief
+          gelesen. Ein zweites Mal kosten sie nur die Höhe, die das Video
+          braucht — auf dem Handy sitzt es dann unter der Falz.
+          Die Daten (landing.belege) bleiben erhalten, falls eine andere
+          Landing sie ohne vorangehenden Brief braucht. */}
+      {
+        landing.video.src && (
+          <p class="mt-10">
+            <a
+              href="#video"
+              class="text-foreground-muted hover:text-brand-600 dark:hover:text-brand-400 inline-flex flex-col items-center gap-1 text-xs transition-colors"
+            >
+              <span>Kurz gezeigt</span>
+              <Icon name="chevron-down" size="sm" />
+            </a>
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- VIDEO: erscheint erst, wenn ein src gesetzt ist. Kein Platzhalter in
+       Produktion - Brief-Empfänger sollen keine Baustelle sehen; die Sektion
+       kommt automatisch, sobald die Datei in briefLandings.ts eingetragen ist. -->
+  {landing.video.src && (
+  <section id="video" class="scroll-mt-20 pt-4 pb-14 lg:pt-8 lg:pb-20">
+    {/* Ab lg zweispaltig: Ein Hochformat-Video in einer zentrierten Spalte
+        lässt den Desktop links und rechts leer stehen. Text daneben nutzt den
+        Platz und hält die Überschrift kurz genug, dass kein Wort allein in
+        die zweite Zeile rutscht. Auf dem Handy bleibt es untereinander —
+        dort liest sich Text über Video ohnehin natürlicher. */}
+    <div class="container max-w-5xl lg:grid lg:grid-cols-[1fr_420px] lg:items-center lg:gap-14">
+      <header class="mx-auto max-w-2xl text-center lg:mx-0 lg:text-left">
+        <h2
+          class="font-display text-foreground text-2xl font-bold tracking-tight text-balance sm:text-3xl"
+        >
+          {landing.video.heading}
+        </h2>
+        {
+          landing.video.text && (
+            <p
+              class="text-foreground-secondary mx-auto mt-4 max-w-xl text-base leading-7 text-pretty lg:mx-0"
+            >
+              {landing.video.text}
+            </p>
+          )
+        }
+        {
+          landing.video.weiter && (
+            <p class="mt-5">
+              <a
+                href={landing.video.weiter.href}
+                data-brief-weiter
+                class="text-brand-600 hover:text-brand-700 inline-flex items-center gap-2 text-sm font-semibold transition-colors"
+              >
+                {landing.video.weiter.label}
+                <Icon name="arrow-right" size="sm" />
+              </a>
+            </p>
+          )
+        }
+      </header>
+
+      <div class="mx-auto mt-8 w-full max-w-[420px] lg:mt-0">
+        {
+          landing.video.src ? (
+            <video
+              class="border-border max-h-[78vh] w-full rounded-2xl border bg-black object-contain shadow-lg"
+              style="aspect-ratio: 604 / 1080"
+              controls
+              playsinline
+              preload="metadata"
+              poster={landing.video.poster}
+            >
+              <source src={landing.video.src} type="video/mp4" />
+            </video>
+          ) : (
+            <div class="bg-background-secondary border-border relative flex aspect-[604/1080] w-full items-center justify-center rounded-2xl border">
+              <div
+                class="bg-grid-pattern pointer-events-none absolute inset-0 opacity-20"
+                aria-hidden="true"
+              />
+              <div class="relative flex flex-col items-center gap-3 text-center">
+                <div class="border-brand-300/70 bg-brand-500/10 text-brand-600 flex h-16 w-16 items-center justify-center rounded-full border">
+                  <Icon name="monitor" size="md" />
+                </div>
+                <p class="text-foreground-muted font-mono text-xs font-semibold tracking-[0.22em] uppercase">
+                  Video folgt
+                </p>
+                <p class="text-foreground-secondary max-w-sm text-sm leading-6">
+                  Hier kommt eine kurze Vorstellung: wie wir arbeiten und wie die Lösungen
+                  aussehen.
+                </p>
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
+  )}
+
+  <!-- WER WIR SIND: ersetzt die Logoleiste. Wer kalt angeschrieben wurde,
+       fragt sich zuerst "mit wem rede ich da" — darauf antwortet ein Absatz
+       besser als eine Reihe fremder Marken. Telefonnummer inklusive: fuer
+       diese Zielgruppe ist der Hoerer der Kanal mit der niedrigsten Huerde. -->
+  <section class="border-border bg-background-secondary border-y py-14 lg:py-16">
+    <div class="container max-w-3xl">
+      <h2 class="font-display text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
+        Wer wir sind
+      </h2>
+      <p class="text-foreground-secondary mt-4 text-base leading-7">
+        RocketBase ist ein kleines festes Entwickler-Team aus der Metropolregion Hamburg,
+        ansässig in Winsen an der Luhe. Gegründet 2014, seit über zehn Jahren am Markt —
+        angefangen bei Konzernprojekten, heute zu Hause im Mittelstand.
+      </p>
+      <p class="text-foreground-secondary mt-4 text-base leading-7">
+        Wir bauen Software für Betriebe, deren Abläufe nicht in ein Standardprogramm passen —
+        vom Angebot über die Einsatzplanung bis zur Rechnung. Kein Baukasten, keine
+        Lizenzfalle: Was entsteht, gehört Ihnen.
+      </p>
+      <p class="text-foreground mt-6 text-base leading-7">
+        Lieber direkt sprechen?{' '}
+        <a
+          href="tel:+4915123336263"
+          class="hover:text-brand-600 dark:hover:text-brand-400 font-semibold underline underline-offset-4 transition-colors"
+        >
+          (+49) 1512 333 6263
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- TERMIN — der einzige Weg auf dieser Seite, neben der Telefonnummer
+       darüber. Kontaktformular, Referenzkarten und Blog-Links sind bewusst
+       raus: Eine Funnel-Seite hat ein Ziel, und zwei gleichrangige Optionen
+       enden am häufigsten in keiner von beiden.
+       `kontakt`/`erfolg` bleiben in den Daten und BriefKontakt.tsx bleibt
+       liegen — falls eine andere Landing das Formular doch braucht. -->
+  <section id="termin" class="py-16 lg:py-20">
+    <div class="container max-w-3xl">
+      <BriefTermin
+        client:load
+        calUrl={landing.termin.calUrl}
+        calLabel={landing.termin.calLabel}
+        heading={landing.termin.heading}
+        text={landing.termin.text}
+        funnel={`brief-${landing.slug}`}
+      />
+    </div>
+  </section>
+
+</FunnelLayout>

@@ -1,0 +1,74 @@
+---
+/**
+ * Nummerierter Sektionskopf der Angebots-Seiten: Badge mit Nummer, Eyebrow
+ * zwischen Linien, h2, optionaler Lead. Dasselbe Muster wie auf
+ * /einsatzplanung/, hier als Komponente, weil die Seite neun davon hat.
+ */
+interface Props {
+  number: string;
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  /** Auf dunklem Grund (bg-surface-invert). */
+  invert?: boolean;
+  align?: 'center' | 'left';
+  /** `md` für Funnel-Seiten: eine Stufe kleiner, damit die Überschrift nicht den Bildschirm füllt. */
+  size?: 'md' | 'lg';
+}
+
+const { number, eyebrow, title, lead, invert = false, align = 'center', size = 'lg' } = Astro.props;
+---
+
+<header data-reveal class:list={['max-w-3xl', align === 'center' ? 'mx-auto text-center' : '']}>
+  <div class:list={['flex max-w-md items-center gap-4', align === 'center' && 'mx-auto']}>
+    {
+      align === 'center' && (
+        <span class:list={['h-px flex-1', invert ? 'bg-white/15' : 'bg-border']} />
+      )
+    }
+    <span
+      class:list={[
+        'flex h-10 w-10 items-center justify-center rounded-full border-2 font-mono text-sm font-bold',
+        invert
+          ? 'border-brand-400/60 text-brand-300 bg-white/5'
+          : 'border-brand-300 bg-card text-brand-600',
+      ]}
+    >
+      {number}
+    </span>
+    <span
+      class:list={[
+        'text-xs font-semibold tracking-[0.22em] uppercase',
+        invert ? 'text-on-invert-secondary' : 'text-foreground-muted',
+      ]}
+    >
+      {eyebrow}
+    </span>
+    <span class:list={['h-px flex-1', invert ? 'bg-white/15' : 'bg-border']}></span>
+  </div>
+  <h2
+    lang="de"
+    class:list={[
+      'font-display mt-8 font-bold tracking-tight text-balance',
+      size === 'lg'
+        ? 'text-3xl sm:text-4xl lg:text-5xl'
+        : 'text-2xl sm:text-3xl lg:text-[2.5rem] lg:leading-tight',
+      invert ? 'text-on-invert' : 'text-foreground',
+    ]}
+  >
+    {title}
+  </h2>
+  {
+    lead && (
+      <p
+        class:list={[
+          'mt-6 text-lg leading-8',
+          invert ? 'text-on-invert-secondary' : 'text-foreground-secondary',
+        ]}
+      >
+        {lead}
+      </p>
+    )
+  }
+  <slot />
+</header>

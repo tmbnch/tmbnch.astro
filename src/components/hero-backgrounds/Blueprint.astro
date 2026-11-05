@@ -1,0 +1,120 @@
+---
+/**
+ * Blueprint – Hero-Hintergrund für den Discovery-Workshop.
+ * Motiv: Anmutung einer technischen Zeichnung / eines Bauplans – feines
+ * Raster, Maß-/Markierungslinien und ein paar "Annotations"-Punkte, wie auf
+ * einem Prozessdiagramm. Steht für Analyse, Konzept und Einordnung.
+ * Dark-ready (brand-indigo).
+ */
+---
+
+<div class="hero-blueprint pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+  <div class="hero-blueprint-backdrop absolute inset-0"></div>
+
+  <svg
+    class="absolute inset-0 h-full w-full"
+    viewBox="0 0 1440 720"
+    preserveAspectRatio="xMidYMid slice"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <radialGradient id="bpGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0%" stop-color="var(--bp-glow-start)" />
+        <stop offset="100%" stop-color="var(--bp-glow-end)" />
+      </radialGradient>
+      <pattern id="bpFineGrid" width="48" height="48" patternUnits="userSpaceOnUse">
+        <path d="M 48 0 L 0 0 0 48" fill="none" stroke="var(--bp-grid-fine)" stroke-width="0.7" />
+      </pattern>
+    </defs>
+
+    <circle cx="980" cy="240" r="360" fill="url(#bpGlow)" opacity="0.55" />
+
+    <!-- Feines Raster (Millimeterpapier-Anmutung) -->
+    <rect width="1440" height="720" fill="url(#bpFineGrid)" />
+
+    <!-- Gröbere Hauptlinien -->
+    <g stroke="var(--bp-grid-main)" stroke-width="1">
+      <line x1="0" y1="240" x2="1440" y2="240" />
+      <line x1="0" y1="480" x2="1440" y2="480" />
+      <line x1="480" y1="0" x2="480" y2="720" />
+      <line x1="960" y1="0" x2="960" y2="720" />
+    </g>
+
+    <!-- Konstruktions-/Maßlinien (gestrichelt) -->
+    <g stroke="var(--bp-construct)" stroke-width="1.2" stroke-dasharray="8 6" fill="none" opacity="0.7">
+      <path d="M 200 540 L 200 200 L 620 200" />
+      <path d="M 620 200 L 620 420 L 1040 420" />
+      <path d="M 1040 420 L 1040 160 L 1300 160" />
+    </g>
+
+    <!-- Annotations-Knoten an den Eckpunkten -->
+    <g>
+      <circle cx="200" cy="200" r="6" fill="none" stroke="var(--bp-node)" stroke-width="1.6" class="hero-blueprint-pulse bp-p1" />
+      <circle cx="620" cy="200" r="6" fill="none" stroke="var(--bp-node)" stroke-width="1.6" class="hero-blueprint-pulse bp-p2" />
+      <circle cx="620" cy="420" r="6" fill="none" stroke="var(--bp-node)" stroke-width="1.6" class="hero-blueprint-pulse bp-p3" />
+      <circle cx="1040" cy="420" r="6" fill="none" stroke="var(--bp-node)" stroke-width="1.6" class="hero-blueprint-pulse bp-p1" />
+      <circle cx="1040" cy="160" r="6" fill="none" stroke="var(--bp-node)" stroke-width="1.6" class="hero-blueprint-pulse bp-p2" />
+    </g>
+
+    <!-- Markierungspunkte (gefüllt) -->
+    <g fill="var(--bp-node)">
+      <circle cx="200" cy="200" r="2.4" />
+      <circle cx="620" cy="420" r="2.4" />
+      <circle cx="1040" cy="160" r="2.4" />
+      <circle cx="1300" cy="160" r="2.4" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .hero-blueprint {
+    --bp-glow-start: oklch(70% 0.12 274 / 0.26);
+    --bp-glow-end: oklch(70% 0.12 274 / 0);
+    --bp-grid-fine: oklch(55% 0.03 274 / 0.08);
+    --bp-grid-main: oklch(55% 0.04 274 / 0.16);
+    --bp-construct: oklch(58% 0.14 274 / 0.45);
+    --bp-node: oklch(58% 0.2 274 / 0.85);
+    --bp-bg-top: oklch(97% 0.004 274);
+    --bp-bg-mid: oklch(94% 0.008 274);
+    --bp-bg-bottom: oklch(98% 0.002 274);
+  }
+
+  :global(.dark) .hero-blueprint {
+    --bp-glow-start: oklch(62% 0.2 274 / 0.38);
+    --bp-glow-end: oklch(62% 0.2 274 / 0);
+    --bp-grid-fine: oklch(72% 0.04 274 / 0.06);
+    --bp-grid-main: oklch(72% 0.05 274 / 0.1);
+    --bp-construct: oklch(78% 0.13 274 / 0.55);
+    --bp-node: oklch(85% 0.1 274 / 0.95);
+    --bp-bg-top: oklch(22% 0.02 274);
+    --bp-bg-mid: oklch(16% 0.016 274);
+    --bp-bg-bottom: oklch(13% 0.012 274);
+  }
+
+  .hero-blueprint-backdrop {
+    background:
+      radial-gradient(ellipse at 70% 30%, var(--bp-glow-start), transparent 60%),
+      linear-gradient(155deg, var(--bp-bg-top) 0%, var(--bp-bg-mid) 55%, var(--bp-bg-bottom) 100%);
+  }
+
+  .hero-blueprint-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: blueprint-pulse ease-in-out infinite;
+    will-change: opacity, transform;
+  }
+  .bp-p1 { animation-duration: 4.4s; animation-delay: 0s; }
+  .bp-p2 { animation-duration: 5.8s; animation-delay: -1.8s; }
+  .bp-p3 { animation-duration: 5s; animation-delay: -3.2s; }
+
+  @keyframes blueprint-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-blueprint-pulse {
+      animation: none;
+    }
+  }
+</style>

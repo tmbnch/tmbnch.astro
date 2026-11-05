@@ -1,0 +1,278 @@
+/*
+ * Gemeinsame Optik der nachgebauten Cockpit-Ansichten (/zahlen/, /f/zahlen/).
+ * Farben angelehnt an die laufende Kundenlösung: Ist in Blau, Plan hellblau,
+ * Prognose orange, Vorjahr grau; Auslastung grün/gelb/rot; Stundenarten pastell.
+ * Die Rahmen kommen aus angebote/frame.css (.af-frame, .af-bar, .af-url).
+ */
+.z-app {
+  --z-blue: oklch(54% 0.15 260);
+  --z-blue-hatch: oklch(42% 0.14 262);
+  --z-sky: oklch(79% 0.1 228);
+  --z-amber: oklch(76% 0.16 68);
+  --z-slate: oklch(48% 0.03 265);
+  --z-lime: oklch(79% 0.15 112);
+  --z-red: oklch(58% 0.2 25);
+  --z-green: oklch(58% 0.15 150);
+  --z-track: oklch(95% 0.004 265);
+  --z-grid: oklch(91% 0.006 265);
+  --z-booked: oklch(91% 0.14 125);
+  --z-planned: oklch(87% 0.065 228);
+  --z-open: oklch(94% 0.12 100);
+  --z-offer: oklch(91% 0.05 350);
+  --z-panel: oklch(98.5% 0.003 265);
+  --z-text: oklch(25% 0.02 265);
+  --z-muted: oklch(55% 0.02 265);
+  --z-line: oklch(92% 0.006 265);
+
+  color: var(--z-text);
+  background: var(--af-url, #fff);
+  font-variant-numeric: tabular-nums;
+}
+:where(.dark) .z-app {
+  --z-track: oklch(28% 0.01 265);
+  --z-grid: oklch(32% 0.012 265);
+  --z-panel: oklch(22% 0.012 265);
+  --z-text: oklch(94% 0.005 265);
+  --z-muted: oklch(70% 0.015 265);
+  --z-line: oklch(32% 0.012 265);
+  --z-booked: oklch(62% 0.13 125);
+  --z-planned: oklch(58% 0.08 228);
+  --z-open: oklch(70% 0.12 100);
+  --z-offer: oklch(62% 0.08 350);
+}
+
+.z-card {
+  border: 1px solid var(--z-line);
+  border-radius: 0.85rem;
+  background: var(--af-url, #fff);
+}
+.z-muted {
+  color: var(--z-muted);
+}
+.z-up {
+  color: var(--z-green);
+}
+.z-down {
+  color: var(--z-red);
+}
+.z-over {
+  color: var(--z-red);
+}
+.z-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.01em;
+  color: var(--z-muted);
+}
+
+/* Segment-Schalter wie in der App (Fest | + Geplant, Tabs) */
+.z-seg {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 0.5rem;
+  border: 1px solid var(--z-line);
+  background: var(--z-panel);
+  gap: 2px;
+}
+.z-seg button,
+.z-seg span {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.38rem;
+  color: var(--z-muted);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+/* Bedienbare Schalter brauchen eine Fingerfläche, rein dekorative nicht. */
+.z-seg button {
+  min-height: 2.75rem;
+  padding-inline: 0.8rem;
+}
+.z-seg button[aria-pressed='true'],
+.z-seg button[aria-selected='true'],
+.z-seg span[data-active] {
+  background: var(--z-blue);
+  color: white;
+}
+
+/* Auslastungsbalken */
+.z-bar-track {
+  position: relative;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--z-track);
+}
+.z-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  transition:
+    width 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.3s ease;
+}
+.z-bar-fill[data-tone='ok'] {
+  background: var(--z-blue);
+}
+.z-bar-fill[data-tone='mid'] {
+  background: var(--z-lime);
+}
+.z-bar-fill[data-tone='low'] {
+  background: var(--z-red);
+}
+/* Überlast: der Teil über 100 % schraffiert */
+.z-bar-over {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 0 999px 999px 0;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--z-blue-hatch) 0 3px,
+    var(--z-blue) 3px 6px
+  );
+  transition:
+    left 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.z-hundred {
+  position: absolute;
+  top: -0.35rem;
+  bottom: -0.35rem;
+  width: 0;
+  border-left: 1px dashed var(--z-muted);
+  opacity: 0.6;
+}
+
+/* Drilldown: Tabs je Person */
+.z-person-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--z-muted);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+.z-person-tab[aria-selected='true'] {
+  background: var(--af-url, #fff);
+  border-color: var(--z-line);
+  color: var(--z-text);
+  box-shadow: 0 6px 16px -10px oklch(30% 0.06 265 / 0.35);
+}
+.z-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: white;
+}
+.z-person[hidden] {
+  display: none;
+}
+
+.z-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.z-details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.z-details > summary::-webkit-details-marker {
+  display: none;
+}
+.z-details[open] .z-chev {
+  transform: rotate(90deg);
+}
+.z-chev {
+  transition: transform 0.2s ease;
+}
+
+/* Hinweis „Beispieldaten“ unter den Nachbauten */
+.z-note {
+  font-size: 0.75rem;
+  color: var(--color-foreground-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .z-bar-fill,
+  .z-bar-over {
+    transition: none;
+  }
+}
+
+/*
+ * Diagrammtext in den Nachbauten.
+ * Die SVGs sind 640-720 Einheiten breit und werden auf dem Handy in rund 280 px
+ * gezeichnet, also auf etwa 0,44 verkleinert. Ein font-size von 10 landet dadurch
+ * bei 4,4 px. Die Schriftgrade stehen deshalb hier und nicht im Markup: mobil so
+ * groß, dass nach dem Verkleinern gut 11 px übrig bleiben, ab sm wieder dezent.
+ */
+.zd-ax {
+  font-size: 29px;
+}
+/*
+ * Die Zahl über jedem Balken: auf dem Handy kollidieren zwölf davon und stoßen
+ * oben an den Rand. Dort tragen Achse und Balkenhöhe die Aussage, ab sm kommen
+ * die Werte zurück.
+ */
+.zd-val {
+  display: none;
+}
+/*
+ * Die Achsenbeschriftung ist mobil knapp dreimal so groß wie vorgesehen und stößt
+ * dadurch links aus dem Diagramm. Statt die Geometrie zu ändern (was den Desktop
+ * mitzöge), rückt nur das Label nach innen.
+ */
+.zd-ax[text-anchor='end'] {
+  translate: 30px 0;
+}
+
+/* Zwölf Monatslabels kollidieren bei dieser Schriftgröße - mobil jedes zweite. */
+.zd-odd {
+  display: none;
+}
+@media (min-width: 640px) {
+  .zd-ax {
+    font-size: 10px;
+  }
+  .zd-val {
+    display: initial;
+    font-size: 9px;
+  }
+  .zd-odd {
+    display: initial;
+  }
+  .zd-ax[text-anchor='end'] {
+    translate: none;
+  }
+}
+
+/* Personenumschalter: mobil drei gleich breite Felder, ab sm die Pillenreihe. */
+@media (min-width: 640px) {
+  .z-person-tab {
+    justify-content: flex-start;
+    white-space: nowrap;
+    padding: 0.35rem 0.75rem 0.35rem 0.35rem;
+  }
+}

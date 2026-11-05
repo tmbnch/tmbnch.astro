@@ -1,0 +1,486 @@
+{
+  "angebote": {
+    "frageA": "heute",
+    "frageB": "personen",
+    "frageZusatz": "menge",
+    "gruppenB": {
+      "1": "eine",
+      "2-3": "wenige",
+      "4-10": "wenige",
+      "gt10": "viele"
+    },
+    "aussagen": {
+      "word-excel|eine": {
+        "titel": "Euer Angebot hängt an einer Person und zwei Dateien.",
+        "text": "Die Regel steckt in ihrer Excel. Ist sie krank oder im Urlaub, wartet der Kunde aufs Angebot.",
+        "gespraech": "Bringt die Excel mit. Marten sagt, ob sich die Regel so übertragen lässt, dass jede Position danach rechnet."
+      },
+      "word-excel|wenige": {
+        "titel": "Jeder hat seine eigene Kopie der Kalkulation.",
+        "text": "Mit mehreren Leuten an Word und Excel entstehen Varianten der Tabelle. Zwei Angebote für dieselbe Leistung haben dann zwei Preise, und beim Schreiben sieht keiner, was übrig bleibt.",
+        "gespraech": "Bringt zwei Angebote von verschiedenen Kollegen mit. Daran sieht man, wo die Rechnung auseinanderläuft."
+      },
+      "word-excel|viele": {
+        "titel": "Bei über zehn Leuten ist die Excel eure eigentliche Software.",
+        "text": "Wer sie pflegt, entscheidet über die Preise aller. Eine Änderung erreicht die Kollegen erst, wenn sie die neue Datei haben.",
+        "gespraech": "Wir klären, welche Version der Tabelle gerade gilt und wer sie ändern darf."
+      },
+      "branchensoftware|eine": {
+        "titel": "Die Sonderfälle rechnet eine Person nebenher.",
+        "text": "Die Software schreibt den Normalfall. Alles mit eigener Regel steht in einer Tabelle daneben, und nur diese Person weiß, wann welche gilt.",
+        "gespraech": "Zeigt einen Sonderfall. Marten sagt, ob ein Zusatz zur Branchensoftware reicht."
+      },
+      "branchensoftware|wenige": {
+        "titel": "Bei euch gibt es zwei Wege zum Preis.",
+        "text": "Den Standard rechnet die Software, den Sonderfall die Tabelle. Mit mehreren Leuten entscheidet jeder selbst, welcher Weg gilt.",
+        "gespraech": "Zeigt einen Sonderfall. Marten sagt, ob ein Zusatz zur Branchensoftware reicht."
+      },
+      "branchensoftware|viele": {
+        "titel": "Die eigentliche Rechnung läuft neben der Software, verteilt auf viele Tabellen.",
+        "text": "Je mehr Leute schreiben, desto mehr Tabellen entstehen. Welcher Preis wie zustande kam, lässt sich später kaum nachvollziehen.",
+        "gespraech": "Wir klären, wie groß der Anteil an Sonderfällen ist. Davon hängt ab, ob sich das lohnt."
+      },
+      "angebots-tool|eine": {
+        "titel": "Das Angebot sieht gut aus. Der Preis kommt aus einer Tabelle.",
+        "text": "Das Programm kennt Positionen und Preise, eure Regel kennt es nicht. Abgetippt wird also weiter.",
+        "gespraech": "Wir klären, ob sich eure Regel ins Programm bringen lässt oder daneben bleiben muss."
+      },
+      "angebots-tool|wenige": {
+        "titel": "Ob die Kalkulation hinter euren Angeboten stimmt, zeigt das Programm nicht.",
+        "text": "Ob die Kalkulation dahinter stimmt, zeigt das Programm nicht. Was übrig bleibt, sieht beim Schreiben keiner.",
+        "gespraech": "Wir klären, ob sich eure Regel ins Programm bringen lässt oder daneben bleiben muss."
+      },
+      "angebots-tool|viele": {
+        "titel": "Viele schreiben schöne Angebote, gerechnet wird überall anders.",
+        "text": "Das Programm sorgt für das gleiche Aussehen, nicht für den gleichen Preis. Bei über zehn Leuten laufen die Kalkulationen auseinander.",
+        "gespraech": "Bringt zwei Angebote verschiedener Kollegen für ähnliche Leistungen mit."
+      },
+      "koepfe|eine": {
+        "titel": "Eine Person rechnet, und die Regel steht nirgends.",
+        "text": "Sie rechnet aus Erfahrung. Das klappt, bis sie fehlt oder jemand dazukommt.",
+        "gespraech": "Marten schreibt im Gespräch mit, wie sie rechnet. Daraus wird die erste Regel, die auch andere anwenden können."
+      },
+      "koepfe|wenige": {
+        "titel": "Zwei Leute, zwei Preise für dieselbe Leistung.",
+        "text": "Ohne gemeinsame Regel rechnet jeder nach eigener Erfahrung. Der Kunde merkt es, wenn er zwei Angebote nebeneinanderlegt.",
+        "gespraech": "Wir vergleichen, wie zwei von euch dieselbe Leistung rechnen. Daraus wird die erste gemeinsame Regel."
+      },
+      "koepfe|viele": {
+        "titel": "Euer Preis hängt davon ab, wer das Angebot schreibt.",
+        "text": "Bei über zehn Leuten ohne gemeinsame Regel ist das der Normalfall. Was eine Leistung kosten soll, weiß dann niemand sicher.",
+        "gespraech": "Wir vergleichen, wie zwei von euch dieselbe Leistung rechnen. Daraus wird die erste gemeinsame Regel."
+      }
+    },
+    "zusatz": {
+      "lt10": "Bei unter zehn Angeboten im Monat sagt Marten auch, wenn sich ein System nicht lohnt.",
+      "30-100": "Bei dieser Menge zählt jede Viertelstunde, die je Angebot wegfällt.",
+      "gt100": "Bei über hundert Angeboten im Monat rechnet sich schon eine Minute, die je Angebot wegfällt."
+    },
+    "gespraechAnders": "Ihr zeigt Marten ein echtes Angebot. Nach 30 Minuten wisst ihr, ob sich das bei euch lohnt."
+  },
+  "einsatz": {
+    "frageA": "heute",
+    "frageB": "hakt",
+    "frageZusatz": "groesse",
+    "aussagen": {
+      "excel|planung": {
+        "titel": "Fällt jemand aus, plant eine Person den Tag neu, im Kopf.",
+        "text": "Wer was darf und wer heute da ist, steht nicht in der Tabelle. Um sechs Uhr morgens hängt alles an der Person, die den Plan kennt.",
+        "gespraech": "Wir gehen einen echten Ausfall der letzten Wochen durch: wer umgeplant hat und wie lange es gedauert hat."
+      },
+      "excel|erfassung": {
+        "titel": "Geplant wird in Excel, geleistet auf Zetteln. Zusammen kommt beides erst am Monatsende.",
+        "text": "Was geplant war und was gemacht wurde, vergleicht keiner, bevor die Rechnung entsteht.",
+        "gespraech": "Wir klären, wie eure Leute heute erfassen und was davon direkt auf die Rechnung kann."
+      },
+      "excel|abrechnung": {
+        "titel": "Die Rechnung baut jemand aus Plan, Zetteln und Mails nach.",
+        "text": "Was in keiner der drei Quellen steht, wird nicht berechnet. Das fällt niemandem auf, weil es keiner vermisst.",
+        "gespraech": "Bringt eine Rechnung vom letzten Monat mit. Wir verfolgen, woher jede Zeile kam."
+      },
+      "excel|forderungen": {
+        "titel": "Ob bezahlt wurde, steht in einer anderen Liste als der Auftrag.",
+        "text": "Gemahnt wird, wenn jemand den Abgleich macht. Meist ist das dieselbe Person, die auch plant.",
+        "gespraech": "Wir klären, wer heute Zahlungseingänge prüft und wie oft."
+      },
+      "branche|planung": {
+        "titel": "Die Software kennt den Auftrag, eure Regeln fürs Umplanen kennt sie nicht.",
+        "text": "Wer welche Qualifikation hat und wer einspringen darf, steht daneben oder im Kopf. Beim Ausfall hilft die Software deshalb kaum.",
+        "gespraech": "Wir klären, welche Regeln beim Umplanen gelten. Kann eure Software sie abbilden, sagt Marten das."
+      },
+      "branche|erfassung": {
+        "titel": "Weil die Erfassung nicht zur Arbeit draußen passt, wird doch wieder abgetippt.",
+        "text": "Deshalb kommen Stunden und Material doch auf Papier oder per Nachricht zurück und werden abgetippt.",
+        "gespraech": "Wir klären, wie eure Leute draußen arbeiten und was sie dort erfassen können."
+      },
+      "branche|abrechnung": {
+        "titel": "Die Software rechnet ab, aber nicht so, wie eure Verträge rechnen.",
+        "text": "Kontingente, Pauschalen und Zuschläge rechnet jemand daneben nach und korrigiert die Rechnung von Hand.",
+        "gespraech": "Bringt einen Vertrag mit, der in der Software nicht sauber abrechnet."
+      },
+      "branche|forderungen": {
+        "titel": "Die Rechnungen kommen aus der Software, das Nachhalten nicht.",
+        "text": "Wer spät zahlt, sieht die Buchhaltung, die Planung sieht es nicht. Der Kunde bekommt den nächsten Einsatz, bevor jemand mahnt.",
+        "gespraech": "Wir klären, wo Rechnung und Zahlung heute zusammenkommen."
+      },
+      "mix|planung": {
+        "titel": "Bei einem Ausfall sucht ihr in drei Programmen.",
+        "text": "Der Kalender zeigt den Termin, die Zeiterfassung die Abwesenheit, eine Liste die Qualifikation. Wer einspringen kann, setzt jemand im Kopf zusammen.",
+        "gespraech": "Wir klären, welches eurer Tools der Anfang wäre und welche bleiben können."
+      },
+      "mix|erfassung": {
+        "titel": "Jedes Tool erfasst ein Stück, keins den ganzen Einsatz.",
+        "text": "Zeit in der Zeiterfassung, Material auf dem Lieferschein, Fotos im Handy. Für die Rechnung sucht jemand alles zusammen.",
+        "gespraech": "Wir klären, welches eurer Tools der Anfang wäre und welche bleiben können."
+      },
+      "mix|abrechnung": {
+        "titel": "Eure Rechnung entsteht genau dort, wo die Tools nicht verbunden sind.",
+        "text": "Jemand überträgt aus Kalender und Zeiterfassung ins Rechnungsprogramm. Jeder Übertrag ist eine Stelle, an der etwas liegen bleibt.",
+        "gespraech": "Wir zählen gemeinsam, wie oft ein Auftrag bis zur Rechnung abgetippt wird."
+      },
+      "mix|forderungen": {
+        "titel": "Das Rechnungsprogramm weiß, wer nicht zahlt. Der Kalender plant ihn trotzdem ein.",
+        "text": "Weil die Tools nichts voneinander wissen, fällt ein säumiger Kunde erst auf, wenn jemand gezielt nachsieht.",
+        "gespraech": "Wir klären, wo Rechnung und Zahlung heute zusammenkommen."
+      }
+    },
+    "zusatz": {
+      "lt30": "Bei unter 30 Leuten sagt Marten ehrlich, ob sich ein eigenes System schon lohnt.",
+      "gt150": "Bei über 150 Leuten geht es meist um mehrere Teams oder Standorte. Das nehmen wir gleich mit auf."
+    },
+    "gespraechAnders": "Ihr erzählt, wie ein Auftrag bei euch läuft. Marten sagt, wo ein System euch Arbeit abnimmt."
+  },
+  "zahlen": {
+    "frageA": "heute",
+    "frageB": "zuerst",
+    "frageZusatz": "groesse",
+    "aussagen": {
+      "excel|umsatz": {
+        "titel": "Euer Umsatz ist so aktuell wie die letzte Excel.",
+        "text": "Wo ihr im Dezember landet, rechnet jemand aus Exporten hoch, einmal im Monat, wenn Zeit ist.",
+        "gespraech": "Wir klären, aus welchen Systemen der Umsatz kommt und was sich davon jeden Morgen rechnen lässt."
+      },
+      "excel|auslastung": {
+        "titel": "Die Auslastung baut jemand von Hand, und dann ist sie schon alt.",
+        "text": "Für die nächsten drei Monate fehlt sie ganz. Wer Luft hat, merkt die Teamleitung, wenn der Auftrag schon fehlt.",
+        "gespraech": "Wir klären, wie ihr Auslastung heute messt und wo neue Aufträge hin sollen."
+      },
+      "excel|db": {
+        "titel": "Woran ihr verdient, müsste jemand aus mehreren Exporten zusammenrechnen.",
+        "text": "Den Umsatz je Kunde seht ihr. Die Kosten je Kunde oder Vertrag rechnet selten jemand jeden Monat nach.",
+        "gespraech": "Wir klären, welche Zahlen dafür schon da sind und welche fehlen."
+      },
+      "excel|vertraege": {
+        "titel": "Welche Verträge auslaufen, steht in einer Liste, die jemand pflegen muss.",
+        "text": "Bleibt das Pflegen liegen, merkt ihr das Vertragsende, wenn die Rechnung fehlt.",
+        "gespraech": "Wir klären, wo eure Verträge heute stehen und wann ihr davon erfahren wollt."
+      },
+      "system|umsatz": {
+        "titel": "Die Zahlen liegen im ERP, die Prognose liegt in Excel.",
+        "text": "Standardberichte zeigen, was war. Wo ihr landet, rechnet trotzdem jemand daneben weiter.",
+        "gespraech": "Wir klären, was sich davon jeden Morgen aus dem ERP rechnen lässt."
+      },
+      "system|auslastung": {
+        "titel": "Euer System kennt die Aufträge, aber nicht, wer in drei Monaten Luft hat.",
+        "text": "Auslastung braucht Planung und Personen zusammen. Das liegt meist in zwei verschiedenen Systemen.",
+        "gespraech": "Wir klären, wo Planung und Personal heute liegen."
+      },
+      "system|db": {
+        "titel": "Die Daten für den Deckungsbeitrag hat das ERP, die passende Auswertung hat es nicht.",
+        "text": "Kosten und Erlöse liegen drin, aber nicht je Kunde oder Vertrag zusammengeführt. Dafür baut jemand eine Excel.",
+        "gespraech": "Wir klären, je was ihr den Deckungsbeitrag sehen wollt: Kunde, Vertrag oder Produkt."
+      },
+      "system|vertraege": {
+        "titel": "Die Verträge liegen im System, den Hinweis aufs Auslaufen gibt es nicht.",
+        "text": "Ein Bericht lässt sich ziehen. Dass ihn jemand rechtzeitig zieht, steht in keinem Standardbericht.",
+        "gespraech": "Wir klären, wie früh ihr vom Auslaufen wissen wollt, damit noch Zeit für das Gespräch ist."
+      },
+      "bi|umsatz": {
+        "titel": "Das Dashboard steht. Ob es stimmt, weiß die Person, die es pflegt.",
+        "text": "Ändert sich ein Export, zeigt die Umsatzkurve falsche Zahlen, und es fällt nicht sofort auf.",
+        "gespraech": "Wir klären, woher das Tool seine Daten bekommt und wer das heute pflegt."
+      },
+      "bi|auslastung": {
+        "titel": "Für Auslastung fehlt eurem BI-Tool meist die Planung als Quelle.",
+        "text": "Es zeigt, was gebucht ist. Was geplant ist, steht woanders und kommt nicht von selbst hinein.",
+        "gespraech": "Wir klären, wo die Planung heute liegt."
+      },
+      "bi|db": {
+        "titel": "Den Deckungsbeitrag zeigt das Tool erst, wenn jemand die Kosten zuordnet.",
+        "text": "Diese Zuordnung bleibt Handarbeit und hängt an derselben Person wie die Pflege.",
+        "gespraech": "Wir klären, welche Kosten sich automatisch zuordnen lassen."
+      },
+      "bi|vertraege": {
+        "titel": "Ein Dashboard zeigt Verträge, es meldet aber nicht von selbst, was ausläuft.",
+        "text": "Wer nicht hineinschaut, erfährt es nicht.",
+        "gespraech": "Wir klären, wann und an wen eine Meldung gehen sollte."
+      },
+      "bwa|umsatz": {
+        "titel": "Euren Umsatz seht ihr drei Wochen nach Monatsende, als Rückblick.",
+        "text": "Steuern lässt sich damit der nächste Monat. Für den laufenden ist es zu spät.",
+        "gespraech": "Wir klären, was sich davon jeden Morgen aus euren Systemen rechnen lässt."
+      },
+      "bwa|auslastung": {
+        "titel": "Die BWA kennt keine Auslastung.",
+        "text": "Sie zeigt Kosten und Erlöse, nicht wer voll ist und wer Luft hat. Das weiß die Teamleitung im Kopf.",
+        "gespraech": "Wir klären, wie ihr Auslastung heute messt und wo neue Aufträge hin sollen."
+      },
+      "bwa|db": {
+        "titel": "Die BWA zeigt den Betrieb im Ganzen, nicht je Kunde.",
+        "text": "Welcher Kunde oder Vertrag sich lohnt, lässt sich daraus nicht ablesen.",
+        "gespraech": "Wir klären, welche Zahlen dafür schon da sind und welche fehlen."
+      },
+      "bwa|vertraege": {
+        "titel": "Was ausläuft, steht in keiner BWA.",
+        "text": "Ein Vertrag fällt auf, wenn sein Umsatz in der BWA fehlt. Für das Gespräch mit dem Kunden ist es dann zu spät.",
+        "gespraech": "Wir klären, wo eure Verträge heute stehen und wann ihr davon erfahren wollt."
+      }
+    },
+    "zusatz": {
+      "lt30": "Bei unter 30 Leuten sagt Marten ehrlich, ob sich ein Cockpit schon lohnt.",
+      "gt150": "Bei über 150 Leuten geht es meist um mehrere Teams oder Standorte. Das nehmen wir gleich mit auf."
+    },
+    "gespraechAnders": "Ihr erzählt, welche Zahlen ihr heute vermisst. Marten sagt, was sich davon live rechnen lässt."
+  },
+  "eigene-software": {
+    "frageA": "system",
+    "frageB": "wo",
+    "frageZusatz": "personen",
+    "aussagen": {
+      "branchensoftware|angebote": {
+        "titel": "Eure Kalkulation läuft neben der Branchensoftware, und genau sie ist vielleicht euer Vorsprung.",
+        "text": "Gerechnet wird in einer Tabelle daneben. Ob das ein eigenes Programm braucht, hängt daran, ob eure Kalkulation euer Vorsprung ist.",
+        "gespraech": "Wir klären, ob ein Zusatz zur Branchensoftware reicht."
+      },
+      "branchensoftware|einsatz": {
+        "titel": "Planung und Abrechnung laufen um die Branchensoftware herum.",
+        "text": "Was ihr anders macht als die Branche, steckt in Zusatzfeldern und Listen. Dort entsteht die Nacharbeit.",
+        "gespraech": "Wir gehen einen Auftrag durch und markieren, wo er die Software verlässt."
+      },
+      "branchensoftware|zahlen": {
+        "titel": "Die Auswertungen, die ihr braucht, kann die Branchensoftware nicht.",
+        "text": "Also baut jemand sie in Excel. Oft reicht hier eine Auswertung neben dem Programm, und die Software bleibt.",
+        "gespraech": "Wir klären, welche Zahl ihr zuerst sehen wollt. Reicht eine Auswertung daneben, sagt Marten das."
+      },
+      "branchensoftware|daneben": {
+        "titel": "Was neben der Branchensoftware läuft, ist vermutlich euer Vorsprung.",
+        "text": "Zusatzfelder und die Excel daneben gibt es, weil ihr anders arbeitet als die Branche. Genau dieser Teil kann ein eigenes Programm bekommen.",
+        "gespraech": "Wir klären, was davon bleiben kann und was ein eigenes Programm bekommen sollte."
+      },
+      "branchensoftware|ueberall": {
+        "titel": "Raus aus der Branchensoftware geht Bereich für Bereich, ohne Stillstand.",
+        "text": "Das geht Bereich für Bereich, die Branchensoftware läuft so lange mit. Buchhaltung und Lohn bleiben und werden angebunden.",
+        "gespraech": "Wir klären, welcher Bereich zuerst kommt und ob Bleiben bei euch die bessere Wahl ist."
+      },
+      "erp|angebote": {
+        "titel": "Preise im ERP, Rechenweg in Excel, dazwischen tippt jemand ab.",
+        "text": "Preise aus dem ERP, Rechenweg in der Tabelle, dazwischen tippt jemand ab.",
+        "gespraech": "Wir klären, ob die Kalkulation ans ERP angebunden werden kann oder ein eigenes Programm braucht."
+      },
+      "erp|einsatz": {
+        "titel": "Euer ERP kennt Ware und Aufträge, den Einsatz draußen kennt es nicht.",
+        "text": "Planung und Abrechnung der Leistung laufen daneben, oft in Excel.",
+        "gespraech": "Wir gehen einen Auftrag durch und markieren, wo er das ERP verlässt."
+      },
+      "erp|zahlen": {
+        "titel": "Die Daten liegen im ERP, die Auswertung baut jemand daneben.",
+        "text": "Das ist oft der kleinste Schritt: eine Auswertung aus dem ERP, ohne das ERP anzufassen.",
+        "gespraech": "Wir klären, welche Zahl ihr zuerst sehen wollt und aus welchen Programmen sie kommt."
+      },
+      "erp|daneben": {
+        "titel": "Neben dem ERP steckt das, womit ihr Geld verdient.",
+        "text": "Was in keine ERP-Maske passt, läuft in Listen und Zusatzfeldern. Das ist der Teil, der ein eigenes Programm bekommen kann, das ERP bleibt.",
+        "gespraech": "Wir klären, was davon bleiben kann und was ein eigenes Programm bekommen sollte."
+      },
+      "erp|ueberall": {
+        "titel": "Ein ERP löst man nicht an einem Stichtag ab.",
+        "text": "Ein Bereich zieht nach dem anderen um, das ERP läuft so lange mit. Was bei euch läuft wie bei tausend anderen, kann bleiben.",
+        "gespraech": "Wir klären, welcher Bereich zuerst kommt und ob Bleiben bei euch die bessere Wahl ist."
+      },
+      "mehrere|angebote": {
+        "titel": "Euer Angebot entsteht quer durch mehrere Programme und wird von Hand zusammengeführt.",
+        "text": "Preise aus dem einen, Texte aus dem anderen, die Kalkulation in Excel. Zusammengeführt wird von Hand.",
+        "gespraech": "Wir zählen gemeinsam, durch wie viele Programme ein Angebot läuft."
+      },
+      "mehrere|einsatz": {
+        "titel": "Vom Auftrag bis zur Rechnung wechselt ihr mehrmals das Programm.",
+        "text": "Bei jedem Wechsel tippt jemand ab. Das Ganze kennt nur, wer alle Programme bedient.",
+        "gespraech": "Wir gehen einen Auftrag durch und zählen die Wechsel."
+      },
+      "mehrere|zahlen": {
+        "titel": "Jedes Programm hat einen Teil der Zahlen, keins zeigt das Ganze.",
+        "text": "Die Gesamtsicht baut jemand in Excel. Das geht oft ohne neues Programm, als Auswertung über alle.",
+        "gespraech": "Wir klären, welche Zahl ihr zuerst sehen wollt und aus welchen Programmen sie kommt."
+      },
+      "mehrere|daneben": {
+        "titel": "Zwischen den Programmen steckt eure eigentliche Arbeit.",
+        "text": "Was keins der Programme abdeckt, hält jemand in Listen zusammen. Wer das macht, ist schwer zu ersetzen.",
+        "gespraech": "Wir klären, was davon bleiben kann und was ein eigenes Programm bekommen sollte."
+      },
+      "mehrere|ueberall": {
+        "titel": "Aus mehreren Programmen wird eins, Stück für Stück, und das Alte läuft so lange mit.",
+        "text": "Ein Bereich nach dem anderen zieht um, die alten laufen so lange mit. Eure Daten kommen mit.",
+        "gespraech": "Wir klären, welcher Bereich zuerst kommt und welche Programme bleiben dürfen."
+      },
+      "excel|angebote": {
+        "titel": "Eure Kalkulation lebt in einer Excel, die zwei Leute verstehen.",
+        "text": "Fällt einer aus, rechnet der andere allein. Ändern traut sich keiner.",
+        "gespraech": "Bringt die Excel mit. Marten sagt, was davon schon gebaut ist und was programmiert werden müsste."
+      },
+      "excel|einsatz": {
+        "titel": "Planung und Abrechnung hängen an den zwei Leuten, die die Excel kennen.",
+        "text": "Das funktioniert, solange die zwei da sind, die sich auskennen.",
+        "gespraech": "Wir gehen einen Auftrag von der Anfrage bis zur Rechnung durch."
+      },
+      "excel|zahlen": {
+        "titel": "Eure Auswertung ist so gut wie die letzte Excel.",
+        "text": "Wer sie baut, entscheidet, was die Geschäftsführung sieht. Jeden Monat neu.",
+        "gespraech": "Wir klären, welche Zahl ihr zuerst sehen wollt."
+      },
+      "excel|daneben": {
+        "titel": "Bei euch ist Excel das Programm.",
+        "text": "Über Jahre gewachsen, voll mit euren Regeln. Genau die sind der Bauplan für ein eigenes Programm.",
+        "gespraech": "Bringt die wichtigste Excel mit. Marten sagt, was davon schon gebaut ist."
+      },
+      "excel|ueberall": {
+        "titel": "Aus Excel wird eine Anwendung, Bereich für Bereich, und die Excel läuft so lange weiter.",
+        "text": "Die Excel läuft weiter, bis der Bereich im neuen Programm stimmt. Die Daten kommen mit.",
+        "gespraech": "Wir klären, welcher Bereich zuerst kommt."
+      }
+    },
+    "zusatz": {
+      "lt10": "Bei unter zehn Leuten am Programm ist ein Zusatz zum Standard oft der bessere Weg. Das sagt Marten auch so.",
+      "gt80": "Bei über 80 Leuten zählt vor allem, dass das Tagesgeschäft während des Umzugs weiterläuft."
+    },
+    "gespraechAnders": "Ihr erzählt, womit ihr arbeitet und was anders laufen soll. Marten sagt, was davon schon gebaut ist."
+  },
+  "software-check": {
+    "frageA": "was",
+    "frageB": "anlass",
+    "frageZusatz": "groesse",
+    "aussagen": {
+      "intern|golive": {
+        "titel": "Ein Tool aus dem Fachbereich geht live, und außer dem, der es gebaut hat, kennt es keiner.",
+        "text": "Vor dem Go-Live zählt, was passiert, wenn zwei gleichzeitig klicken oder die Datenbank weg ist.",
+        "gespraech": "Ihr erzählt, was läuft und wer es gebaut hat.",
+        "check": "Architektur-Review vor dem Go-Live"
+      },
+      "intern|kunde": {
+        "titel": "Für ein intern gebautes Tool reicht dem Kunden eine Hausliste meist nicht.",
+        "text": "Eine Hausliste reicht ihm dann meist nicht. Der Bericht trägt Standard und geprüftes Level, das kann ein Auditor nachlesen.",
+        "gespraech": "Wir klären, welchen Nachweis euer Kunde genau verlangt.",
+        "check": "Sicherheitsprüfung nach OWASP ASVS"
+      },
+      "intern|cra": {
+        "titel": "Ob ein internes Tool unter den CRA fällt, hängt daran, ob ihr es weitergebt.",
+        "text": "Läuft es nur bei euch, ist die Frage eine andere als bei Software, die ihr verkauft. Das klären wir zuerst, bevor jemand prüft.",
+        "gespraech": "Wir klären, was ihr an Kunden abgebt.",
+        "check": "Erst Einordnung im Gespräch"
+      },
+      "intern|bauch": {
+        "titel": "Bei schnell gebauten Tools sitzen die Fehler meist bei Rechten, Anmeldung und Eingaben.",
+        "text": "Meist sitzen die Fehler bei Zugriffsrechten, Anmeldung und Eingaben.",
+        "gespraech": "Ihr erzählt, was läuft und wer es gebaut hat. Marten sagt, was er als Erstes anschauen würde.",
+        "check": "Architektur-Review, danach je nach Befund Sicherheit"
+      },
+      "intern|vorfall": {
+        "titel": "Nach einem Vorfall ist die Frage, was in dem Tool sonst noch offen ist.",
+        "text": "Dann ist die Frage, was sonst noch offen ist, und ob jemand außer dem Entwickler den Code beurteilen kann.",
+        "gespraech": "Wir klären, was passiert ist und was seitdem geändert wurde.",
+        "check": "Sicherheitsprüfung nach OWASP ASVS"
+      },
+      "portal|golive": {
+        "titel": "Bei einem Portal geht zuerst schief, wer welche Daten sieht.",
+        "text": "Bei einem Portal geht zuerst schief, wer welche Daten sieht. Das gehört vor den Start geprüft.",
+        "gespraech": "Wir klären, was bis zum Termin noch geprüft werden kann.",
+        "check": "Review und Prüfung, in dieser Reihenfolge"
+      },
+      "portal|kunde": {
+        "titel": "Euer Kunde braucht einen Bericht, den sein Auditor nachlesen kann.",
+        "text": "Der Bericht nennt Standard und Level, jeder Befund ist eingestuft und hat einen Vorschlag.",
+        "gespraech": "Wir klären, welchen Nachweis euer Kunde genau verlangt.",
+        "check": "Sicherheitsprüfung nach OWASP ASVS"
+      },
+      "portal|cra": {
+        "titel": "Ob euer Portal unter den CRA fällt, hängt davon ab, was ihr ausliefert.",
+        "text": "Eine App, die Kunden installieren, ist eine andere Frage als eine Seite im Browser. Das klären wir zuerst.",
+        "gespraech": "Wir klären, was ihr an Kunden abgebt.",
+        "check": "Erst Einordnung im Gespräch"
+      },
+      "portal|bauch": {
+        "titel": "Wenn im Haus keiner den Code kennt, ist das Bauchgefühl meist berechtigt.",
+        "text": "Das Bauchgefühl ist meist berechtigt, wenn niemand den Code kennt, der ihn betreibt.",
+        "gespraech": "Ihr erzählt, wer es gebaut hat und wer es heute betreibt.",
+        "check": "Architektur-Review, danach je nach Befund Sicherheit"
+      },
+      "portal|vorfall": {
+        "titel": "Nach einem Vorfall im Portal zählt, was sonst noch offen ist, bevor es der Nächste findet.",
+        "text": "Dann zählt, was sonst noch offen ist, bevor es der nächste findet.",
+        "gespraech": "Wir klären, was passiert ist und was seitdem geändert wurde.",
+        "check": "Sicherheitsprüfung nach OWASP ASVS"
+      },
+      "produkt|golive": {
+        "titel": "Vor dem Marktstart zu prüfen ist günstiger als nachzubessern, und der CRA verlangt es ab Ende 2027.",
+        "text": "Dann gilt für euch der CRA, und bis Ende 2027 müsst ihr nachweisbar sauber sein. Vor dem Start zu prüfen ist günstiger als danach.",
+        "gespraech": "Wir klären, was bis zum Start geprüft werden kann.",
+        "check": "Sicherheitsprüfung nach OWASP ASVS"
+      },
+      "produkt|kunde": {
+        "titel": "Für eure Kunden zählt ein Bericht mit Standard und geprüftem Level.",
+        "text": "Mit Standard und Level im Bericht kann er das nachlesen. Ein Zertifikat ist es nicht, das stellt eine Prüfstelle aus.",
+        "gespraech": "Wir klären, welchen Nachweis euer Kunde genau verlangt.",
+        "check": "Sicherheitsprüfung nach OWASP ASVS"
+      },
+      "produkt|cra": {
+        "titel": "Mit einem Produkt mit Software drin betrifft euch der CRA.",
+        "text": "Bis Ende 2027 müsst ihr nachweisbar sauber sein, mit Meldeprozess und Risikobewertung. Wir bereiten vor und begleiten.",
+        "gespraech": "Wir klären, was ihr abgebt und was davon zuerst dran ist.",
+        "check": "Sicherheitsprüfung, danach Begleitung zum CRA"
+      },
+      "produkt|bauch": {
+        "titel": "Jeder Fehler in Software, die ihr verkauft, landet bei euren Kunden.",
+        "text": "Jeder Fehler darin liegt bei euren Kunden. Und ab Ende 2027 fragt der CRA danach.",
+        "gespraech": "Ihr erzählt, was im Produkt läuft und wer es gebaut hat.",
+        "check": "Architektur-Review, danach je nach Befund Sicherheit"
+      },
+      "produkt|vorfall": {
+        "titel": "Bei verkaufter Software haben vermutlich mehrere Kunden dieselbe Lücke.",
+        "text": "Bei verkaufter Software ist die Frage, wie viele Kunden dieselbe Lücke haben.",
+        "gespraech": "Wir klären, was passiert ist und was seitdem geändert wurde.",
+        "check": "Sicherheitsprüfung nach OWASP ASVS"
+      },
+      "konzept|golive": {
+        "titel": "Kurz vor dem Bau ist der günstigste Moment für einen Blick aufs Konzept.",
+        "text": "Dann ist jetzt der günstigste Moment für einen Blick auf Konzept und Datenmodell.",
+        "gespraech": "Wir klären, wie viel Zeit bis zum Termin bleibt.",
+        "check": "Architektur-Review des Konzepts"
+      },
+      "konzept|kunde": {
+        "titel": "Das geforderte Level lässt sich jetzt als Anforderung festlegen. Später nachzurüsten kostet mehr.",
+        "text": "Dann lässt sich das geprüfte Level gleich als Anforderung festlegen. Später nachzurüsten kostet mehr.",
+        "gespraech": "Wir klären, welchen Nachweis euer Kunde genau verlangt.",
+        "check": "Architektur-Review des Konzepts"
+      },
+      "konzept|cra": {
+        "titel": "Wird es ein Produkt, plant ihr den CRA am besten gleich mit.",
+        "text": "Meldeprozess und Risikobewertung kosten im Konzept wenig und nach dem Start viel.",
+        "gespraech": "Wir klären, was ihr an Kunden abgeben wollt.",
+        "check": "Architektur-Review des Konzepts"
+      },
+      "konzept|bauch": {
+        "titel": "Am Konzept ist ein Fehler noch am billigsten.",
+        "text": "Am Konzept ist ein Fehler noch am billigsten.",
+        "gespraech": "Ihr erzählt, was gebaut werden soll und von wem.",
+        "check": "Architektur-Review des Konzepts"
+      },
+      "konzept|vorfall": {
+        "titel": "Was beim alten System schiefging, gehört gleich in die Planung des neuen.",
+        "text": "Dann gehört in die Planung, was damals schiefging, damit es im neuen nicht wieder passiert.",
+        "gespraech": "Wir klären, was passiert ist.",
+        "check": "Architektur-Review des Konzepts"
+      }
+    },
+    "zusatz": {},
+    "gespraechAnders": "Ihr erzählt, was läuft und wer es gebaut hat. Marten sagt, was er als Erstes anschauen würde."
+  }
+}

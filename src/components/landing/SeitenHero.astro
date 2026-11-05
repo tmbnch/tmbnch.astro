@@ -1,0 +1,96 @@
+---
+/**
+ * Erster Bildschirm der Seiten außerhalb des Funnels, dasselbe Muster wie `SchlankPage`: links
+ * Botschaft und ein Weiterlesen-Link, rechts ein Bild. Mobil steht der Link unter dem Bild. Das Bild kommt über den Standard-Slot.
+ */
+import { Picture } from 'astro:assets';
+import Blueprint from '@/components/hero-backgrounds/Blueprint.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import founderPortrait from '@/assets/rocketbase/founder-marten-priess.jpg';
+import { contactLinks } from '@/data/rocketbase';
+
+interface Props {
+  eyebrow: string;
+  titel: string;
+  /** Zweiter Teil der Überschrift in Markenfarbe. */
+  titelFarbe?: string;
+  text: string;
+  /** Ohne Angabe gibt es im Hero keinen Hauptknopf: Erst lesen, Kontakt steht im Menü. */
+  knopf?: string;
+  href?: string;
+  zweiterKnopf?: { text: string; href: string };
+}
+const {
+  eyebrow,
+  titel,
+  titelFarbe,
+  text,
+  knopf,
+  href = contactLinks.cal,
+  zweiterKnopf,
+} = Astro.props;
+const mitBild = Astro.slots.has('default');
+---
+
+<section class="relative overflow-x-clip">
+  <Blueprint />
+  <div
+    class="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_60%_50%_at_30%_40%,var(--color-background)_0%,transparent_75%)] opacity-80"
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class:list={['relative z-10 mx-auto grid w-full max-w-7xl gap-x-14 gap-y-6 px-5 pt-24 pb-10 sm:px-8 sm:pt-28 lg:pb-16', mitBild && 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:grid-rows-[auto_auto]']}
+  >
+    <div class:list={[mitBild ? 'lg:self-end' : 'max-w-3xl']}>
+      <p class="text-brand-600 dark:text-brand-300 text-xs font-semibold tracking-[0.14em] uppercase">
+        {eyebrow}
+      </p>
+      <h1
+        lang="de"
+        class="font-display text-foreground mt-3 text-[2rem] leading-[1.1] font-bold tracking-tight text-balance sm:text-5xl sm:leading-[1.08] lg:text-[2.75rem] lg:leading-[1.12]"
+      >
+        {titel}
+        {titelFarbe && <span class="text-brand-500 block">{titelFarbe}</span>}
+      </h1>
+      <p class="text-foreground-secondary mt-4 text-base leading-7 sm:text-lg sm:leading-8">{text}</p>
+    </div>
+    {mitBild && <div class="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center"><slot /></div>}
+    <div class="lg:self-start">
+      <div class="flex flex-wrap items-center gap-3">
+        {
+          knopf && (
+            <Button size="lg" href={href} target={href.startsWith('http') ? '_blank' : undefined}>
+              {knopf}
+              <Icon name={href.startsWith('http') ? 'arrow-up-right' : 'arrow-right'} size="sm" />
+            </Button>
+          )
+        }
+        {
+          zweiterKnopf && (
+            <Button variant="link" href={zweiterKnopf.href}>
+              {zweiterKnopf.text}
+              <Icon name="arrow-right" size="sm" />
+            </Button>
+          )
+        }
+      </div>
+      <div class:list={['mt-4 hidden items-center gap-3', knopf && 'lg:flex']}>
+        <Picture
+          src={founderPortrait}
+          alt="Marten Prieß, Gründer von RocketBase"
+          widths={[80, 160]}
+          sizes="2.5rem"
+          formats={['avif', 'webp']}
+          class="h-10 w-10 rounded-full object-cover object-[center_22%]"
+          pictureAttributes={{ class: 'shrink-0' }}
+          loading="eager"
+        />
+        <p class="text-foreground-muted text-sm leading-5">
+          Marten Prieß spricht selbst mit euch.<br />30 Minuten, online, kostenlos.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

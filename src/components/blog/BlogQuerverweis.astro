@@ -1,0 +1,59 @@
+---
+/**
+ * Zwei Blogartikel zu einer Tür (Frontmatter `doors`), am Ende der Tür-Seiten. Nur auf den
+ * indexierten Seiten einbinden, nicht auf den Funnels unter /f/ (lenkt dort ab).
+ * Reihenfolge: Artikel, die nur dieser Tür zugeordnet sind, zuerst; dann hervorgehobene; dann neueste.
+ */
+import { getCollection } from 'astro:content';
+import BlogCard from './BlogCard.astro';
+import { defaultLocale } from '@/i18n/config';
+import { getReadingTime } from '@/lib/utils';
+import type { TuerId } from '@/data/tueren';
+
+interface Props {
+  tuer: TuerId;
+  titel?: string;
+  max?: number;
+}
+const { tuer, titel = 'Zum Weiterlesen', max = 2 } = Astro.props;
+
+const posts = (
+  await getCollection('blog', ({ data }) => data.locale === defaultLocale && data.doors.includes(tuer) && (import.meta.env.PROD ? data.draft !== true : true))
+)
+  .sort(
+    (a, b) =>
+      a.data.doors.length - b.data.doors.length ||
+      Number(b.data.featured) - Number(a.data.featured) ||
+      b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+  )
+  .slice(0, max);
+---
+
+{
+  posts.length > 0 && (
+    <section class="bg-background border-border relative border-t py-20 lg:py-24">
+      <div class="container max-w-6xl">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-brand-600 dark:text-brand-300 font-mono text-xs font-semibold tracking-[0.2em] uppercase">Aus dem Blog</p>
+            <h2 class="font-display text-foreground mt-3 text-2xl font-bold tracking-tight sm:text-3xl">{titel}</h2>
+          </div>
+          <a href="/blog/" class="text-brand-600 text-sm font-semibold hover:underline">Alle Artikel</a>
+        </div>
+        <div class="mt-10 grid gap-6 md:grid-cols-2">
+          {posts.map((post) => (
+            <BlogCard
+              title={post.data.title}
+              description={post.data.description}
+              href={`/blog/${post.id.replace(`${defaultLocale}/`, '')}/`}
+              publishedAt={post.data.publishedAt}
+              tags={post.data.tags}
+              image={post.data.image}
+              readingTime={getReadingTime(post.body ?? '')}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

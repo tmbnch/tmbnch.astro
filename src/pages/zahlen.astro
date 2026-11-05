@@ -1,0 +1,51 @@
+---
+/**
+ * Tür 3: Zahlen & Steuerung. Dieselben Inhalte wie die Anzeigen-Landing
+ * /f/zahlen/, aber mit Navigation, indexiert und ohne Quiz. Inhalt in
+ * components/zahlen/ZahlenPage.astro.
+ */
+import { Image } from 'astro:assets';
+import LandingLayout from '@/layouts/LandingLayout.astro';
+import { zahlenFaqs } from '@/components/zahlen/faqs';
+import { createServiceSchema, createFAQSchema } from '@/lib/schema';
+import WegfallZiele from '@/components/zahlen/WegfallZiele.astro';
+import SchlankPage from '@/components/funnel-schlank/SchlankPage.astro';
+import cockpit from '@/assets/references/cockpit-demo-1920.png';
+import AuslastungTeams from '@/components/zahlen/AuslastungTeams.astro';
+import HeuteKalender from '@/components/zahlen/HeuteKalender.astro';
+import { zahlen, preisFrage } from '@/data/funnelSchlank';
+import { additionalCases, cases } from '@/data/rocketbase';
+
+const serviceSchema = createServiceSchema({
+  name: 'Zahlen und Steuerung',
+  description: 'Cockpit für Umsatz und Prognose, Auslastung bis zur einzelnen Person, Deckungsbeitrag und auslaufende Verträge, live aus den vorhandenen Systemen.',
+  url: new URL(Astro.url.pathname, Astro.site).toString(),
+  serviceType: 'Individuelles Management-Cockpit und Reporting',
+  areaServed: 'DE',
+});
+const faqs = zahlenFaqs.map((f) => (f.q === preisFrage.q ? preisFrage : f));
+const faqSchema = createFAQSchema(faqs.map((f) => ({ question: f.q, answer: f.a })));
+const stimme = [...cases, ...additionalCases].find((c) => c.slug === 'stage-cml')?.testimonial;
+---
+
+<LandingLayout
+  title="Kennzahlen-Dashboard: Umsatz und Auslastung"
+  description="Eine Übersicht aus den Zahlen, die ihr schon habt. Ihr seht jeden Tag, wie der Betrieb läuft und wo er in drei Monaten steht. BWA und Steuerberater bleiben."
+  lang="de"
+  extraSchemas={[serviceSchema, faqSchema]}
+>
+  <SchlankPage mehrTitel="Ihr seht heute, was nächstes Jahr fehlt" tor={zahlen} modus="seite" blogTuer="zahlen" faqs={faqs} zitat={stimme}>
+  <Image
+    slot="hero"
+    src={cockpit}
+    alt="Cockpit mit Umsatz, Auslastung und Verträgen, Demo-Daten"
+    widths={[640, 960, 1280]}
+    sizes="(min-width: 1024px) 50vw, 100vw"
+    class="border-border w-full rounded-2xl border shadow-xl"
+    loading="eager"
+  />
+  <div class="hidden lg:block"><AuslastungTeams /></div>
+  <HeuteKalender slot="heute" />
+  <WegfallZiele slot="mehr" />
+</SchlankPage>
+</LandingLayout>

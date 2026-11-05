@@ -1,0 +1,807 @@
+---
+/**
+ * Funnel-Fassung, gerendert von /f/einsatz/ (seit 2026-10-16, Branch new-funnels). Die indexierte
+ * Tür-Seite /einsatzplanung/ hängt an components/einsatz/ und bleibt ausführlicher.
+ *
+ * Inhalt der Tür 2 „Einsatz & Abrechnung“, geteilt von zwei Seiten (wie AngebotePage, ZahlenPage):
+ *   /f/einsatz/       (variant="funnel"): Anzeigen-Landing, FunnelLayout, noindex, Quiz im Hero und am Ende
+ *   /einsatzplanung/  (variant="site"):   Tür 2 in der Navigation, LandingLayout, indexiert, statt Quiz ein CTA
+ * Entstanden 2026-10-07, ersetzt die alte Einsatzplanungs-Seite.
+ *
+ * Die Ansichten sind Nachbauten aus laufenden Kundenlösungen (Ablaufplanung und Plantafel aus dem
+ * Metallbau, Einsatz je Vertrag, Leistungsnachweis, Rechnung und Mahnwesen aus der Beratung) in
+ * HTML/SVG, mit Beispieldaten. Keine Screenshots, außer im Referenzblock.
+ *
+ * Keine Preise auf dieser Seite, auch kein „Festpreis“, kein Workshop als Schritt.
+ *
+ * Funnel-Fassung 2026-10-18 (Muster wie /f/angebote/, Vorbild hivegrid.de): wenig Text, die
+ * Grafiken erzählen und lösen ihre Aktion beim Hereinscrollen selbst aus (lib/szene.ts):
+ *   Heute → 01 Ablauf (Verzug meldet sich) → 02 Plantafel (Krankmeldung) → 03 Rechnung →
+ *   04 Praxis → Vertrauensband → 05 Lohnt sich + Marten → 06 FAQ → Kontakt.
+ * Raus (stehen auf /einsatzplanung/): Einsatz je Vertrag, Mahnwesen, mittlerer Aufruf,
+ * Links zu den Referenzen.
+ */
+import { einsatzFaqs } from './faqs';
+import BlogQuerverweis from '@/components/blog/BlogQuerverweis.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import Blueprint from '@/components/hero-backgrounds/Blueprint.astro';
+import { ClientLogoStrip } from '@/components/ui/marketing/ClientLogoStrip';
+import SectionHeader from '@/components/angebote/SectionHeader.astro';
+import FunnelQuiz from '@/components/funnel/FunnelQuiz';
+import ErstgespraechKarte from '@/components/funnel/ErstgespraechKarte.astro';
+import DealZeile from '@/components/funnel/DealZeile.astro';
+import VonHeuteBisDahin from '@/components/funnel/VonHeuteBisDahin.astro';
+import LohntSich from '@/components/funnel/LohntSich.astro';
+import VertrauensBand from '@/components/funnel/VertrauensBand.astro';
+import '@/styles/szene.css';
+import { Picture } from 'astro:assets';
+import founderPortrait from '@/assets/rocketbase/founder-marten-priess.jpg';
+import metallBoard from '@/assets/references/metall-board-highlighted.png';
+import mavoxPlanung from '@/assets/references/mavox-winterdienst-tourenplanung.png';
+import fkcInvoice from '@/assets/references/fkc-invoice.png';
+import type { FunnelQuizQuestion } from '@/data/funnels';
+import { contactLinks } from '@/data/rocketbase';
+import AblaufPlan from '@/components/einsatz/AblaufPlan.astro';
+import Plantafel from '@/components/einsatz/Plantafel.astro';
+import LeistungRechnung from '@/components/einsatz/LeistungRechnung.astro';
+import HeuteEinsatz from '@/components/einsatz/HeuteEinsatz.astro';
+import '@/components/angebote/frame.css';
+import '@/components/zahlen/zahlen.css';
+import '@/components/einsatz/einsatz.css';
+
+interface Props {
+  variant: 'funnel' | 'site';
+}
+const { variant } = Astro.props;
+const istFunnel = variant === 'funnel';
+
+const clientLogos = [
+  { key: 'fkc_logo', name: 'FKC Consulting' },
+  { key: 'diezinger_logo', name: 'Schlosserei Diezinger' },
+  { key: 'mavox_logo', name: 'MAVOX Winterdienst' },
+  { key: 'stage_logo', name: 'Stage Entertainment' },
+];
+
+const quizFragen: FunnelQuizQuestion[] = [
+  {
+    id: 'heute',
+    question: 'Wie plant ihr heute eure Einsätze?',
+    hint: 'Grobe Einordnung reicht.',
+    options: [
+      {
+        id: 'excel',
+        label: 'In Excel oder an der Wandtafel',
+        description: 'Eine Person hält den Plan zusammen.',
+      },
+      {
+        id: 'branche',
+        label: 'In einer Branchensoftware',
+        description: 'Sie kann vieles, aber nicht so, wie wir arbeiten.',
+      },
+      {
+        id: 'mix',
+        label: 'Verteilt auf mehrere Tools',
+        description: 'Kalender, Zeiterfassung, Rechnungsprogramm, dazwischen Listen.',
+      },
+      {
+        id: 'sonstiges',
+        label: 'Anders',
+        allowText: true,
+        textPlaceholder: 'Beschreibt in ein, zwei Sätzen, wie ihr heute plant …',
+      },
+    ],
+  },
+  {
+    id: 'hakt',
+    question: 'Wo hakt es am meisten?',
+    hint: 'Das, was am meisten Zeit kostet.',
+    options: [
+      {
+        id: 'planung',
+        label: 'Planung und Umplanung',
+        description: 'Krankheit, Verzug, Eilaufträge: jedes Mal von vorn.',
+      },
+      {
+        id: 'erfassung',
+        label: 'Erfassung der Leistungen',
+        description: 'Stunden und Material kommen spät und unvollständig zurück.',
+      },
+      {
+        id: 'abrechnung',
+        label: 'Abrechnung',
+        description: 'Rechnungen werden aus losen Enden zusammengesucht.',
+      },
+      {
+        id: 'forderungen',
+        label: 'Offene Rechnungen',
+        description: 'Mahnen passiert, wenn jemand dran denkt.',
+      },
+    ],
+  },
+  {
+    id: 'groesse',
+    question: 'Wie viele Leute arbeiten bei euch?',
+    hint: 'Ungefähr reicht.',
+    options: [
+      { id: 'lt30', label: 'Unter 30' },
+      { id: '30-80', label: '30 bis 80' },
+      { id: '80-150', label: '80 bis 150' },
+      { id: 'gt150', label: 'Über 150' },
+    ],
+  },
+];
+
+const quizProps = {
+  einordnung: 'einsatz' as const,
+  funnel: 'einsatz',
+  questions: quizFragen,
+  contact: {
+    heading: 'Wohin darf sich Marten Prieß melden?',
+    text: 'Hinterlasst eure Kontaktdaten, Marten Prieß meldet sich werktags persönlich und sucht mit euch einen Termin.',
+  },
+  success: {
+    heading: 'Danke, eure Nachricht ist angekommen.',
+    text: 'Marten Prieß meldet sich werktags bei euch.',
+  },
+  submitLabel: 'Nachricht senden',
+  phoneHint: 'Telefon für eine kurze Rückfrage. Wir rufen an, wenn es hilft.',
+  leadEvent: 'einsatz_lead',
+  privacyUrl: '/datenschutz/',
+};
+
+const referenzen = [
+  {
+    href: '/referenzen/fkc-consulting/',
+    client: 'FKC Consulting',
+    title: 'Einsätze planen gegen das Kontingent',
+    text: 'Was im Vertrag steht, steuert die Terminplanung: jeder Einsatz zieht vom Kontingent ab, Leistungen werden erfasst, die Rechnung bringt den Nachweis mit. Abgelöst hat das eine Branchensoftware samt Excel daneben.',
+    image: fkcInvoice,
+    alt: 'Rechnung mit Leistungsnachweis in der Anwendung',
+  },
+  {
+    href: '/referenzen/schlosserei-diezinger/',
+    client: 'Schlosserei Diezinger',
+    title: 'Plantafel und Ablauf je Auftrag',
+    text: 'Fertigungsschritte, Personen, Abwesenheiten und Fremdvergaben in einem Plan statt in Excel. Anmelden in der Werkstatt per Karte, damit die Erfassung schnell genug ist.',
+    image: metallBoard,
+    alt: 'Farbige Auftragsplanung als Board',
+  },
+  {
+    href: '/referenzen/mavox-winterdienst/',
+    client: 'MAVOX Winterdienst',
+    title: 'Touren und Nachweise draußen',
+    text: 'Tourenplanung im Büro, Erfassung mit Foto-Nachweis auf dem Handy, auch nachts und am Wochenende. Was draußen passiert, ist sofort abrechenbar.',
+    image: mavoxPlanung,
+    alt: 'Tourenplanung für den Winterdienst',
+  },
+];
+
+const miniFaqs = einsatzFaqs;
+
+// „Von heute bis dahin“: Strecke und Einwände der Funnel-Fassung (ersetzt dort die FAQ).
+const strecke = {
+  stationen: [
+    { wann: 'So läuft es heute', titel: 'Excel planen, einzeln nachtelefonieren', text: 'Geplant wird in einer Excel, die eine Person versteht. Fällt jemand aus, geht das Umplanen über Anrufe und Nachrichten. Was erledigt wurde, kommt am Monatsende.' },
+    { wann: 'Woche 1 bis 2', titel: 'Erstgespräch und Aufnahme', text: 'Dreißig Minuten über eure Lage. Dann nehmen wir euren Ablauf auf, so wie er wirklich läuft, und ihr bekommt einen Festpreis.' },
+    { wann: 'Danach, 3 bis 6 Wochen', titel: 'Die Plantafel läuft', text: 'Programmiert zum Festpreis. Erfassung und Rechnung folgen Stufe für Stufe, eure Wochenplanung bleibt, bis das Neue trägt.' },
+  ] as const,
+  einwaende: [
+    { satz: 'Das dauert ewig.', antwort: 'Nach der Aufnahme läuft die Plantafel in drei bis sechs Wochen. Euer Tagesgeschäft läuft weiter.' },
+    { satz: 'Dafür haben wir keine Zeit.', antwort: 'Zwei bis drei Stunden pro Woche von euch: ein Termin, dazu Ausprobieren.' },
+    { satz: 'Dann müssen wir alles umstellen.', antwort: 'Umgestellt wird Schritt für Schritt. Das Alte läuft, bis das Neue trägt.' },
+    { satz: 'Wir haben schon ein ERP.', antwort: 'Das bleibt meist für Belege und Finanzen. Das Neue holt sich die Daten von dort.' },
+    { satz: 'Unsere Monteure machen das nicht mit.', antwort: 'Erfassen heißt: Foto, ein Tipp, fertig. Auf dem Handy, auch nachts auf der Baustelle.' },
+    { satz: 'Ist das nicht wieder Software von der Stange?', antwort: 'Nein. Wir setzen auf dem auf, was bei anderen Betrieben schon läuft, und programmieren, was bei euch anders ist. Nichts zum Konfigurieren, keine Grenzen. Mit unserer Erfahrung und KI beim Programmieren geht das schnell und bleibt bezahlbar.' },
+    { satz: 'Das ist sicher teuer.', antwort: 'Den Rahmen hört ihr im Erstgespräch, den Festpreis nach der Aufnahme. Programmiert wird erst, wenn ihr ihn kennt.' },
+  ],
+};
+
+---
+
+<!-- HERO -->
+<section
+  data-hero
+  class:list={[
+    'relative overflow-x-clip lg:flex lg:flex-col',
+    istFunnel ? 'lg:min-h-[calc(100svh-3.5rem)]' : 'pt-24 sm:pt-20 lg:min-h-[100svh] lg:pt-16',
+  ]}
+>
+  <Blueprint />
+  <div
+    class="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_60%_50%_at_30%_40%,var(--color-background)_0%,transparent_75%)] opacity-80"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div
+    class="relative z-10 mx-auto w-full max-w-[84rem] px-5 pt-8 pb-16 sm:px-8 sm:pt-14 lg:grid lg:flex-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:items-center lg:gap-16 lg:px-12 lg:py-6"
+  >
+    <div class="text-center lg:text-left">
+      <p
+        data-reveal="fade-down"
+        class="text-brand-600 dark:text-brand-300 text-sm font-semibold tracking-[0.22em] uppercase"
+      >
+        Einsatz &amp; Abrechnung
+      </p>
+      <h1
+        data-reveal="fade-down"
+        lang="de"
+        class="font-display text-foreground mt-3 text-[2.05rem] leading-[1.08] font-bold tracking-tight text-balance hyphens-auto [-webkit-hyphens:auto] sm:mt-5 sm:text-6xl sm:leading-[1.05] xl:text-[4.25rem]"
+      >
+        {
+          istFunnel ? (
+            <>
+              Planen könnt ihr.
+              <span class="text-brand-500 block">Umplanen kostet euch den Tag.</span>
+            </>
+          ) : (
+            <>
+        Geplant, erledigt, abgerechnet.
+        <span class="text-brand-500 block">In einem System.</span>
+            </>
+          )
+        }
+      </h1>
+      <p
+        data-reveal
+        class="text-foreground-muted mt-6 hidden flex-wrap items-center justify-center gap-x-2.5 gap-y-2 text-sm font-medium sm:flex lg:justify-start"
+      >
+        <span>Schluss mit</span>
+        {
+          ['Plan-Excel', 'Telefonketten', 'Stundenzetteln'].map((alt) => (
+            <span class="hero-alt border-border rounded-md border px-2 py-0.5">{alt}</span>
+          ))
+        }
+      </p>
+      {istFunnel && <DealZeile />}
+      {
+        !istFunnel && (
+      <p
+        data-reveal
+        class="text-foreground-secondary mx-auto mt-4 max-w-lg text-base leading-7 sm:mt-7 sm:text-lg sm:leading-8 lg:mx-0"
+      >
+        Wer was macht, was erledigt ist, was auf die Rechnung kommt. In einem System, nach eurem
+        Ablauf.
+      </p>
+        )
+      }
+      <p
+        class="text-foreground-muted border-border/70 bg-background/85 mx-auto mt-8 hidden max-w-lg rounded-xl border px-4 py-3 text-sm leading-6 backdrop-blur-sm lg:mx-0 lg:block"
+      >
+        Der Einsatzplan weiß, wer kann, wer darf und wer heute da ist. Fällt jemand aus, seht ihr
+        sofort, wer einspringen kann. Für Werkstatt, Außendienst und Beratung.
+      </p>
+    </div>
+
+    {
+      istFunnel ? (
+        <div id="quiz" class="mt-7 scroll-mt-20 sm:mt-10 lg:mt-0 lg:min-h-[38rem]" data-quiz>
+          <FunnelQuiz
+            client:load
+            {...quizProps}
+            markRequired
+            compact
+          />
+        </div>
+      ) : (
+        <div class="mt-7 sm:mt-10 lg:mt-0 lg:flex lg:items-center">
+          <div class="border-border bg-card/90 rounded-[2rem] border p-7 shadow-[0_22px_55px_rgba(34,43,74,0.10)] backdrop-blur-sm sm:p-9">
+            <p class="text-brand-600 text-xs font-semibold tracking-[0.22em] uppercase">
+              So fängt es an
+            </p>
+            <h2 class="font-display text-foreground mt-4 text-2xl font-bold tracking-tight">
+              30 Minuten über euren Weg vom Auftrag zur Rechnung.
+            </h2>
+            <p class="text-foreground-secondary mt-4 text-base leading-7">
+              Ihr erzählt, wie ihr heute plant, erfasst und abrechnet. Wir sagen, wo ein System euch
+              am meisten Zeit spart. Kostenlos, ohne Folien.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3">
+              <Button size="lg" href={contactLinks.cal} target="_blank">
+                Erstgespräch buchen
+                <Icon name="arrow-up-right" size="sm" />
+              </Button>
+              <Button variant="outline" size="lg" href="/discovery-workshop/">
+                Der Workshop danach
+                <Icon name="arrow-right" size="sm" />
+              </Button>
+            </div>
+            <div class="border-border/70 mt-6 flex items-center gap-3 border-t pt-5">
+              <Picture
+                src={founderPortrait}
+                alt="Marten Prieß"
+                widths={[48, 96]}
+                sizes="48px"
+                formats={['avif', 'webp']}
+                class="h-12 w-12 shrink-0 rounded-full object-cover"
+                loading="lazy"
+              />
+              <p class="text-sm leading-6">
+                <span class="text-foreground block font-semibold">Marten Prieß</span>
+                <span class="text-foreground-secondary">
+                  Gründer von RocketBase, führt das Gespräch selbst.
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    <!-- mobil unter dem Quiz, damit das Quiz ohne Scrollen anfängt -->
+    {
+      istFunnel && (
+        <p class="text-foreground-muted border-border/70 bg-background/85 mx-auto mt-6 max-w-lg rounded-xl border px-4 py-3 text-center text-sm leading-6 backdrop-blur-sm lg:hidden">
+          Der Einsatzplan weiß, wer kann, wer darf und wer heute da ist.
+        </p>
+      )
+    }
+  </div>
+
+  <div class="relative z-10">
+    <a
+      href="#heute"
+      class="hero-scroll absolute top-0 left-1/2 z-20 hidden h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full lg:flex"
+      aria-label="Weiter nach unten"
+      data-hero-scroll
+    >
+      <span class="hero-scroll-icon flex"><Icon name="chevron-down" size="sm" /></span>
+    </a>
+    <ClientLogoStrip
+      heading="Aus Projekten mit"
+      logos={clientLogos}
+      variant="light"
+      uniform
+      class="py-10 lg:py-11"
+    />
+  </div>
+</section>
+
+<!-- HEUTE: mobil zuerst das Bild -->
+<section
+  id="heute"
+  class="heute-sec border-border relative scroll-mt-20 overflow-x-clip border-b pt-14 pb-12 sm:py-20 lg:py-24"
+>
+  <div
+    class="container grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-16"
+  >
+    <div class="af-rise order-2 lg:order-1">
+      <p
+        class="inline-flex items-center gap-2 font-mono text-xs font-semibold tracking-[0.2em] text-[oklch(58%_0.19_25)] uppercase"
+      >
+        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+        Kommt euch das bekannt vor?
+      </p>
+      <h2
+        class="font-display text-foreground mt-4 text-3xl font-bold tracking-tight text-balance sm:text-4xl lg:text-[2.35rem] lg:leading-[1.15]"
+      >
+        Der Plan steht.{' '}
+        <span class="text-foreground-muted">Bis um sechs Uhr morgens jemand krank ist.</span>
+      </h2>
+      <p class="text-foreground-secondary mt-5 text-[0.95rem] leading-7">
+        Geplant wird in einer Excel, die eine Person versteht. Umgeplant wird am Telefon, einer
+        nach dem anderen. Die Stundenzettel kommen am Monatsende, und die Rechnung baut jemand aus
+        allem, was er findet.
+      </p>
+      <p class="text-foreground mt-4 text-[0.95rem] leading-7 font-semibold">
+        Mit jedem Auftrag wächst der Aufwand. Der Umsatz nicht ganz so schnell.
+      </p>
+    </div>
+
+    <div class="szene-auf order-1 lg:order-2" data-szene>
+      <HeuteEinsatz />
+    </div>
+  </div>
+</section>
+
+<!-- 01 ABLAUF JE AUFTRAG -->
+<section
+  id="ablauf-auftrag"
+  class:list={['bg-background relative scroll-mt-20 overflow-x-clip py-16 lg:py-28', istFunnel && 'hidden lg:block']}
+>
+  <div
+    class="bg-brand-300/10 pointer-events-none absolute top-40 left-1/2 h-[40rem] w-[60rem] -translate-x-1/2 rounded-full blur-[120px]"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="relative z-10 container max-w-7xl">
+    <SectionHeader
+      size="md"
+      number="01"
+      eyebrow="Ablauf je Auftrag"
+      title="Jeder Schritt kennt seinen Vorgänger."
+      lead="Verzögert sich ein Schritt, rutscht alles dahinter mit. Ihr seht sofort, ob der Termin beim Kunden noch hält."
+    />
+    <div
+      class="szene-auf mx-auto mt-12 max-w-6xl lg:mt-14"
+      data-szene
+      data-szene-klick="[data-verzug-btn]"
+      data-szene-pause="1600"
+    >
+      <AblaufPlan />
+      <p class="z-note mt-4 text-center">
+        Nachgebaut aus einer Lösung im Metallbau. Probiert den Knopf selbst.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 PLANTAFEL -->
+<section class="bg-background-secondary border-border relative border-y py-16 lg:py-28">
+  <div
+    class="relative z-10 container grid max-w-7xl gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:gap-14"
+  >
+    <div class="af-rise">
+      <SectionHeader
+        size="md"
+        align="left"
+        number="02"
+        eyebrow="Plantafel"
+        title="Wer macht was, und wer springt ein?"
+      />
+      <p class="text-foreground-secondary mt-6 text-base leading-7">
+        Fällt jemand aus, zeigt die Tafel, welche Aufträge betroffen sind und wer einspringen kann.
+      </p>
+    </div>
+    <div
+      class="szene-auf min-w-0"
+      data-szene
+      data-szene-klick="[data-krank-btn]"
+      data-szene-pause="1500"
+    >
+      <Plantafel />
+    </div>
+  </div>
+</section>
+
+<!-- 03 LEISTUNG ZUR RECHNUNG -->
+<section class:list={['bg-background relative overflow-x-clip py-16 lg:py-28', istFunnel && 'hidden lg:block']}>
+  <div class="relative z-10 container max-w-7xl">
+    <SectionHeader
+      size="md"
+      number="03"
+      eyebrow="Leistung zur Rechnung"
+      title="Erfasst ist abgerechnet."
+      lead="Was erfasst ist, liegt am Monatsende für die Rechnung bereit. Anhaken, abschicken."
+    />
+    <div class="szene-auf mx-auto mt-12 max-w-6xl lg:mt-14" data-szene>
+      <LeistungRechnung />
+      <p class="z-note mt-4 text-center">Hakt Positionen an oder ab, die Rechnung rechnet mit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 IN DER PRAXIS: ohne Links, der Funnel führt nur zum Formular -->
+<section class="invert-section bg-surface-invert relative overflow-x-clip py-20 lg:py-28">
+  <div class="relative z-10 container max-w-7xl">
+    <SectionHeader
+      size="md"
+      invert
+      number="04"
+      eyebrow="In der Praxis"
+      title="Drei Betriebe. Drei Abläufe."
+      lead="Was sich unterscheidet, sind die Regeln dazwischen. Genau die bauen wir ein."
+    />
+    <div class="mt-12 grid gap-5 lg:mt-14 lg:grid-cols-3" data-szene data-szene-kinder>
+      {
+        referenzen.map((r) => (
+          <article class="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur transition-colors hover:border-white/25">
+            <div class:list={['overflow-hidden border-b border-white/10 bg-white', istFunnel && 'hidden lg:block']}>
+              <Picture
+                src={r.image}
+                alt={r.alt}
+                widths={[360, 540, 720]}
+                sizes="(max-width: 1024px) 100vw, 33vw"
+                formats={['avif', 'webp']}
+                class="aspect-[16/10] w-full object-cover object-left-top transition-transform duration-700 group-hover:scale-[1.04]"
+                loading="lazy"
+              />
+            </div>
+            <div class="flex flex-1 flex-col p-6">
+              <p class="text-brand-200 text-xs font-semibold tracking-[0.2em] uppercase">
+                {r.client}
+              </p>
+              <h3 class="font-display text-on-invert mt-3 text-lg font-bold tracking-tight">
+                {r.title}
+              </h3>
+              <p class:list={['text-on-invert-secondary mt-3 text-[0.92rem] leading-7', istFunnel && 'hidden lg:block']}>{r.text}</p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- VERTRAUEN -->
+<VertrauensBand />
+
+<!-- VON HEUTE BIS DAHIN: Strecke und Einwände, nur im Funnel -->
+{istFunnel && <VonHeuteBisDahin stationen={strecke.stationen} einwaende={strecke.einwaende} />}
+
+<!-- 05 LOHNT SICH DAS? Rechen-Streifen und Marten -->
+<section
+  id="ablauf"
+  class="bg-background-secondary border-border relative scroll-mt-20 border-b py-16 lg:py-28"
+>
+  <div class="relative z-10 container max-w-6xl">
+    <SectionHeader
+      size="md"
+      number="05"
+      eyebrow="Lohnt sich das?"
+      title="Das klärt ein Gespräch."
+      lead="Unverbindlich, 30 Minuten, keine Vorbereitung. Vorher könnt ihr kurz überschlagen, worum es bei euch geht."
+    />
+    <div class="mx-auto mt-10 grid max-w-5xl gap-6 lg:mt-14">
+      <div class="af-rise">
+        <LohntSich
+          id="ls-einsatz"
+          frage="Wie viele Aufträge rechnet ihr im Monat ab?"
+          wer="Alles, was durch Planung, Erfassung und Rechnung läuft: Baustellen, Touren, Serviceeinsätze."
+          min={10}
+          max={300}
+          step={10}
+          start={60}
+          minutenJe={20}
+          wofuer="ins Umplanen, Stundenzettel nachhalten und Rechnungen zusammenbauen."
+          annahme="Zwanzig Minuten je Auftrag, über den ganzen Weg: Termin verschieben und alle informieren, fehlenden Stundenzetteln hinterhertelefonieren, Stunden abtippen, Material nachtragen, die Rechnung aus Zettel und Mail zusammenbauen. Wo bei euch die meiste Zeit hängt, sehen wir im Gespräch."
+        />
+      </div>
+      <!-- Nur auf der indexierten Seite: Im Funnel führt das Quiz zum Gespräch, die Karte wäre ein zweiter Weg. -->
+      {
+        !istFunnel && (
+          <ErstgespraechKarte
+            id="ablauf-01"
+            class="w-full max-w-none"
+            zitat="Erzählt mir, wie ein Auftrag bei euch läuft. Nach 30 Minuten wisst ihr, ob sich das bei euch lohnt."
+            text="Ihr erzählt, wie ihr heute plant und abrechnet. Ich sage euch ehrlich, ob sich etwas lohnt, und wenn ja, was zuerst."
+          />
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class:list={['bg-background border-border relative border-b py-24 lg:py-28', istFunnel && 'hidden']}>
+  <div class="relative z-10 container max-w-4xl">
+    <SectionHeader size="md" number="06" eyebrow="Häufige Fragen" title="Was vorab gefragt wird." />
+    <div class="mt-12 flex flex-col gap-4">
+      {
+        miniFaqs.map((item) => (
+          <details class="group border-border bg-card rounded-2xl border p-5 shadow-sm transition-shadow duration-300 open:shadow-lg sm:p-6">
+            <summary class="flex min-h-11 cursor-pointer list-none items-start gap-4 py-0.5 [&::-webkit-details-marker]:hidden">
+              <h3 class="font-display text-foreground flex-1 text-base font-bold tracking-tight sm:text-lg">
+                {item.q}
+              </h3>
+              <Icon
+                name="chevron-down"
+                size="sm"
+                class="text-foreground-muted mt-1 shrink-0 transition-transform duration-300 group-open:rotate-180"
+              />
+            </summary>
+            <p class="text-foreground-secondary border-border/60 mt-4 border-t pt-4 text-[0.95rem] leading-7">
+              {item.a}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Blog: zwei Artikel zu dieser Tür, nur auf der indexierten Seite -->
+{!istFunnel && <BlogQuerverweis tuer="einsatz" />}
+
+<!-- KONTAKT -->
+<section id="kontakt" class:list={['kontakt-sec relative scroll-mt-20 overflow-x-clip py-24 lg:py-32', istFunnel && 'hidden lg:block']}>
+  <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div
+      class="bg-brand-400/15 absolute -bottom-40 -left-24 h-[34rem] w-[34rem] rounded-full blur-[150px]"
+    >
+    </div>
+    <div
+      class="bg-grid-pattern absolute inset-0 [mask-image:linear-gradient(to_top,black,transparent_85%)] opacity-[0.06]"
+    >
+    </div>
+  </div>
+  <div
+    class="relative z-10 container grid max-w-6xl gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch lg:gap-16"
+  >
+    <div class="af-rise flex flex-col">
+      <p
+        class="text-brand-600 dark:text-brand-300 font-mono text-xs font-semibold tracking-[0.2em] uppercase"
+      >
+        Nächster Schritt
+      </p>
+      <h2
+        lang="de"
+        class="font-display text-foreground mt-4 text-3xl font-bold tracking-tight text-balance sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]"
+      >
+        Erstgespräch vereinbaren.
+      </h2>
+      <p class="text-foreground-secondary mt-5 text-lg leading-8">
+        {
+          istFunnel
+            ? 'Drei kurze Fragen und eure Kontaktdaten, mehr braucht es nicht. So kennen wir eure Ausgangslage schon vor dem Termin.'
+            : 'Bucht direkt einen Termin oder schreibt uns. Wir melden uns persönlich.'
+        }
+      </p>
+      <ol class="kontakt-ablauf mt-9 mb-8 space-y-6">
+        {
+          [
+            {
+              titel: istFunnel ? 'Fragen beantworten' : 'Termin buchen',
+              text: istFunnel
+                ? 'Wie ihr heute plant, wo es hakt, wie groß ihr seid. Dauert eine Minute.'
+                : 'Einen freien Termin wählen, mehr braucht es nicht.',
+            },
+            { titel: 'Wir melden uns', text: 'Werktags, persönlich, mit einem Terminvorschlag.' },
+            {
+              titel: 'Erstgespräch',
+              text: '30 Minuten, online, kostenlos. Ihr erzählt, wie ein Auftrag bei euch läuft. Danach wisst ihr, ob es passt.',
+            },
+          ].map((schritt, i) => (
+            <li class="relative flex gap-4">
+              <span class="bg-card border-brand-300 text-brand-600 dark:text-brand-300 relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <div class="pt-1">
+                <p class="font-display text-foreground font-bold tracking-tight">{schritt.titel}</p>
+                <p class="text-foreground-secondary mt-1 text-[0.95rem] leading-7">
+                  {schritt.text}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="border-border mt-auto flex items-center gap-4 border-t pt-8">
+        <Picture
+          src={founderPortrait}
+          alt="Marten Prieß"
+          widths={[56, 112]}
+          sizes="56px"
+          formats={['avif', 'webp']}
+          class="h-14 w-14 shrink-0 rounded-full object-cover"
+          loading="lazy"
+        />
+        <p class="text-sm leading-6">
+          <span class="text-foreground block font-semibold">Marten Prieß</span>
+          <span class="text-foreground-secondary"
+            >Gründer von RocketBase, meldet sich persönlich.</span
+          >
+        </p>
+      </div>
+    </div>
+
+    {
+      istFunnel ? (
+        <div class="af-rise lg:min-h-[38rem]">
+          <FunnelQuiz
+            client:visible
+            {...quizProps}
+            markRequired
+            compact
+          />
+        </div>
+      ) : (
+        <div class="af-rise flex flex-col justify-center gap-4">
+          <Button size="lg" href={contactLinks.cal} target="_blank">
+            Erstgespräch buchen
+            <Icon name="arrow-up-right" size="sm" />
+          </Button>
+          <Button variant="outline" size="lg" href="/discovery-workshop/">
+            Der Workshop im Detail
+            <Icon name="arrow-right" size="sm" />
+          </Button>
+          <p class="text-foreground-muted text-sm leading-6">
+            Oder per Mail an{' '}
+            <a href={`mailto:${contactLinks.email}`} class="text-brand-600 font-semibold">
+              {contactLinks.email}
+            </a>
+            .
+          </p>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero-scroll {
+    color: var(--color-foreground-secondary);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 14px 30px -14px oklch(30% 0.08 265 / 0.45);
+    transition:
+      opacity 0.3s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  @media (hover: hover) {
+    .hero-scroll:hover {
+      color: var(--color-brand-600);
+      border-color: color-mix(in oklch, var(--color-brand-400) 60%, var(--color-border));
+    }
+  }
+  .hero-scroll[data-hidden='true'] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .hero-scroll-icon {
+    animation: hero-scroll-bob 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  @keyframes hero-scroll-bob {
+    0%,
+    100% {
+      transform: translateY(-2px);
+    }
+    50% {
+      transform: translateY(3px);
+    }
+  }
+  .hero-alt {
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in oklch, var(--color-brand-500) 70%, transparent);
+    text-decoration-thickness: 2px;
+    background: var(--color-card);
+  }
+  .heute-sec {
+    background:
+      radial-gradient(
+        50% 70% at 85% 50%,
+        color-mix(in oklch, oklch(60% 0.19 25) 6%, transparent),
+        transparent 70%
+      ),
+      var(--color-background-secondary);
+  }
+  .cta-band {
+    background:
+      radial-gradient(
+        55% 140% at 90% 50%,
+        color-mix(in oklch, var(--color-brand-400) 28%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        45% 120% at 0% 100%,
+        color-mix(in oklch, var(--color-brand-300) 18%, transparent),
+        transparent 70%
+      ),
+      color-mix(in oklch, var(--color-brand-500) 9%, var(--color-background));
+  }
+  .kontakt-sec {
+    background:
+      radial-gradient(
+        55% 80% at 85% 40%,
+        color-mix(in oklch, var(--color-brand-400) 16%, transparent),
+        transparent 70%
+      ),
+      color-mix(in oklch, var(--color-brand-500) 6%, var(--color-background));
+  }
+  .kontakt-ablauf > li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 2.5rem;
+    bottom: -1.25rem;
+    left: 1.125rem;
+    width: 1px;
+    background: var(--color-border);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scroll-icon {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { szenenStarten } from '@/lib/szene';
+  szenenStarten();
+  const heroScroll = document.querySelector<HTMLElement>('[data-hero-scroll]');
+  if (heroScroll) {
+    const sync = () => (heroScroll.dataset.hidden = window.scrollY > 40 ? 'true' : 'false');
+    window.addEventListener('scroll', sync, { passive: true });
+    sync();
+  }
+</script>

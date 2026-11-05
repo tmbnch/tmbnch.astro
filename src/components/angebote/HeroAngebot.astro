@@ -1,0 +1,430 @@
+---
+/**
+ * Hero-Visual: vereinfachte Angebotsseite als HTML statt Screenshot, damit sie
+ * auf jeder Größe scharf und lesbar ist.
+ *
+ * Interaktiv: die optionale Position lässt sich ab- und zuwählen, Summe und
+ * Deckungsbeitrag laufen mit; „Angebot annehmen“ zeigt kurz die Zusage.
+ * Zwei schwebende Hinweise: die Öffnung (was ihr seht) und der
+ * Deckungsbeitrag (nur intern). Alle Werte sind Beispielwerte.
+ */
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+const positionen = [
+  { titel: 'Aufnahme und Planung', detail: 'Pauschal', preis: 4800 },
+  { titel: 'Umsetzung vor Ort', detail: '3 Termine · 24 h', preis: 2160 },
+  { titel: 'Anfahrt', detail: '3 × 34 km', preis: 280, auto: true },
+];
+const option = { titel: 'Wartung im ersten Jahr', detail: 'Optional · 4 Termine', preis: 1200 };
+// Deckungsbeitrag mit und ohne Option (Beispielwerte).
+const db = { mit: { euro: 3460, prozent: 41 }, ohne: { euro: 2751, prozent: 38 } };
+const basis = positionen.reduce((n, p) => n + p.preis, 0);
+const eur = (n: number) => `${n.toLocaleString('de-DE')} €`;
+---
+
+<div
+  class="ha relative mx-auto w-full max-w-[34rem]"
+  data-hero-angebot
+  data-basis={basis}
+  data-option={option.preis}
+  data-db-mit={`${db.mit.euro}|${db.mit.prozent}`}
+  data-db-ohne={`${db.ohne.euro}|${db.ohne.prozent}`}
+>
+  <div class="ha-glow pointer-events-none absolute -inset-10 rounded-[3rem] blur-3xl" aria-hidden="true">
+  </div>
+
+  <!-- Angebotsseite -->
+  <div class="ha-card relative overflow-hidden rounded-[1.6rem]">
+    <div class="ha-bar flex items-center gap-2 px-4 py-2.5" aria-hidden="true">
+      <span class="flex gap-1.5"><i></i><i></i><i></i></span>
+      <span class="ha-url mx-auto truncate rounded-md px-3 py-0.5 text-[11px]">
+        angebot.euer-betrieb.de/2026-118
+      </span>
+    </div>
+
+    <div class="ha-brand flex items-center gap-3 px-5 py-4 sm:px-6">
+      <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 text-sm font-bold text-white">
+        EB
+      </span>
+      <div class="min-w-0">
+        <p class="text-[11px] font-semibold tracking-[0.16em] text-white/70 uppercase">Angebot für</p>
+        <p class="truncate text-sm font-semibold text-white">Beispiel GmbH</p>
+      </div>
+      <span class="ml-auto rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white">
+        gültig bis 30.11.
+      </span>
+    </div>
+
+    <div class="px-5 pt-5 pb-5 sm:px-6">
+      <ul class="space-y-1.5">
+        {
+          positionen.map((p, i) => (
+            <li class="ha-row flex items-center gap-3 rounded-xl px-3 py-2.5" style={`--d: ${200 + i * 90}ms`}>
+              <div class="min-w-0 flex-1">
+                <p class="text-foreground text-sm font-semibold">{p.titel}</p>
+                <p class="text-foreground-muted mt-0.5 flex items-center gap-1.5 text-xs">
+                  {p.detail}
+                  {p.auto && (
+                    <span class="ha-auto inline-flex items-center gap-1 rounded-full px-1.5 text-[10px] font-semibold uppercase">
+                      <Icon name="zap" size="xs" />
+                      berechnet
+                    </span>
+                  )}
+                </p>
+              </div>
+              <p class="text-foreground font-mono text-sm font-semibold whitespace-nowrap tabular-nums">
+                {eur(p.preis)}
+              </p>
+            </li>
+          ))
+        }
+        <li class="ha-row" style="--d: 470ms">
+          <button
+            type="button"
+            role="switch"
+            aria-checked="true"
+            data-ha-option
+            class="ha-option flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left"
+          >
+            <span class="ha-check flex h-5 w-5 shrink-0 items-center justify-center rounded-md" aria-hidden="true">
+              <Icon name="check" size="xs" />
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="text-foreground block text-sm font-semibold">{option.titel}</span>
+              <span class="text-foreground-muted mt-0.5 block text-xs">{option.detail}</span>
+            </span>
+            <span class="ha-option-preis text-foreground font-mono text-sm font-semibold whitespace-nowrap tabular-nums">
+              {eur(option.preis)}
+            </span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="border-border mt-4 flex items-end justify-between gap-3 border-t pt-4 sm:gap-4">
+        <div>
+          <p class="text-foreground-muted text-xs">Summe netto</p>
+          <p class="font-display text-foreground mt-0.5 text-[1.65rem] font-bold tracking-tight whitespace-nowrap tabular-nums max-[379px]:text-[1.4rem] sm:text-3xl" data-ha-summe>
+            {eur(basis + option.preis)}
+          </p>
+        </div>
+        <button
+          type="button"
+          data-ha-annehmen
+          class="ha-accept inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold whitespace-nowrap text-white max-[379px]:px-3 max-[379px]:text-[0.8rem] sm:px-4"
+        >
+          <span data-ha-accept-label>Angebot annehmen</span>
+          <Icon name="arrow-right" size="sm" class="max-[379px]:hidden" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Was ihr seht: Öffnung -->
+  <div class="ha-float ha-float-a absolute -top-6 -right-2 sm:-right-10" aria-hidden="true">
+    <div class="ha-pill flex items-center gap-2.5 rounded-2xl px-3.5 py-2.5">
+      <span class="ha-pulse relative flex h-2.5 w-2.5"><span></span></span>
+      <div>
+        <p class="text-foreground text-xs font-semibold">Kunde hat geöffnet</p>
+        <p class="text-foreground-muted text-[11px]">vor 2 Minuten · zum 3. Mal</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nur intern: Deckungsbeitrag -->
+  <div class="ha-float ha-float-b absolute -bottom-[6.5rem] -left-2 w-[15.5rem] sm:-left-12" aria-hidden="true">
+    <div class="ha-pill rounded-2xl p-3.5">
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-foreground text-xs font-semibold">Deckungsbeitrag</p>
+        <span class="ha-intern rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase">nur für euch</span>
+      </div>
+      <p class="text-foreground mt-1.5 font-mono text-sm font-bold tabular-nums" data-ha-db>
+        {eur(db.mit.euro)} · {db.mit.prozent} %
+      </p>
+      <div class="ha-bar-track mt-2 h-1.5 overflow-hidden rounded-full">
+        <span class="ha-bar-fill block h-full rounded-full" data-ha-db-bar style={`width: ${db.mit.prozent * 1.6}%`}></span>
+      </div>
+      <p class="text-foreground-secondary mt-2 flex items-center gap-1.5 text-[11px] font-medium">
+        <span class="ha-dot"></span> Rechnet sich
+      </p>
+    </div>
+  </div>
+</div>
+<p class="text-foreground-muted mt-4 text-center text-xs sm:mt-[7.5rem] lg:pl-40 lg:text-right">
+  Vereinfacht, mit Beispielwerten. Klickt die Option an.
+</p>
+
+<style>
+  .ha-glow {
+    background: radial-gradient(
+      60% 60% at 50% 50%,
+      color-mix(in oklch, var(--color-brand-400) 35%, transparent),
+      transparent 70%
+    );
+  }
+  .ha-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow:
+      0 50px 100px -40px oklch(30% 0.09 265 / 0.55),
+      0 0 0 1px color-mix(in oklch, var(--color-brand-400) 12%, transparent);
+    animation: ha-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .ha-bar {
+    border-bottom: 1px solid var(--color-border);
+    background: color-mix(in oklch, var(--color-foreground) 3%, var(--color-card));
+  }
+  .ha-bar i {
+    display: block;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--color-foreground) 18%, transparent);
+  }
+  .ha-url {
+    color: var(--color-foreground-muted);
+    background: color-mix(in oklch, var(--color-foreground) 5%, transparent);
+  }
+  .ha-brand {
+    background: linear-gradient(120deg, var(--color-brand-600), var(--color-brand-500));
+  }
+
+  .ha-row {
+    animation: ha-row 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--d);
+  }
+  li.ha-row:not(:has(button)) {
+    background: color-mix(in oklch, var(--color-foreground) 3%, transparent);
+  }
+  .ha-auto {
+    color: var(--color-brand-700);
+    background: color-mix(in oklch, var(--color-brand-500) 12%, transparent);
+  }
+  :global(.dark) .ha-auto {
+    color: var(--color-brand-200);
+  }
+
+  .ha-option {
+    border: 1px dashed color-mix(in oklch, var(--color-brand-400) 60%, var(--color-border));
+    background: color-mix(in oklch, var(--color-brand-500) 6%, transparent);
+    cursor: pointer;
+    transition:
+      background 0.25s ease,
+      border-color 0.25s ease,
+      opacity 0.25s ease;
+  }
+  .ha-option:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  .ha-check {
+    color: #fff;
+    background: var(--color-brand-500);
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+  .ha-option[aria-checked='false'] {
+    background: transparent;
+    border-color: var(--color-border);
+  }
+  .ha-option[aria-checked='false'] .ha-check {
+    color: transparent;
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--color-border);
+  }
+  .ha-option[aria-checked='false'] .ha-option-preis {
+    color: var(--color-foreground-muted);
+    text-decoration: line-through;
+  }
+
+  .ha-accept {
+    background: var(--color-brand-500);
+    box-shadow: 0 12px 26px -12px var(--color-brand-500);
+    transition:
+      background 0.2s ease,
+      transform 0.15s ease;
+  }
+  .ha-accept:hover {
+    background: var(--color-brand-600);
+  }
+  .ha-accept:active {
+    transform: scale(0.97);
+  }
+  .ha-accept[data-done='true'] {
+    background: oklch(62% 0.15 150);
+  }
+
+  /* Außen: einmal einblenden. Innen: endlos schweben, auf eigener GPU-Ebene,
+     ohne backdrop-filter (der würde bei jedem Frame neu gerechnet). */
+  .ha-pill {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 24px 50px -24px oklch(30% 0.09 265 / 0.55);
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+  }
+  .ha-float-a {
+    animation: ha-pop 0.7s 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .ha-float-b {
+    animation: ha-pop 0.7s 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .ha-float-a .ha-pill {
+    animation: ha-float 8s 1.6s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  }
+  .ha-float-b .ha-pill {
+    animation: ha-float 9s 1.9s cubic-bezier(0.37, 0, 0.63, 1) infinite reverse;
+  }
+  .ha-pulse span,
+  .ha-pulse::before {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: oklch(68% 0.15 150);
+  }
+  .ha-pulse::before {
+    content: '';
+    animation: ha-ping 1.8s ease-out infinite;
+  }
+  .ha-intern {
+    color: var(--color-brand-700);
+    background: color-mix(in oklch, var(--color-brand-500) 12%, transparent);
+  }
+  :global(.dark) .ha-intern {
+    color: var(--color-brand-200);
+  }
+  .ha-bar-track {
+    background: color-mix(in oklch, var(--color-foreground) 8%, transparent);
+  }
+  .ha-bar-fill {
+    background: oklch(68% 0.15 150);
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ha-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: oklch(68% 0.15 150);
+  }
+
+  @keyframes ha-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.98);
+    }
+  }
+  @keyframes ha-row {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @keyframes ha-pop {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.94);
+    }
+  }
+  @keyframes ha-float {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -10px, 0);
+    }
+  }
+  @keyframes ha-ping {
+    to {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  @media (max-width: 639px) {
+    .ha-float-a {
+      right: 0.5rem;
+    }
+    .ha-float-b {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      width: auto;
+      margin: 0.75rem 1.5rem 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ha-card,
+    .ha-row,
+    .ha-float-a,
+    .ha-float-b,
+    .ha-pill,
+    .ha-pulse::before {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-hero-angebot]').forEach((root) => {
+    const fmt = (n: number) => `${n.toLocaleString('de-DE')} €`;
+    const basis = Number(root.dataset.basis);
+    const option = Number(root.dataset.option);
+    const [mitEuro, mitProz] = (root.dataset.dbMit ?? '').split('|').map(Number);
+    const [ohneEuro, ohneProz] = (root.dataset.dbOhne ?? '').split('|').map(Number);
+    const schalter = root.querySelector<HTMLButtonElement>('[data-ha-option]');
+    const summe = root.querySelector('[data-ha-summe]');
+    const dbText = root.querySelector('[data-ha-db]');
+    const dbBar = root.querySelector<HTMLElement>('[data-ha-db-bar]');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let shown = basis + option;
+    const zaehle = (ziel: number) => {
+      if (!summe) return;
+      if (reduced || document.hidden) {
+        shown = ziel;
+        summe.textContent = fmt(ziel);
+        return;
+      }
+      const start = shown;
+      const t0 = performance.now();
+      const step = (t: number) => {
+        const k = Math.min(1, (t - t0) / 450);
+        const e = 1 - Math.pow(1 - k, 3);
+        shown = Math.round(start + (ziel - start) * e);
+        summe.textContent = fmt(shown);
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+      // Endwert sichern, falls rAF gedrosselt wird.
+      window.setTimeout(() => {
+        shown = ziel;
+        summe.textContent = fmt(ziel);
+      }, 600);
+    };
+
+    schalter?.addEventListener('click', () => {
+      const an = schalter.getAttribute('aria-checked') !== 'true';
+      schalter.setAttribute('aria-checked', an ? 'true' : 'false');
+      zaehle(basis + (an ? option : 0));
+      const euro = an ? mitEuro : ohneEuro;
+      const proz = an ? mitProz : ohneProz;
+      if (dbText) dbText.textContent = `${fmt(euro ?? 0)} · ${proz} %`;
+      if (dbBar) dbBar.style.width = `${(proz ?? 0) * 1.6}%`;
+    });
+
+    const annehmen = root.querySelector<HTMLButtonElement>('[data-ha-annehmen]');
+    const label = root.querySelector('[data-ha-accept-label]');
+    let timer: number | undefined;
+    annehmen?.addEventListener('click', () => {
+      if (!label) return;
+      annehmen.dataset.done = 'true';
+      label.textContent = 'Zusage ist da';
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        annehmen.dataset.done = 'false';
+        label.textContent = 'Angebot annehmen';
+      }, 2600);
+    });
+  });
+</script>

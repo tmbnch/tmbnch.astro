@@ -1,0 +1,206 @@
+---
+/**
+ * FunnelLayout - Layout für Anzeigen-Landingpages (/f/*).
+ *
+ * Bewusst ohne Navigation: keine Ausstiegspunkte außer dem Funnel-CTA.
+ * Immer noindex - die Seiten werden nur über Anzeigen erreicht.
+ * Impressum + Datenschutz bleiben verlinkt (Pflicht).
+ */
+import BaseLayout from './BaseLayout.astro';
+import rocketbaseLogo from '@/assets/rocketbase/logo.svg';
+import siteConfig from '@/config/site.config';
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /**
+   * Kurzzeile rechts im Header. Default passt zu den Anzeigen-Funnels (/f/);
+   * der Brief-Kanal (/b/) setzt eine eigene, weil dort keine Ersteinschätzung
+   * angeboten wird.
+   */
+  headerNote?: string;
+  /** Knopf „Erstgespräch anfragen“ im Header ab lg, springt zu #quiz. */
+  headerCta?: boolean;
+  /** Beschriftung von Header-Knopf und Leiste unten, z. B. „Rückruf anfordern“ beim Software-Check. */
+  ctaLabel?: string;
+}
+
+const { title, description, headerNote = 'Kostenlose Ersteinschätzung', headerCta = false, ctaLabel = 'Erstgespräch anfragen' } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<BaseLayout title={title} description={description} noindex nofollow lang="de">
+  <!-- Mobil statisch und flach: Im Instagram-Browser bleiben von 844 px rund 670 sichtbar,
+       ein klebender Header würde davon dauerhaft 56 nehmen. Ab sm klebt er wie gewohnt. -->
+  <header
+    slot="header"
+    class="border-border/60 bg-background/80 top-0 z-40 border-b backdrop-blur-md sm:sticky"
+  >
+    <div class="container flex h-12 items-center justify-between sm:h-14">
+      <img
+        src={rocketbaseLogo.src}
+        alt={siteConfig.branding.logo.alt}
+        class="h-6 w-auto sm:h-7 dark:invert"
+        width="100"
+        height="28"
+        loading="eager"
+        fetchpriority="high"
+      />
+      {
+        headerCta ? (
+          <Button size="sm" href="#quiz" class="hidden whitespace-nowrap lg:inline-flex">
+            {ctaLabel}
+          </Button>
+        ) : (
+          <span class="text-foreground-muted hidden text-xs font-semibold tracking-[0.18em] uppercase sm:block">
+            {headerNote}
+          </span>
+        )
+      }
+    </div>
+  </header>
+
+  <slot />
+
+  <!-- Leiste unten, nur unterhalb von lg und nur, wenn die Seite ein #quiz hat: erscheint,
+       sobald [data-leiste-start] (sonst das Quiz) nach oben aus dem Bild ist, und springt zum
+       Quiz. Steht das Quiz selbst im Bild, fährt sie wieder ein. -->
+  <div
+    data-funnel-leiste
+    class="border-border bg-background/95 fixed inset-x-0 bottom-0 z-30 translate-y-full border-t backdrop-blur-md transition-transform duration-300 ease-out lg:hidden"
+    hidden
+  >
+    <div
+      class="container flex items-center justify-between gap-4 py-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))]"
+    >
+      <img src={rocketbaseLogo.src} alt="" class="h-5 w-auto dark:invert" width="72" height="20" loading="lazy" />
+      <Button size="md" href="#quiz" class="whitespace-nowrap">
+        {ctaLabel}
+        <Icon name="arrow-up-right" size="sm" />
+      </Button>
+    </div>
+  </div>
+
+  <!-- pb: Platz für die fixierte Leiste, sonst liegt sie über Impressum und Datenschutz.
+       Die Höhe setzt das Skript als --leiste-h; der Startwert trägt, bis es läuft. -->
+  <footer
+    slot="footer"
+    class="border-border bg-background-secondary funnel-footer border-t pt-8 pb-8"
+  >
+    <div class="container flex flex-col items-center justify-between gap-4 sm:flex-row">
+      <p class="text-foreground-muted text-sm">
+        © {year} {siteConfig.name}
+      </p>
+      <nav class="flex items-center gap-6">
+        <!-- Einziger Weg zur Hauptseite: bewusst nur im Footer und in neuem Tab,
+             damit der Funnel oben ablenkungsfrei bleibt und offen stehen bleibt. -->
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener"
+          class="text-foreground-muted hover:text-foreground text-sm transition-colors"
+        >
+          Über RocketBase
+        </a>
+        <a href="/impressum/" class="text-foreground-muted hover:text-foreground text-sm transition-colors">
+          Impressum
+        </a>
+        <a href="/datenschutz/" class="text-foreground-muted hover:text-foreground text-sm transition-colors">
+          Datenschutz
+        </a>
+        <!-- Ersetzt unterhalb von lg den schwebenden Cookie-Schild, der dort über den Quiz-Antworten lag. -->
+        <button
+          type="button"
+          data-consent-oeffnen
+          class="text-foreground-muted hover:text-foreground text-sm transition-colors"
+        >
+          Cookies
+        </button>
+      </nav>
+    </div>
+  </footer>
+</BaseLayout>
+
+<script>
+  // Stiller Tracking-Versuch: Aufruf und Verhalten gehen an Plausible immer,
+  // ans Sales-Backend nur mit `?r=`-Kennung. Siehe src/lib/engagement.ts.
+  import { meldeSeitenaufruf, streckeAusPfad } from '@/lib/funnelTracking';
+  import { verfolgeEngagement } from '@/lib/engagement';
+
+  // Der Name kommt aus dem Pfad, nicht aus der `funnel`-Prop: Sonst trägt jede Stelle
+  // ihren eigenen, und Öffnung und Abgabe stehen im Board unter zwei Strecken.
+  const funnel = streckeAusPfad();
+  meldeSeitenaufruf(funnel);
+  verfolgeEngagement(funnel);
+</script>
+
+<style is:global>
+  /* Unterhalb von lg kein schwebender Cookie-Schild: Er lag über den Quiz-Antworten und der
+     Leiste. Die Einstellungen öffnet dort der Knopf „Cookies“ im Footer. */
+  @media (max-width: 1023px) {
+    body:has([data-funnel-leiste]) .consent-reopener {
+      display: none !important;
+    }
+    /* Die Leiste ist fixiert und belegt keinen Platz im Fluss: Der Footer schiebt sich
+       selbst so weit hoch, dass seine Links frei bleiben. Nur wenn die Leiste wirklich
+       sichtbar ist, sonst klafft am Seitenende eine Lücke. */
+    body:has([data-funnel-leiste]:not([hidden])) .funnel-footer {
+      padding-bottom: calc(2rem + var(--leiste-h, 3.75rem));
+    }
+    /* Ist die Erstgespräch-Leiste eingefahren, sitzt das eingeklappte Cookie-Symbol darüber
+       statt auf ihrem Knopf. */
+    body:has([data-funnel-leiste]:not([hidden]):not(.translate-y-full)) {
+      --consent-mini-ueber: var(--leiste-h, 3.75rem);
+    }
+  }
+</style>
+
+<script>
+  // Leiste unten: sichtbar, sobald der Start oberhalb des Bildausschnitts liegt und das Quiz
+  // nicht im Bild ist. Beim Quiz im Hero sind Start und Quiz dasselbe Element.
+  function leisteEinrichten() {
+    const leiste = document.querySelector<HTMLElement>('[data-funnel-leiste]');
+    const quiz = document.getElementById('quiz');
+    if (!leiste || !quiz || !('IntersectionObserver' in window)) return;
+    leiste.removeAttribute('hidden');
+
+    // Die echte Höhe an den Footer geben: Sie hängt an der Schriftgröße und an
+    // env(safe-area-inset-bottom), ist also je Gerät verschieden.
+    const hoeheMelden = () => {
+      document.documentElement.style.setProperty(
+        '--leiste-h',
+        `${Math.ceil(leiste.getBoundingClientRect().height)}px`
+      );
+    };
+    hoeheMelden();
+    if ('ResizeObserver' in window) new ResizeObserver(hoeheMelden).observe(leiste);
+    window.addEventListener('resize', hoeheMelden);
+    const start = document.querySelector<HTMLElement>('[data-leiste-start]') ?? quiz;
+    let vorbei = false;
+    let quizImBild = false;
+    const beobachter = new IntersectionObserver(
+      (eintraege) => {
+        for (const eintrag of eintraege) {
+          if (eintrag.target === start)
+            vorbei = !eintrag.isIntersecting && eintrag.boundingClientRect.bottom < 0;
+          if (eintrag.target === quiz) quizImBild = eintrag.isIntersecting;
+        }
+        leiste.classList.toggle('translate-y-full', !vorbei || quizImBild);
+      },
+      { threshold: 0 }
+    );
+    beobachter.observe(start);
+    beobachter.observe(quiz);
+  }
+  leisteEinrichten();
+  document.addEventListener('astro:after-swap', leisteEinrichten);
+
+  document.addEventListener('click', (ereignis) => {
+    const ziel = ereignis.target as HTMLElement | null;
+    if (!ziel?.closest('[data-consent-oeffnen]')) return;
+    const w = window as unknown as { openConsentSettings?: () => void };
+    w.openConsentSettings?.();
+  });
+</script>

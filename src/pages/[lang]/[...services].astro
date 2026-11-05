@@ -1,0 +1,53 @@
+---
+// @ts-nocheck - scaffolding, not yet wired into the site
+import LandingLayout from '@/layouts/LandingLayout.astro';
+import { locales, isValidLocale, defaultLocale, type Locale } from '@/i18n/config';
+import { useTranslations } from '@/i18n/index';
+import { routes } from '@/i18n/routes';
+
+export function getStaticPaths() {
+  return locales
+    .filter((lang) => lang !== defaultLocale)
+    .map((lang) => ({
+      params: {
+        lang,
+        services: routes.services[lang],
+      },
+    }));
+}
+
+const { lang } = Astro.params;
+
+if (!lang || !isValidLocale(lang)) {
+  return Astro.redirect('/');
+}
+
+const locale = lang as Locale;
+const t = useTranslations(locale);
+---
+
+<LandingLayout
+  title={t('services.title') || 'Services'}
+  description={t('services.description') || 'Add your description here'}
+  lang={locale}
+  routeId="services"
+>
+  <!-- Hero Section -->
+  <section class="py-20 bg-secondary">
+    <div class="container">
+      <h1 class="text-4xl font-bold text-foreground">
+        {t('services.title') || 'Services'}
+      </h1>
+      <p class="mt-4 text-foreground-muted max-w-2xl">
+        {t('services.description') || 'Add your content here.'}
+      </p>
+    </div>
+  </section>
+
+  <!-- Content Section -->
+  <section class="py-16">
+    <div class="container">
+      <!-- Your content -->
+    </div>
+  </section>
+</LandingLayout>

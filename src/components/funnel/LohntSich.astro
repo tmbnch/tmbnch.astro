@@ -1,0 +1,288 @@
+---
+/**
+ * „Lohnt sich das bei euch?“ für alle Funnel-Seiten: ein Regler, eine Zahl, ein Monat.
+ * Menge mal Minuten ergibt die Stunden, die heute neben dem System verloren gehen, dazu ein
+ * Monat mit 20 Arbeitstagen, die verlorenen eingefärbt. Bewusst grob und ohne Preis, Umfang
+ * oder Termin: Was es wirklich ist, klärt das Erstgespräch. Ohne JS steht der Startwert.
+ *
+ * Flacher Streifen über die volle Breite: ab lg Regler, Ergebnis und Monatsraster in einer Zeile.
+ */
+interface Props {
+  /** Die Frage am Regler, z. B. „Wie viele Angebote schreibt ihr im Monat?“ */
+  frage: string;
+  /** Eine Zeile darunter: wer oder was mitzählt, damit der Regler einen Bezug hat. */
+  wer?: string;
+  min: number;
+  max: number;
+  step: number;
+  start: number;
+  /** Minuten je Einheit und Monat, die heute neben dem System verloren gehen. */
+  minutenJe: number;
+  /** Wofür die Zeit draufgeht, z. B. „ins Abtippen, Nachrechnen und Nachfassen.“ */
+  wofuer: string;
+  /** Kleine Zeile unten: woher die grobe Rechnung kommt. */
+  annahme: string;
+  /**
+   * Wie das Ergebnis gezeigt wird.
+   * „tage“: Arbeitstage von zwanzig im Monat, das Raster ist der Monat.
+   * „personen“: ganze Leute, die einen Monat lang nur das machen; das Raster sind Personen.
+   *   Dafür, wenn die Stundenzahl so groß wird, dass sie niemandem mehr etwas sagt.
+   */
+  einheit?: 'tage' | 'personen';
+  id?: string;
+}
+
+const {
+  frage,
+  wer,
+  min,
+  max,
+  step,
+  start,
+  minutenJe,
+  wofuer,
+  annahme,
+  einheit = 'tage',
+  id = 'ls',
+} = Astro.props;
+
+const fmt = (n: number) => n.toLocaleString('de-DE', { maximumFractionDigits: 1 });
+
+// Ein Arbeitstag sind acht Stunden, ein Monat zwanzig Arbeitstage.
+const stunden = (start * minutenJe) / 60;
+const tage = Math.max(1, Math.round(stunden / 8));
+const istPersonen = einheit === 'personen';
+
+// Bei „personen“ zählt die große Zahl Leute, nicht Stunden: ein Monat Vollzeit sind 160 Stunden.
+// Eine Nachkommastelle bleibt, damit auch kleine Betriebe eine Zahl über null sehen.
+const personen = Math.round((stunden / 160) * 10) / 10;
+// Im „personen“-Modus trägt das Monatsraster nichts: die Zahl liegt meist über einer
+// Person, dann wäre jedes Feld eingefärbt und der Regler bewegt nichts mehr. Dort steht
+// an seiner Stelle die Lohnsumme als zweiter Anker — was eine Stelle im Jahr kostet.
+const kacheln = tage;
+// Vorsichtig gerechnet mit 55.000 Euro Arbeitgeberkosten je Vollzeitstelle und Jahr.
+const kostenJeStelle = 55000;
+const kosten = Math.round((personen * kostenJeStelle) / 1000) * 1000;
+const eur = (n: number) => n.toLocaleString('de-DE', { maximumFractionDigits: 0 });
+---
+
+<div
+  class="ls rounded-3xl p-5 sm:p-6 lg:p-7"
+  data-ls
+  data-minuten={minutenJe}
+  data-einheit={einheit}
+>
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.9fr)_minmax(0,1fr)] lg:items-center lg:gap-8">
+    <div>
+      <p class="text-brand-600 dark:text-brand-300 font-mono text-[11px] font-semibold tracking-[0.2em] uppercase">
+        Kurz überschlagen
+      </p>
+      <label
+        for={`${id}-range`}
+        class="font-display text-foreground mt-2 block text-lg leading-snug font-bold tracking-tight"
+      >
+        {frage}
+      </label>
+      {wer && <p class="text-foreground-secondary mt-1.5 text-sm leading-5">{wer}</p>}
+      <div class="mt-4 flex items-center gap-4">
+        <input
+          id={`${id}-range`}
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={start}
+          class="ls-range w-full"
+          data-ls-range
+          aria-describedby={`${id}-ergebnis`}
+        />
+        <output
+          class="ls-out font-display text-foreground min-w-[3ch] text-right text-2xl font-bold tabular-nums"
+          data-ls-out
+        >
+          {start}
+        </output>
+      </div>
+    </div>
+
+    <div id={`${id}-ergebnis`} class="ls-ergebnis rounded-2xl p-4">
+      <p class="text-foreground-secondary text-sm leading-5">
+        {istPersonen ? 'Das sind jeden Monat ungefähr' : 'Heute gehen dafür ungefähr'}
+      </p>
+      <p class="font-display text-foreground mt-1 text-3xl font-bold tracking-tight tabular-nums sm:text-4xl">
+        {istPersonen ? (
+          <>
+            <span data-ls-zahl>{fmt(personen)}</span>{' '}
+            <span data-ls-einheit>{personen === 1 ? 'Vollzeitstelle' : 'Vollzeitstellen'}</span>
+          </>
+        ) : (
+          <>
+            <span data-ls-zahl>{fmt(stunden)}</span> Stunden
+          </>
+        )}
+      </p>
+      <p class="text-foreground-secondary mt-1 text-sm leading-5">{wofuer}</p>
+    </div>
+
+    <div class="ls-monat" aria-hidden="true">
+      {istPersonen ? (
+        <>
+          <p class="text-foreground text-sm leading-5 font-semibold">Aufs Jahr gerechnet</p>
+          <p class="font-display text-foreground mt-2 text-2xl font-bold tracking-tight tabular-nums">
+            <span data-ls-kosten>{eur(kosten)}</span> Euro
+          </p>
+          <p class="text-foreground-secondary mt-1 text-sm leading-5">
+            an Lohn für Arbeit, die das Programm euch abnehmen sollte.
+          </p>
+          <p class="text-foreground-muted mt-3 text-[10px] font-semibold tracking-[0.12em] uppercase">
+            gerechnet mit 55.000 Euro je Stelle
+          </p>
+        </>
+      ) : (
+        <>
+          <p class="text-foreground text-sm leading-5 font-semibold">
+            Rund <span data-ls-tage>{tage}</span>{' '}
+            <span data-ls-tage-wort>{tage === 1 ? 'Arbeitstag' : 'Arbeitstage'}</span> von 20
+          </p>
+          <div class="ls-tage mt-3">
+            {Array.from({ length: 20 }, (_, i) => (
+              <span class:list={['ls-tag', i < kacheln && 'ls-tag-weg']} />
+            ))}
+          </div>
+          <p class="text-foreground-muted mt-2 flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.12em] uppercase">
+            <span class="ls-legende">
+              <i />
+            </span>
+            gehen dafür im Monat drauf
+          </p>
+        </>
+      )}
+    </div>
+  </div>
+  <p class="border-border/70 text-foreground-muted mt-5 border-t pt-4 text-xs leading-[1.65] text-balance">
+    {annahme}
+  </p>
+</div>
+
+<style>
+  .ls {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 24px 55px -40px oklch(30% 0.08 265 / 0.5);
+  }
+  .ls-ergebnis {
+    background: color-mix(in oklch, var(--color-brand-500) 6%, var(--color-background-secondary));
+    border: 1px solid color-mix(in oklch, var(--color-brand-400) 35%, var(--color-border));
+  }
+  .ls-tage {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 0.3rem;
+  }
+  .ls-tag {
+    aspect-ratio: 1;
+    border-radius: 0.3rem;
+    background: color-mix(in oklch, var(--color-foreground) 8%, transparent);
+    transition:
+      background 0.3s ease,
+      scale 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ls-tag-weg {
+    background: oklch(64% 0.17 35);
+    scale: 0.92;
+  }
+  .ls-legende {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ls-legende i {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 0.15rem;
+    background: oklch(64% 0.17 35);
+  }
+  .ls-range {
+    appearance: none;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--color-brand-500) 0%,
+      var(--color-brand-500) var(--p, 17%),
+      color-mix(in oklch, var(--color-foreground) 10%, transparent) var(--p, 17%)
+    );
+    outline: none;
+    cursor: pointer;
+  }
+  .ls-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background: var(--color-card);
+    border: 2px solid var(--color-brand-500);
+    box-shadow: 0 6px 16px -6px var(--color-brand-500);
+  }
+  .ls-range::-moz-range-thumb {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background: var(--color-card);
+    border: 2px solid var(--color-brand-500);
+  }
+  .ls-range:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 4px;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ls]').forEach((root) => {
+    const minuten = Number(root.dataset.minuten) || 60;
+    const istPersonen = root.dataset.einheit === 'personen';
+    const range = root.querySelector<HTMLInputElement>('[data-ls-range]');
+    const out = root.querySelector<HTMLElement>('[data-ls-out]');
+    const zahlEl = root.querySelector<HTMLElement>('[data-ls-zahl]');
+    const einheitEl = root.querySelector<HTMLElement>('[data-ls-einheit]');
+    const tageEl = root.querySelector<HTMLElement>('[data-ls-tage]');
+    const kostenEl = root.querySelector<HTMLElement>('[data-ls-kosten]');
+    const tageWortEl = root.querySelector<HTMLElement>('[data-ls-tage-wort]');
+    const tagEls = [...root.querySelectorAll<HTMLElement>('.ls-tag')];
+    if (!range || !out || !zahlEl) return;
+
+    const zeichne = () => {
+      const n = Number(range.value);
+      const min = Number(range.min);
+      const max = Number(range.max);
+      range.style.setProperty('--p', `${((n - min) / (max - min)) * 100}%`);
+      out.textContent = String(n);
+
+      const stunden = (n * minuten) / 60;
+      const nf = (x: number) => x.toLocaleString('de-DE', { maximumFractionDigits: 1 });
+
+      if (istPersonen) {
+        // Ein Monat Vollzeit sind 160 Stunden. Die Kacheln zeigen volle Leute, höchstens zwanzig.
+        const personen = Math.round((stunden / 160) * 10) / 10;
+        zahlEl.textContent = nf(personen);
+        if (einheitEl)
+          einheitEl.textContent = personen === 1 ? 'Vollzeitstelle' : 'Vollzeitstellen';
+        // Lohnsumme als zweiter Anker, auf volle Tausend gerundet.
+        if (kostenEl) {
+          const kosten = Math.round((personen * 55000) / 1000) * 1000;
+          kostenEl.textContent = kosten.toLocaleString('de-DE', { maximumFractionDigits: 0 });
+        }
+        return;
+      }
+
+      zahlEl.textContent = nf(stunden);
+      const tage = Math.max(1, Math.round(stunden / 8));
+      if (tageEl) tageEl.textContent = tage > 20 ? 'über 20' : String(tage);
+      if (tageWortEl) tageWortEl.textContent = tage === 1 ? 'Arbeitstag' : 'Arbeitstage';
+      tagEls.forEach((t, i) => t.classList.toggle('ls-tag-weg', i < tage));
+    };
+
+    range.addEventListener('input', zeichne);
+    zeichne();
+  });
+</script>

@@ -1,0 +1,1040 @@
+---
+/**
+ * Anzeigen-Landing für den Angebotsbaustein, gerendert von /f/angebote/ (Fassung seit 2026-10-16,
+ * Branch new-funnels). Die ausführliche, indexierte Tür-Seite /angebote/ hängt an
+ * components/angebote/, dort gehört die Tiefe hin.
+ * Ein Ziel: das Formular (Erstgespräch).
+ * Kalte Besucher aus Anzeigen, deshalb kurz, konkret, ein roter Faden:
+ *
+ *   Hero          Versprechen, Logos, Quiz-Formular
+ *   Heute         Wiedererkennen: Excel, Word, PDF, Warten
+ *   01 Idee       Eine Zahl wandert von der Rechnung ins Angebot zum Kunden (Szene, ZahlWandert)
+ *   02 Rechner    Der Unterschied zum Anfassen: rechnet nach eurer Regel (mobil kompakt, zählt hoch)
+ *   03 Ebenen     Beweis: vier Ebenen des Angebots als klickbarer Stapel echter Screenshots
+ *   Band          Vier Fakten auf dunklem Grund, ohne Zusagen zu Dauer, Kosten oder Umfang
+ *   04 Lohnt sich Regler „Angebote im Monat“ und die Marten-Karte: unverbindlich, wenig Aufwand
+ *   05 FAQ        Nur die Fragen, die vor dem Absenden bremsen
+ *   Kontakt       Dasselbe Quiz-Formular noch einmal
+ *
+ * Bewusst NICHT auf der Funnel-Seite (steht auf /angebote/): „Wie rechnet ihr“ mit
+ * Rechenarten und Optionen, „Alles drin“ (FeatureBento), „Erweiterungen“ (ModulHub),
+ * Workshop als Schritt, die vollständige FAQ. Alles, was erklärt statt überzeugt,
+ * klärt Marten im Gespräch.
+ *
+ * Texte in einfacher Sprache (Philipp, 2026-10-16): kurze Sätze, Alltagswörter,
+ * Fachwörter höchstens einmal und erklärt. Mobil weniger Text, Bilder zuerst.
+ * Wording (Philipp, 2026-10-05): nie „Modul“. Keine Preise, kein „Festpreis“.
+ */
+import { angeboteFaqs } from './faqs';
+import BlogQuerverweis from '@/components/blog/BlogQuerverweis.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import Blueprint from '@/components/hero-backgrounds/Blueprint.astro';
+import { ClientLogoStrip } from '@/components/ui/marketing/ClientLogoStrip';
+import AngebotEbenen, { type Ebene } from '@/components/angebote-funnel/AngebotEbenen.astro';
+import LohntSich from '@/components/funnel/LohntSich.astro';
+import VertrauensBand from '@/components/funnel/VertrauensBand.astro';
+import '@/styles/szene.css';
+import SectionHeader from '@/components/angebote/SectionHeader.astro';
+import FunnelQuiz from '@/components/funnel/FunnelQuiz';
+import { contactLinks } from '@/data/rocketbase';
+import { Picture } from 'astro:assets';
+import founderPortrait from '@/assets/rocketbase/founder-marten-priess.jpg';
+import type { FunnelQuizQuestion } from '@/data/funnels';
+import HeuteChaos from '@/components/angebote/HeuteChaos.astro';
+import KalkulationRechner, {
+  type Rechnung,
+} from '@/components/angebote/KalkulationRechner.astro';
+import ZahlWandert from '@/components/angebote-funnel/ZahlWandert.astro';
+import ErstgespraechKarte from '@/components/funnel/ErstgespraechKarte.astro';
+import DealZeile from '@/components/funnel/DealZeile.astro';
+import VonHeuteBisDahin from '@/components/funnel/VonHeuteBisDahin.astro';
+
+import editor from '@/assets/angebote/v2-editor-praesentation.webp';
+import bausteine from '@/assets/angebote/v2-bausteine-falk.webp';
+import kundeStart from '@/assets/angebote/kunde-umfang-hd.webp';
+import kundeAnnahme from '@/assets/angebote/kunde-annahme-hd.webp';
+
+const clientLogos = [
+  { key: 'fkc_logo', name: 'FKC Consulting' },
+  { key: 'statista-logo', name: 'Statista' },
+  { key: 'stage_logo', name: 'Stage Entertainment' },
+  { key: 'diezinger_logo', name: 'Schlosserei Diezinger' },
+  { key: 'mavox_logo', name: 'MAVOX Winterdienst' },
+];
+
+// Quiz im Hero: drei kurze Fragen, danach das Kontaktformular (Telefon Pflicht).
+// Es gibt auf dieser Seite keine Terminbuchung, jeder Aufruf führt zum Formular.
+const quizFragen: FunnelQuizQuestion[] = [
+  {
+    id: 'heute',
+    question: 'Wie macht ihr heute ein Angebot?',
+    hint: 'Ungefähr reicht.',
+    options: [
+      {
+        id: 'word-excel',
+        label: 'Word und Excel',
+        description: 'Vorlage kopieren, Zahlen aus der Tabelle abtippen.',
+      },
+      {
+        id: 'branchensoftware',
+        label: 'In unserer Branchensoftware',
+        description: 'Der Normalfall geht. Die Sonderfälle laufen nebenher.',
+      },
+      {
+        id: 'angebots-tool',
+        label: 'Mit einem Angebots-Programm',
+        description: 'Sieht gut aus, rechnet aber nicht wie wir.',
+      },
+      {
+        id: 'koepfe',
+        label: 'Jeder rechnet ein bisschen anders',
+        description: 'Das Wissen steckt in wenigen Köpfen.',
+      },
+      {
+        id: 'sonstiges',
+        label: 'Anders',
+        allowText: true,
+        textPlaceholder: 'Schreibt in ein, zwei Sätzen, wie ihr heute Angebote macht …',
+      },
+    ],
+  },
+  {
+    id: 'menge',
+    question: 'Wie viele Angebote schreibt ihr im Monat?',
+    hint: 'Ungefähr reicht.',
+    options: [
+      { id: 'lt10', label: 'Unter 10' },
+      { id: '10-30', label: '10 bis 30' },
+      { id: '30-100', label: '30 bis 100' },
+      { id: 'gt100', label: 'Über 100' },
+    ],
+  },
+  {
+    id: 'personen',
+    question: 'Wie viele Leute schreiben bei euch Angebote?',
+    hint: 'Alle, die Angebote rechnen oder verschicken.',
+    options: [
+      { id: '1', label: 'Eine Person' },
+      { id: '2-3', label: '2 bis 3' },
+      { id: '4-10', label: '4 bis 10' },
+      { id: 'gt10', label: 'Mehr als 10' },
+    ],
+  },
+];
+
+const quizTexte = {
+  contact: {
+    heading: 'Wohin darf sich Marten Prieß melden?',
+    text: 'Hinterlasst eure Kontaktdaten. Marten Prieß meldet sich werktags persönlich und macht einen Terminvorschlag.',
+  },
+  success: {
+    heading: 'Danke, eure Nachricht ist da.',
+    text: 'Marten Prieß meldet sich werktags bei euch.',
+  },
+};
+
+// 03 — die Ebenen eines Angebots, je ein Satz. Die echten Screenshots liegen auf dem Stapel.
+const ebenen: Ebene[] = [
+  {
+    titel: 'Vorlage und Texte',
+    text: 'Texte und Bilder kommen aus eurer Bibliothek. Nichts wird abgetippt.',
+    image: editor,
+    alt: 'Editor der Angebotsseite mit Abschnitten, Präsentation und Bildauswahl',
+  },
+  {
+    titel: 'Kalkulation',
+    text: 'Jede Position rechnet nach eurer Regel. Was übrig bleibt, steht dran.',
+    image: bausteine,
+    alt: 'Angebot mit Positionen, Stunden und Deckungsbeitrag je Zeile',
+  },
+  {
+    titel: 'Angebotsseite',
+    text: 'Beim Kunden eine Seite in eurem Design. Kein PDF im Anhang.',
+    image: kundeStart,
+    alt: 'Angebotsseite beim Kunden mit Abschnitten und Leistungen',
+  },
+  {
+    titel: 'Zusage',
+    text: 'Optionen wählen, Summe sehen, per Klick zusagen. Alles landet bei euch.',
+    image: kundeAnnahme,
+    alt: 'Zusage auf der Angebotsseite mit wählbaren Leistungen und Summe',
+  },
+];
+
+// 01 — Kalkulation: Beispielrechnungen je Branche (Beispielwerte, frei erfunden).
+const rechnungen: Rechnung[] = [
+  {
+    key: 'zertifizierung',
+    icon: 'check-circle',
+    branche: 'Zertifizierung & Audit',
+    grundlage: 'Akkreditierungsregel · IAF MD 5',
+    satz: 'Aus Mitarbeitern und Standorten werden Audittage.',
+    eingaben: [
+      { label: 'Beschäftigte beim Kunden', wert: '240' },
+      { label: 'Standorte', wert: '3' },
+      { label: 'Stufe-1-Audit', wert: '2,0 d', auto: true },
+      { label: 'Stufe-2-Audit', wert: '4,5 d', auto: true },
+      { label: 'Überwachung, 2 ×', wert: '5,0 d', auto: true },
+    ],
+    regel: 'Mehr Mitarbeiter und Standorte, mehr Audittage. Reisetage kommen je Standort dazu.',
+    ergebnis: [
+      { label: 'Zyklus, 3 Jahre', wert: '17.420 €' },
+      { label: 'Audittage', wert: '13,0 d' },
+    ],
+    kosten: '9.900 €',
+    db: '7.520 €',
+    dbProzent: 43,
+    ampel: 'gruen',
+    regler: {
+      label: 'Wie viel davon remote?',
+      optionen: [
+        {
+          name: 'Alles vor Ort',
+          wert: '3 Anreisen',
+          kosten: '9.900 €',
+          db: '7.520 €',
+          dbProzent: 43,
+          ampel: 'gruen',
+        },
+        {
+          name: 'Ein Drittel remote',
+          wert: 'nach IAF MD 4',
+          setzt: { 'Überwachung, 2 ×': '3,4 d' },
+          preis: '16.100 €',
+          kennzahl: '11,4 d',
+          kosten: '8.100 €',
+          db: '8.000 €',
+          dbProzent: 50,
+          ampel: 'gruen',
+        },
+        {
+          name: 'Maximal remote',
+          wert: 'Grenze erreicht',
+          setzt: { 'Überwachung, 2 ×': '2,6 d', Standorte: '1 + 2 remote' },
+          preis: '15.200 €',
+          kennzahl: '10,1 d',
+          kosten: '7.100 €',
+          db: '8.100 €',
+          dbProzent: 53,
+          ampel: 'gruen',
+        },
+      ],
+    },
+  },
+  {
+    key: 'pruefung',
+    icon: 'shield',
+    branche: 'Prüfung & Kontrolle',
+    grundlage: 'BetrSichV · DGUV Vorschrift 3',
+    satz: 'Aus der Zahl der Geräte wird der Prüfauftrag.',
+    eingaben: [
+      { label: 'Ortsveränderliche Geräte', wert: '340' },
+      { label: 'Prüfzeit je Gerät', wert: '6 min' },
+      { label: 'Ortsfeste Anlagen', wert: '12' },
+      { label: 'Prüfzeit je Anlage', wert: '1,5 h' },
+      { label: 'Prüffrist', wert: '12 Monate' },
+      { label: 'Preis je Gerät', wert: '16,00 €' },
+    ],
+    regel: 'Geräte mal Prüfzeit, Anlagen extra. Viele Geräte: kleinerer Preis je Gerät.',
+    ergebnis: [
+      { label: 'Preis je Jahr', wert: '5.630 €' },
+      { label: 'Prüfstunden', wert: '52 h' },
+    ],
+    kosten: '3.380 €',
+    db: '2.250 €',
+    dbProzent: 40,
+    ampel: 'gruen',
+    regler: {
+      label: 'Wie viele Geräte?',
+      optionen: [
+        {
+          name: 'Ein Standort',
+          wert: '340 Geräte',
+          kosten: '3.380 €',
+          db: '2.250 €',
+          dbProzent: 40,
+          ampel: 'gruen',
+        },
+        {
+          name: 'Mittlerer Bestand',
+          wert: '900 Geräte',
+          setzt: {
+            'Ortsveränderliche Geräte': '900',
+            'Prüfzeit je Gerät': '5 min',
+            'Preis je Gerät': '13,50 €',
+          },
+          preis: '13.200 €',
+          kennzahl: '93 h',
+          kosten: '7.300 €',
+          db: '5.900 €',
+          dbProzent: 45,
+          ampel: 'gruen',
+        },
+        {
+          name: 'Drei Standorte',
+          wert: '1.800 Geräte',
+          setzt: {
+            'Ortsveränderliche Geräte': '1.800',
+            'Prüfzeit je Gerät': '4,5 min',
+            'Ortsfeste Anlagen': '38',
+            'Preis je Gerät': '11,50 €',
+          },
+          preis: '24.800 €',
+          kennzahl: '192 h',
+          kosten: '13.900 €',
+          db: '10.900 €',
+          dbProzent: 44,
+          ampel: 'gruen',
+        },
+      ],
+    },
+  },
+  {
+    key: 'wartung',
+    icon: 'settings',
+    branche: 'Wartung & Anlagen',
+    grundlage: 'VDI 6022 · VDMA 24186',
+    satz: 'Aus Anlagen und Turnus wird der Vertrag.',
+    eingaben: [
+      { label: 'Anlagen im Objekt', wert: '85' },
+      { label: 'Wartungen je Jahr', wert: '2' },
+      { label: 'Zeit je Anlage', wert: '1,2 h' },
+      { label: 'Laufzeit', wert: '36 Monate' },
+      { label: 'Preisanpassung ab Jahr 2', wert: '+3 %' },
+    ],
+    regel: 'Anlagen mal Wartungen mal Zeit. Der Notdienst kommt als Pauschale dazu.',
+    ergebnis: [
+      { label: 'Vertragswert je Jahr', wert: '18.160 €' },
+      { label: 'Stunden je Jahr', wert: '204 h' },
+    ],
+    kosten: '12.900 €',
+    db: '5.260 €',
+    dbProzent: 29,
+    ampel: 'gelb',
+    regler: {
+      label: 'Wer fährt raus?',
+      optionen: [
+        {
+          name: 'Eigener Monteur',
+          wert: '89 €/h',
+          kosten: '12.900 €',
+          db: '5.260 €',
+          dbProzent: 29,
+          ampel: 'gelb',
+        },
+        {
+          name: 'Fremdmonteur',
+          wert: '124 €/h',
+          kosten: '15.300 €',
+          db: '2.860 €',
+          dbProzent: 16,
+          ampel: 'rot',
+        },
+        {
+          name: 'Mit Notdienst',
+          wert: '24/7 aufgeschaltet',
+          setzt: { 'Wartungen je Jahr': '2 + Notdienst' },
+          preis: '24.900 €',
+          kennzahl: '246 h',
+          kosten: '16.800 €',
+          db: '8.100 €',
+          dbProzent: 33,
+          ampel: 'gelb',
+        },
+      ],
+    },
+  },
+  {
+    key: 'handwerk',
+    icon: 'layers',
+    branche: 'Handwerk & Objekte',
+    grundlage: 'VOB/C · Aufmaß',
+    satz: 'Aus dem Aufmaß wird das Angebot.',
+    eingaben: [
+      { label: 'Wohneinheiten', wert: '34' },
+      { label: 'Fläche gesamt', wert: '2.108 m²', auto: true },
+      { label: 'Lack, Einkauf', wert: '1,40 €/l' },
+      { label: 'Verbrauch, 3 Schichten', wert: '0,36 l/m²' },
+      { label: 'Lohnstunden', wert: '443 h', auto: true },
+      { label: 'Aufschlag Material', wert: '15 %' },
+    ],
+    regel: 'Wohnungen mal Fläche. Daraus Stunden und Material nach eurem Ansatz.',
+    ergebnis: [
+      { label: 'Preis', wert: '26.900 €' },
+      { label: 'Preis je m²', wert: '12,76 €' },
+    ],
+    kosten: '19.400 €',
+    db: '7.500 €',
+    dbProzent: 28,
+    ampel: 'gelb',
+    regler: {
+      label: 'Wer macht die Arbeit?',
+      optionen: [
+        {
+          name: 'Eigene Kolonne',
+          wert: '58 €/h',
+          kosten: '19.400 €',
+          db: '7.500 €',
+          dbProzent: 28,
+          ampel: 'gelb',
+        },
+        {
+          name: 'Mit Gerüst',
+          wert: 'Fassade, 4 Wochen',
+          setzt: { 'Fläche gesamt': '2.108 m² + Fassade' },
+          preis: '34.200 €',
+          kennzahl: '16,22 €',
+          kosten: '23.900 €',
+          db: '10.300 €',
+          dbProzent: 30,
+          ampel: 'gelb',
+        },
+        {
+          name: 'Nachunternehmer',
+          wert: '71 €/h',
+          kosten: '22.600 €',
+          db: '4.300 €',
+          dbProzent: 16,
+          ampel: 'rot',
+        },
+      ],
+    },
+  },
+];
+
+// 04 — nur die Fragen, die vor dem Absenden bremsen. Der Rest steht auf /angebote/.
+const funnelFragen = new Set([
+  'Ist das eine fertige Software?',
+  'Wir haben schon eine Branchensoftware. Lohnt sich das trotzdem?',
+  'Rechnet das wirklich nach unserer Regel?',
+  'Was kostet das?',
+  'Wie viel Zeit kostet uns das?',
+  'Wo laufen die Daten?',
+]);
+const miniFaqs = angeboteFaqs.filter((f) => funnelFragen.has(f.q));
+
+interface Props {
+  variant: 'funnel' | 'site';
+}
+const { variant } = Astro.props;
+const istFunnel = variant === 'funnel';
+
+// „Von heute bis dahin“: Strecke und Einwände der Funnel-Fassung (ersetzt dort die FAQ).
+const strecke = {
+  stationen: [
+    { wann: 'So läuft es heute', titel: 'Jedes Angebot neu zusammengesucht', text: 'Preise aus der letzten Kalkulation, Zuschläge aus dem Kopf, der Deckungsbeitrag in einer Excel daneben. Wer freigibt, sieht die Rechnung dahinter nicht, und ob der Kunde das Angebot überhaupt geöffnet hat, weiß keiner.' },
+    { wann: 'Woche 1 bis 2', titel: 'Erstgespräch und Aufnahme', text: 'Dreißig Minuten über euer kompliziertestes Angebot. Dann legen wir eure Kalkulationsregeln fest, so wie ihr heute rechnet, und ihr bekommt einen Festpreis.' },
+    { wann: 'Danach, 2 bis 4 Wochen', titel: 'Eure Kalkulation läuft', text: 'Programmiert zum Festpreis, nach euren Regeln, mit eurem Briefkopf. Der Kunde bekommt die Seite, ihr das PDF für die Akte.' },
+  ] as const,
+  einwaende: [
+    { satz: 'Das dauert ewig.', antwort: 'Sobald eure Regeln festgelegt sind, läuft eure Kalkulation in zwei bis vier Wochen.' },
+    { satz: 'Dafür haben wir keine Zeit.', antwort: 'Zwei bis drei Stunden pro Woche von euch: ein Termin, dazu Ausprobieren.' },
+    { satz: 'Unsere Kalkulation ist zu speziell.', antwort: 'Genau dafür programmieren wir. Aufmaß, Stückliste, Staffel, Zuschläge: eure Regeln, aufgeschrieben und gerechnet.' },
+    { satz: 'Bleibt das PDF?', antwort: 'Ja, auf Knopfdruck, für die Akte. Der Kunde bekommt dazu die Seite mit Optionen und Zusage per Klick.' },
+    { satz: 'Dann müssen wir alles umstellen.', antwort: 'Umgestellt wird Schritt für Schritt. Das Alte läuft, bis das Neue trägt.' },
+    { satz: 'Ist das nicht wieder Software von der Stange?', antwort: 'Nein. Wir setzen auf dem auf, was bei anderen Betrieben schon läuft, und programmieren, was bei euch anders ist. Nichts zum Konfigurieren, keine Grenzen. Mit unserer Erfahrung und KI beim Programmieren geht das schnell und bleibt bezahlbar.' },
+    { satz: 'Das ist sicher teuer.', antwort: 'Den Rahmen hört ihr im Erstgespräch, den Festpreis nach der Aufnahme. Programmiert wird erst, wenn ihr ihn kennt.' },
+  ],
+};
+
+---
+
+<!-- HERO: Text links, Quiz rechts (drei Fragen, dann Kontaktformular) --><!--
+  Ab lg füllt der Hero die erste Bildschirmhöhe (unter dem 3.5rem-Header): Inhalt mittig,
+  Logos am unteren Rand, darauf ein Scroll-Hinweis, der beim ersten Scrollen ausblendet.
+-->
+<section
+  data-hero
+  class:list={[
+    'relative overflow-x-clip lg:flex lg:flex-col',
+    istFunnel ? 'lg:min-h-[calc(100svh-3.5rem)]' : 'pt-24 sm:pt-20 lg:min-h-[100svh] lg:pt-16',
+  ]}
+>
+  <Blueprint />
+  <div
+    class="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_60%_50%_at_30%_40%,var(--color-background)_0%,transparent_75%)] opacity-80"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div
+    class="relative z-10 mx-auto w-full max-w-[84rem] px-5 pt-8 pb-16 sm:px-8 sm:pt-14 lg:grid lg:flex-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:items-center lg:gap-16 lg:px-12 lg:py-6"
+  >
+    <div class="text-center lg:text-left">
+      <p
+        data-reveal="fade-down"
+        class="text-brand-600 dark:text-brand-300 text-sm font-semibold tracking-[0.22em] uppercase"
+      >
+        Angebot &amp; Kalkulation
+      </p>
+      <h1
+        data-reveal="fade-down"
+        lang="de"
+        class="font-display text-foreground mt-3 text-[2.05rem] leading-[1.08] font-bold tracking-tight text-balance hyphens-auto [-webkit-hyphens:auto] sm:mt-5 sm:text-6xl sm:leading-[1.05] xl:text-[4.25rem]"
+      >
+        {
+          istFunnel ? (
+            <>
+              Ein System, das eure Kalkulation kennt.
+              <span class="text-brand-500 block">Und eure Marge gleich mit.</span>
+            </>
+          ) : (
+            <>
+        Euer Angebot
+        <span class="text-brand-500 block">rechnet sich selbst.</span>
+            </>
+          )
+        }
+      </h1>
+      <p
+        data-reveal
+        class="text-foreground-muted mt-6 hidden flex-wrap items-center justify-center gap-x-2.5 gap-y-2 text-sm font-medium sm:flex lg:justify-start"
+      >
+        <span>Schluss mit</span>
+        {
+          ['Excel daneben', 'Word-Vorlage', 'Zahlendreher'].map((alt) => (
+            <span class="hero-alt border-border rounded-md border px-2 py-0.5">{alt}</span>
+          ))
+        }
+      </p>
+      {istFunnel && <DealZeile />}
+      {
+        !istFunnel && (
+      <p
+        data-reveal
+        class="text-foreground-secondary mx-auto mt-4 max-w-lg text-base leading-7 sm:mt-7 sm:text-lg sm:leading-8 lg:mx-0"
+      >
+        Ihr gebt eure Zahlen ein. Das Angebot rechnet nach eurer Regel. Der Kunde bekommt eine Seite
+        und sagt per Klick ja.
+        <span class="hidden lg:inline"> Und ihr wisst vorher, was übrig bleibt.</span>
+      </p>
+        )
+      }
+      <p
+        data-reveal
+        class="text-foreground-muted border-border/70 bg-background/85 mx-auto mt-8 hidden max-w-lg rounded-xl border px-4 py-3 text-sm leading-6 backdrop-blur-sm lg:mx-0 lg:block"
+      >
+        Das PDF bleibt, auf Knopfdruck und mit eurem Briefkopf. Was dazukommt: die Kalkulation
+        dahinter rechnet nach euren Regeln, und ihr seht beim Schreiben, was übrig bleibt. Für
+        Prüfung, Zertifizierung, Wartung, Service und Handwerk.
+      </p>
+    </div>
+
+    <!-- Mindesthöhe = höchster Schritt (Frage 1, ca. 600px), sonst springt der mittig gesetzte Hero je Schritt -->
+    {
+      istFunnel ? (
+        <div id="quiz" class="mt-7 scroll-mt-20 sm:mt-10 lg:mt-0 lg:min-h-[38rem]" data-quiz>
+          <FunnelQuiz
+            client:load
+            questions={quizFragen}
+            einordnung="angebote"
+            contact={quizTexte.contact}
+            success={quizTexte.success}
+            submitLabel="Nachricht senden"
+            markRequired
+            phoneHint="Telefon für eine kurze Rückfrage. Wir rufen an, wenn es hilft."
+            leadEvent="angebote_lead"
+            compact
+            privacyUrl="/datenschutz/"
+          />
+        </div>
+      ) : (
+        <div class="mt-7 sm:mt-10 lg:mt-0 lg:flex lg:items-center">
+          <div class="border-border bg-card/90 rounded-[2rem] border p-7 shadow-[0_22px_55px_rgba(34,43,74,0.10)] backdrop-blur-sm sm:p-9">
+            <p class="text-brand-600 text-xs font-semibold tracking-[0.22em] uppercase">
+              So fängt es an
+            </p>
+            <h2 class="font-display text-foreground mt-4 text-2xl font-bold tracking-tight">
+              30 Minuten. Ein echtes Angebot von euch. Eine ehrliche Antwort.
+            </h2>
+            <p class="text-foreground-secondary mt-4 text-base leading-7">
+              Ihr zeigt uns, wie ihr heute ein Angebot rechnet. Wir sagen, ob sich das bei euch
+              lohnt. Kostenlos, ohne Folien.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3">
+              <Button size="lg" href={contactLinks.cal} target="_blank">
+                Erstgespräch buchen
+                <Icon name="arrow-up-right" size="sm" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    <!-- mobil unter dem Quiz, damit das Quiz ohne Scrollen anfängt -->
+    <p
+      class="text-foreground-muted border-border/70 bg-background/85 mx-auto mt-6 max-w-lg rounded-xl border px-4 py-3 text-center text-sm leading-6 backdrop-blur-sm lg:hidden"
+    >
+      Das PDF bleibt. Was dazukommt: die Kalkulation dahinter rechnet nach euren Regeln.
+    </p>
+  </div>
+  <!-- LOGOS: schließen die erste Bildschirmhöhe ab; der Scroll-Hinweis sitzt auf ihrer Oberkante -->
+  <div class="relative z-10">
+    <a
+      href="#heute"
+      class="hero-scroll absolute top-0 left-1/2 z-20 hidden h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full lg:flex"
+      aria-label="Weiter nach unten"
+      data-hero-scroll
+    >
+      <span class="hero-scroll-icon flex"><Icon name="chevron-down" size="sm" /></span>
+    </a>
+    <ClientLogoStrip
+      heading="Aus Projekten mit"
+      logos={clientLogos}
+      variant="light"
+      uniform
+      class="py-10 lg:py-11"
+    />
+  </div>
+</section>
+
+<!-- HEUTE: der Ist-Zustand, kurz, damit sich Leser wiedererkennen. Mobil zuerst das Bild. -->
+<section
+  id="heute"
+  class="heute-sec border-border relative scroll-mt-20 overflow-x-clip border-b pt-14 pb-12 sm:py-20 lg:py-24"
+>
+  <div
+    class="container grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-16"
+  >
+    <div class="af-rise order-2 lg:order-1">
+      <p
+        class="inline-flex items-center gap-2 font-mono text-xs font-semibold tracking-[0.2em] text-[oklch(58%_0.19_25)] uppercase"
+      >
+        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+        Kommt euch das bekannt vor?
+      </p>
+      <h2
+        class="font-display text-foreground mt-4 text-3xl font-bold tracking-tight text-balance sm:text-4xl lg:text-[2.35rem] lg:leading-[1.15]"
+      >
+        Die Rechnung steht in Excel. Das Angebot in Word.{' '}
+        <span class="text-foreground-muted">Dazwischen tippt jemand ab.</span>
+      </h2>
+      <p class="text-foreground-secondary mt-5 text-[0.95rem] leading-7">
+        Eine Tabelle rechnet den Preis. Jemand tippt ihn ins Angebot. Dann geht ein PDF raus. Und
+        dann wartet ihr.
+      </p>
+      <p class="text-foreground mt-4 text-[0.95rem] leading-7 font-semibold">
+        Schöne Angebote machen viele Programme. Aber keins rechnet so wie ihr.
+      </p>
+    </div>
+
+    <div class="af-rise order-1 lg:order-2">
+      <HeuteChaos szene />
+    </div>
+  </div>
+</section>
+
+<!-- 01 DIE IDEE: eine Zahl, einmal eingegeben, wandert bis zum Kunden -->
+<section
+  id="idee"
+  class:list={['bg-background border-border relative scroll-mt-20 overflow-x-clip border-b py-16 lg:py-28', istFunnel && 'hidden lg:block']}
+>
+  <div class="relative z-10 container max-w-6xl">
+    <SectionHeader
+      size="md"
+      number="01"
+      eyebrow="Die Idee"
+      title="Eine Zahl. Einmal eingegeben."
+      lead="Aus eurer Rechnung wird die Angebotszeile. Und beim Kunden die Summe auf der Seite."
+    />
+    <div class="mx-auto mt-12 max-w-6xl lg:mt-16">
+      <ZahlWandert />
+    </div>
+  </div>
+</section>
+
+<!-- 02 DIE KALKULATION: der Unterschied zum Anfassen -->
+<section
+  id="kalkulation"
+  class="bg-background relative scroll-mt-20 overflow-x-clip py-16 lg:py-28"
+>
+  <div
+    class="bg-brand-300/10 pointer-events-none absolute top-40 left-1/2 h-[40rem] w-[60rem] -translate-x-1/2 rounded-full blur-[120px]"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="relative z-10 container max-w-7xl">
+    <SectionHeader
+      size="md"
+      number="02"
+      eyebrow="Die Kalkulation"
+      title="Eure Regel. Nicht unsere."
+      lead="Probiert es: Tippt auf eine Branche, dann auf die Knöpfe. Der Preis rechnet mit."
+    />
+
+    <div class="af-rise mx-auto mt-10 max-w-6xl lg:mt-12">
+      <KalkulationRechner rechnungen={rechnungen} kontaktHref={istFunnel ? '#quiz' : '#kontakt'}>
+        <p slot="hinweis">
+          <span class="text-foreground font-semibold"
+            >Die Zahlen sind erfunden. Die Regeln sind echt.</span
+          >
+          Eure Regel bauen wir so ein, wie ihr sie braucht. Preise und Sätze legt ihr selbst fest.{
+            ' '
+          }
+          <a
+            href={istFunnel ? '#quiz' : '#kontakt'}
+            class="text-brand-600 hover:text-brand-700 dark:text-brand-300 inline-flex items-center gap-1 font-semibold whitespace-nowrap underline-offset-4 hover:underline"
+          >
+            Fragt uns
+            <Icon name="arrow-right" size="xs" />
+          </a>
+        </p>
+      </KalkulationRechner>
+    </div>
+  </div>
+</section>
+
+<!-- 03 SO SIEHT DAS AUS: echte Screenshots, fünf Schritte -->
+<section
+  id="angebot"
+  class:list={['invert-section bg-surface-invert relative scroll-mt-20 overflow-x-clip py-16 lg:py-28', istFunnel && 'hidden lg:block']}
+>
+  <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div
+      class="bg-brand-500/25 absolute -top-40 left-1/4 h-[36rem] w-[36rem] rounded-full blur-[140px]"
+    >
+    </div>
+    <div
+      class="bg-brand-300/15 absolute right-0 bottom-0 h-[30rem] w-[30rem] rounded-full blur-[140px]"
+    >
+    </div>
+    <div
+      class="bg-grid-pattern absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent_85%)] opacity-[0.07]"
+    >
+    </div>
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
+    <SectionHeader
+      number="03"
+      eyebrow="So sieht das aus"
+      title="Vier Ebenen. Ein Angebot."
+      lead="Klickt euch durch. Echte Bilder aus einer Kundenlösung."
+      size="md"
+      invert
+    />
+    <div class="mx-auto mt-10 max-w-6xl lg:mt-14">
+      <AngebotEbenen ebenen={ebenen} start={2} />
+    </div>
+  </div>
+</section>
+
+<!-- VERTRAUEN: vier Fakten auf dunklem Band -->
+<VertrauensBand />
+
+<!-- VON HEUTE BIS DAHIN: Strecke und Einwände, nur im Funnel -->
+{istFunnel && <VonHeuteBisDahin stationen={strecke.stationen} einwaende={strecke.einwaende} />}
+
+<!-- 04 SO KOMMT IHR DAZU: Marten, das Erstgespräch, der Knopf -->
+<section
+  id="ablauf"
+  class="gespraech-sec border-border relative scroll-mt-20 overflow-x-clip border-b py-16 lg:py-28"
+>
+  <div class="relative z-10 container max-w-6xl">
+    <SectionHeader
+      size="md"
+      number="04"
+      eyebrow="Lohnt sich das?"
+      title="Das klärt ein Gespräch."
+      lead="Unverbindlich, 30 Minuten, keine Vorbereitung. Vorher könnt ihr kurz überschlagen, worum es bei euch geht."
+    />
+
+    <!-- Erst der flache Rechen-Streifen über die volle Breite, darunter die Marten-Karte -->
+    <div class="mx-auto mt-10 grid max-w-5xl gap-6 lg:mt-14">
+      <div class="af-rise">
+        <LohntSich
+          frage="Wie viele Angebote schreibt ihr im Monat?"
+          wer="Gemeint sind die kalkulierten, nicht die Standardpreisliste."
+          min={5}
+          max={80}
+          step={5}
+          start={25}
+          minutenJe={120}
+          wofuer="ins Zusammensuchen, Durchrechnen, Abstimmen und Nachfassen."
+          annahme="Zwei Stunden je kalkuliertem Angebot, von der Anfrage bis zur Zusage: Mengen aus dem Aufmaß ziehen, Einkaufspreise suchen, Zuschläge setzen, den Deckungsbeitrag in der Excel prüfen, zwei Varianten rechnen, freigeben lassen, nachfassen. Eure komplizierten dauern deutlich länger."
+        />
+      </div>
+
+      <!-- Nur auf der indexierten Seite: Im Funnel führt das Quiz zum Gespräch, die Karte wäre ein zweiter Weg. -->
+      {
+        !istFunnel && (
+          <ErstgespraechKarte
+            id="ablauf-01"
+            class="w-full max-w-none"
+            zitat="Zeigt mir ein echtes Angebot von euch. Nach 30 Minuten wisst ihr, ob sich das bei euch lohnt."
+            text="Ihr erzählt, wie ihr heute Angebote schreibt und wie lange eins dauert. Ich sage euch ehrlich, ob sich das lohnt, und wenn ja, womit wir anfangen."
+          />
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<!-- 05 FAQ: nur, was vor dem Absenden bremst -->
+<section class:list={['bg-background-secondary border-border relative border-b py-16 lg:py-28', istFunnel && 'hidden']}>
+  <div class="relative z-10 container max-w-4xl">
+    <SectionHeader size="md" number="05" eyebrow="Häufige Fragen" title="Was oft gefragt wird." />
+
+    <div class="mt-10 flex flex-col gap-4 lg:mt-12">
+      {
+        miniFaqs.map((item) => (
+          <details class="group border-border bg-card rounded-2xl border p-5 shadow-sm transition-shadow duration-300 open:shadow-lg sm:p-6">
+            <summary class="flex min-h-11 cursor-pointer list-none items-start gap-4 py-0.5 [&::-webkit-details-marker]:hidden">
+              <h3 class="font-display text-foreground flex-1 text-base font-bold tracking-tight sm:text-lg">
+                {item.q}
+              </h3>
+              <Icon
+                name="chevron-down"
+                size="sm"
+                class="text-foreground-muted mt-1 shrink-0 transition-transform duration-300 group-open:rotate-180"
+              />
+            </summary>
+            <p class="text-foreground-secondary border-border/60 mt-4 border-t pt-4 text-[0.95rem] leading-7">
+              {item.a}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+    <p class="text-foreground-muted mt-8 text-center text-sm">
+      Noch eine Frage? Stellt sie im{' '}
+      <a
+        href="#kontakt"
+        class="text-brand-600 dark:text-brand-300 font-semibold underline-offset-4 hover:underline"
+      >
+        Erstgespräch</a
+      >.
+    </p>
+  </div>
+</section>
+
+<!-- Blog: zwei Artikel zu dieser Tür, nur auf der indexierten Seite -->
+{!istFunnel && <BlogQuerverweis tuer="angebot" />}
+
+<!-- KONTAKT: Erstgespräch vereinbaren, über denselben Fragebogen wie im Hero -->
+<section
+  id="kontakt"
+  class:list={['kontakt-sec border-border relative scroll-mt-20 overflow-x-clip py-16 lg:py-32', istFunnel && 'hidden lg:block']}
+>
+  <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div
+      class="bg-brand-400/15 absolute -bottom-40 -left-24 h-[34rem] w-[34rem] rounded-full blur-[150px]"
+    >
+    </div>
+    <div
+      class="bg-grid-pattern absolute inset-0 [mask-image:linear-gradient(to_top,black,transparent_85%)] opacity-[0.06]"
+    >
+    </div>
+  </div>
+  <div
+    class="relative z-10 container grid max-w-6xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch lg:gap-16"
+  >
+    <!-- Links: kurz, was passiert; die drei Schritte nur ab lg, mobil reicht die Überschrift -->
+    <div class="af-rise flex flex-col">
+      <p
+        class="text-brand-600 dark:text-brand-300 font-mono text-xs font-semibold tracking-[0.2em] uppercase"
+      >
+        Nächster Schritt
+      </p>
+      <h2
+        lang="de"
+        class="font-display text-foreground mt-4 text-3xl font-bold tracking-tight text-balance hyphens-auto [-webkit-hyphens:auto] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]"
+      >
+        Erstgespräch vereinbaren.
+      </h2>
+      <p class="text-foreground-secondary mt-5 text-lg leading-8">
+        Drei kurze Fragen und eure Kontaktdaten. Mehr braucht es nicht.
+      </p>
+
+      <ol class="kontakt-ablauf mt-9 mb-8 hidden space-y-6 lg:block">
+        {
+          [
+            {
+              titel: 'Fragen beantworten',
+              text: 'Wie ihr heute Angebote macht, wie viele und wer daran sitzt. Eine Minute.',
+            },
+            {
+              titel: 'Wir melden uns',
+              text: 'Werktags, persönlich, mit einem Terminvorschlag.',
+            },
+            {
+              titel: 'Erstgespräch',
+              text: '30 Minuten, online, kostenlos. Ihr zeigt uns ein echtes Beispiel. Danach wisst ihr, ob es passt.',
+            },
+          ].map((schritt, i) => (
+            <li class="relative flex gap-4">
+              <span class="bg-card border-brand-300 text-brand-600 dark:text-brand-300 relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <div class="pt-1">
+                <p class="font-display text-foreground font-bold tracking-tight">{schritt.titel}</p>
+                <p class="text-foreground-secondary mt-1 text-[0.95rem] leading-7">
+                  {schritt.text}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="border-border mt-6 flex items-center gap-4 border-t pt-6 lg:mt-auto lg:pt-8">
+        <Picture
+          src={founderPortrait}
+          alt="Marten Prieß"
+          widths={[56, 112]}
+          sizes="56px"
+          formats={['avif', 'webp']}
+          class="h-14 w-14 shrink-0 rounded-full object-cover"
+          loading="lazy"
+        />
+        <p class="text-sm leading-6">
+          <span class="text-foreground block font-semibold">Marten Prieß</span>
+          <span class="text-foreground-secondary"
+            >Gründer von RocketBase, meldet sich persönlich.</span
+          >
+        </p>
+      </div>
+    </div>
+
+    {
+      istFunnel ? (
+        <div class="af-rise lg:min-h-[38rem]">
+          <FunnelQuiz
+            client:visible
+            questions={quizFragen}
+            einordnung="angebote"
+            contact={quizTexte.contact}
+            success={quizTexte.success}
+            submitLabel="Nachricht senden"
+            markRequired
+            phoneHint="Telefon für eine kurze Rückfrage. Wir rufen an, wenn es hilft."
+            leadEvent="angebote_lead"
+            compact
+            privacyUrl="/datenschutz/"
+          />
+        </div>
+      ) : (
+        <div class="af-rise flex flex-col justify-center gap-4">
+          <Button size="lg" href={contactLinks.cal} target="_blank">
+            Erstgespräch buchen
+            <Icon name="arrow-up-right" size="sm" />
+          </Button>
+          <p class="text-foreground-muted text-sm leading-6">
+            Oder per Mail an{' '}
+            <a href={`mailto:${contactLinks.email}`} class="text-brand-600 font-semibold">
+              {contactLinks.email}
+            </a>
+            .
+          </p>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  /* Hero: Scroll-Hinweis auf der Unterkante */
+  .hero-scroll {
+    color: var(--color-foreground-secondary);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 14px 30px -14px oklch(30% 0.08 265 / 0.45);
+    transition:
+      opacity 0.3s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  @media (hover: hover) {
+    .hero-scroll:hover {
+      color: var(--color-brand-600);
+      border-color: color-mix(in oklch, var(--color-brand-400) 60%, var(--color-border));
+    }
+  }
+  .hero-scroll:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+  }
+  .hero-scroll[data-hidden='true'] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .hero-scroll-icon {
+    animation: hero-scroll-bob 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  @keyframes hero-scroll-bob {
+    0%,
+    100% {
+      transform: translateY(-2px);
+    }
+    50% {
+      transform: translateY(3px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scroll-icon {
+      animation: none;
+    }
+  }
+
+  /* Hero: was der Baustein ablöst, durchgestrichen */
+  .hero-alt {
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in oklch, var(--color-brand-500) 70%, transparent);
+    text-decoration-thickness: 2px;
+    background: var(--color-card);
+  }
+
+  /* Heute-Abschnitt */
+  .heute-sec {
+    background:
+      radial-gradient(
+        50% 70% at 85% 50%,
+        color-mix(in oklch, oklch(60% 0.19 25) 6%, transparent),
+        transparent 70%
+      ),
+      var(--color-background-secondary);
+  }
+
+  /* 03: Gesprächskarte, leicht in Markenfarbe getönter Hintergrund */
+  .gespraech-sec {
+    background:
+      radial-gradient(
+        55% 140% at 90% 50%,
+        color-mix(in oklch, var(--color-brand-400) 22%, transparent),
+        transparent 70%
+      ),
+      color-mix(in oklch, var(--color-brand-500) 7%, var(--color-background));
+  }
+  /* Kontakt: hell, leicht in Markenfarbe getönt, damit die weiße Fragebogen-Karte trägt */
+  .kontakt-sec {
+    background:
+      radial-gradient(
+        55% 80% at 85% 40%,
+        color-mix(in oklch, var(--color-brand-400) 16%, transparent),
+        transparent 70%
+      ),
+      color-mix(in oklch, var(--color-brand-500) 6%, var(--color-background));
+  }
+  /* Kontakt: Verbindungslinie zwischen den drei Schritten links */
+  .kontakt-ablauf > li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 2.5rem;
+    bottom: -1.25rem;
+    left: 1.125rem;
+    width: 1px;
+    background: var(--color-border);
+  }
+</style>
+<script>
+  import { szenenStarten } from '@/lib/szene';
+  szenenStarten();
+  // Hero: Scroll-Hinweis nach dem ersten Scrollen ausblenden (und oben wieder zeigen).
+  const heroScroll = document.querySelector<HTMLElement>('[data-hero-scroll]');
+  if (heroScroll) {
+    const sync = () => (heroScroll.dataset.hidden = window.scrollY > 40 ? 'true' : 'false');
+    window.addEventListener('scroll', sync, { passive: true });
+    sync();
+  }
+</script>

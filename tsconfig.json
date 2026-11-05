@@ -1,0 +1,21 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  },
+  "include": ["src/**/*", "src/env.d.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".netlify",
+    "src/i18n/translations/en.ts",
+    "src/i18n/translations/es.ts",
+    "src/i18n/translations/fr.ts",
+    "src/components/landing/FeatureTabs.tsx"
+  ]
+}

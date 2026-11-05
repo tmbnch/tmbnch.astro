@@ -1,0 +1,118 @@
+---
+/**
+ * Bilder-Fächer im Hero der Startseite: vorne ein Screenshot, dahinter die nächsten leicht gedreht.
+ * Alle fünf Sekunden wandert das vordere Bild nach hinten, ein Klick blättert sofort weiter.
+ * Ohne JS steht der Fächer still, bei reduzierter Bewegung wechselt er nur per Klick.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  bilder: { src: ImageMetadata; alt: string }[];
+}
+const { bilder } = Astro.props;
+---
+
+<button type="button" data-faecher class="faecher" aria-label="Nächstes Bild zeigen">
+  {
+    bilder.map((b, i) => (
+      <span class="faecher-karte" data-pos={i}>
+        <Image
+          src={b.src}
+          alt={b.alt}
+          widths={[640, 960, 1280]}
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          class="block h-full w-full object-cover object-top"
+          loading={i === 0 ? 'eager' : 'lazy'}
+        />
+      </span>
+    ))
+  }
+</button>
+
+<style>
+  .faecher {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  .faecher:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 6px;
+  }
+  .faecher-karte {
+    position: absolute;
+    inset: 6% 5% auto;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    background: var(--color-card);
+    box-shadow: 0 18px 45px -18px oklch(30% 0.08 265 / 0.45);
+    transition:
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.7s ease;
+  }
+  .faecher-karte[data-pos='0'] {
+    z-index: 4;
+    transform: none;
+  }
+  .faecher-karte[data-pos='1'] {
+    z-index: 3;
+    transform: translate(5%, -5%) rotate(3deg) scale(0.96);
+  }
+  .faecher-karte[data-pos='2'] {
+    z-index: 2;
+    transform: translate(-5%, 3%) rotate(-3.5deg) scale(0.94);
+  }
+  .faecher-karte[data-pos='3'] {
+    z-index: 1;
+    transform: translate(3%, 7%) rotate(5deg) scale(0.9);
+    opacity: 0.85;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .faecher-karte {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const TAKT = 5000;
+
+  function einrichten() {
+    for (const faecher of document.querySelectorAll<HTMLElement>('[data-faecher]')) {
+      if (faecher.dataset.bereit) continue;
+      faecher.dataset.bereit = '1';
+      const karten = [...faecher.querySelectorAll<HTMLElement>('[data-pos]')];
+      const weiter = () =>
+        karten.forEach((k) => {
+          k.dataset.pos = String((Number(k.dataset.pos) + karten.length - 1) % karten.length);
+        });
+
+      let uhr = 0;
+      const stelleUhr = () => {
+        window.clearInterval(uhr);
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        uhr = window.setInterval(() => {
+          if (!faecher.isConnected) return window.clearInterval(uhr);
+          if (!document.hidden) weiter();
+        }, TAKT);
+      };
+      // Der Takt beginnt nach einem Klick neu, sonst springt das gewählte Bild gleich wieder weg.
+      faecher.addEventListener('click', () => {
+        weiter();
+        stelleUhr();
+      });
+      stelleUhr();
+    }
+  }
+
+  einrichten();
+  document.addEventListener('astro:after-swap', einrichten);
+</script>

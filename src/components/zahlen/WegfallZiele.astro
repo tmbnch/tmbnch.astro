@@ -1,0 +1,153 @@
+---
+/**
+ * Zwei Karten nebeneinander, nachgebaut aus dem Geschäftsführer-Cockpit:
+ * links der Vertragswert, der ins Folgejahr wegfällt (enden, ohne Folgevertrag, reduziert),
+ * rechts der Stand gegen die Umsatzziele je Geschäftsbereich. Beispieldaten.
+ */
+import '@/components/angebote/frame.css';
+import './zahlen.css';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+
+const wegfall = [
+  { bereich: 'Wartungsverträge', projekte: 153, std: '−8.291,82', wert: '−925,46 Tsd. €' },
+  { bereich: 'Schulungen', projekte: 90, std: '−1.042,53', wert: '−119,12 Tsd. €' },
+  { bereich: 'Beratung', projekte: 23, std: '−878,82', wert: '−113,58 Tsd. €' },
+  { bereich: 'Prüfungen', projekte: 19, std: '−713,89', wert: '−88,39 Tsd. €' },
+];
+
+const SCALE = 115;
+const ziele = [
+  { bereich: 'Schulungen', ist: '252,3 Tsd. €', ziel: '235,8 Tsd. €', pct: 107.01, diff: '+16,52 Tsd. €' },
+  { bereich: 'Wartungsverträge', ist: '2,76 Mio. €', ziel: '2,84 Mio. €', pct: 97.42, diff: '−73,28 Tsd. €' },
+  { bereich: 'Prüfungen', ist: '639,1 Tsd. €', ziel: '669,4 Tsd. €', pct: 95.49, diff: '−30,22 Tsd. €' },
+  { bereich: 'Beratung', ist: '257,6 Tsd. €', ziel: '297,3 Tsd. €', pct: 86.65, diff: '−39,68 Tsd. €' },
+];
+const gesamt = { bereich: 'Gesamt', ist: '3,91 Mio. €', ziel: '4,04 Mio. €', pct: 96.86, diff: '−126,66 Tsd. €' };
+const pctTxt = (p: number) => p.toFixed(2).replace('.', ',') + ' %';
+const tone = (p: number) => (p >= 90 ? 'ok' : p >= 70 ? 'mid' : 'low');
+const hundred = (100 / SCALE) * 100;
+---
+
+<div class="z-app grid gap-4 rounded-[1.25rem] lg:grid-cols-2" style="background: transparent">
+  <figure class="af-frame z-app">
+    <div class="p-4 sm:p-5">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <p class="flex items-center gap-1.5 text-sm font-bold">
+          <Icon name="clock" size="xs" class="z-muted" /> Vertragswert-Wegfall
+          <span class="z-muted text-xs font-medium">2026 → 2027</span>
+        </p>
+        <div class="z-seg" aria-hidden="true">
+          <span data-active>Bereiche</span>
+          <span>Gründe</span>
+        </div>
+      </div>
+      <div class="mt-3 hidden sm:block sm:overflow-x-auto">
+        <table class="w-full min-w-[22rem] text-left text-[0.78rem]">
+          <thead>
+            <tr class="z-muted text-[0.7rem]">
+              <th class="py-1.5 font-medium">Geschäftsbereich</th>
+              <th class="py-1.5 text-right font-medium">Projekte</th>
+              <th class="py-1.5 text-right font-medium">Stunden</th>
+              <th class="py-1.5 text-right font-medium">Vertragswert</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              wegfall.map((r) => (
+                <tr class="border-t" style="border-color: var(--z-line)">
+                  <td class="py-2 font-medium">{r.bereich}</td>
+                  <td class="py-2 text-right">{r.projekte}</td>
+                  <td class="z-muted py-2 text-right whitespace-nowrap">{r.std} Std.</td>
+                  <td class="py-2 text-right font-bold whitespace-nowrap">{r.wert}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+          <tfoot>
+            <tr class="border-t-2" style="border-color: var(--z-line)">
+              <td class="pt-2.5 pb-1 font-bold">
+                Gesamt
+                <span class="z-label block font-normal">164 enden · 115 ohne Folgevertrag · 6 reduziert</span>
+              </td>
+              <td class="pt-2.5 pb-1 text-right font-semibold">285</td>
+              <td class="z-muted pt-2.5 pb-1 text-right whitespace-nowrap">−10.927,06 Std.</td>
+              <td class="z-over pt-2.5 pb-1 text-right font-bold whitespace-nowrap">−1,25 Mio. €</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {/*
+        Vier Spalten mit Geldbeträgen passen nicht in 300 px - im Screenshot brach
+        dort "−925,46 Tsd." von seinem "€" ab. Mobil darum je Bereich eine Zeile:
+        Name und Projektzahl oben, Stunden und Wert darunter, beides unzertrennlich.
+      */}
+      <ul class="mt-3 space-y-2 sm:hidden">
+        {wegfall.map((r) => (
+          <li class="border-t pt-2 text-[0.78rem]" style="border-color: var(--z-line)">
+            <div class="flex items-baseline justify-between gap-2">
+              <span class="font-medium">{r.bereich}</span>
+              <span class="z-label shrink-0 whitespace-nowrap">{r.projekte} Projekte</span>
+            </div>
+            <div class="mt-0.5 flex items-baseline justify-between gap-2">
+              <span class="z-muted whitespace-nowrap">{r.std} Std.</span>
+              <span class="font-bold whitespace-nowrap">{r.wert}</span>
+            </div>
+          </li>
+        ))}
+        <li class="border-t-2 pt-2 text-[0.78rem]" style="border-color: var(--z-line)">
+          <div class="flex items-baseline justify-between gap-2">
+            <span class="font-bold">Gesamt</span>
+            <span class="z-label shrink-0 whitespace-nowrap">285 Projekte</span>
+          </div>
+          <div class="mt-0.5 flex items-baseline justify-between gap-2">
+            <span class="z-muted whitespace-nowrap">−10.927,06 Std.</span>
+            <span class="z-over font-bold whitespace-nowrap">−1,25 Mio. €</span>
+          </div>
+          <p class="z-label mt-1">164 enden · 115 ohne Folgevertrag · 6 reduziert</p>
+        </li>
+      </ul>
+    </div>
+  </figure>
+
+  <figure class="af-frame z-app">
+    <div class="p-4 sm:p-5">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <p class="flex items-center gap-1.5 text-sm font-bold">
+          <Icon name="trending-up" size="xs" class="z-muted" /> Umsatzziele nach Geschäftsbereich
+          <span class="z-muted text-xs font-medium">2026</span>
+        </p>
+        <div class="z-seg" aria-hidden="true">
+          <span data-active>Fest</span>
+          <span>+ Geplant</span>
+        </div>
+      </div>
+      <ul class="mt-4 space-y-3">
+        {
+          [...ziele, gesamt].map((z) => (
+            <li
+              class:list={['grid grid-cols-[minmax(0,1fr)_6rem] items-center gap-x-3 gap-y-1 sm:grid-cols-[minmax(0,11.5rem)_minmax(0,1fr)_5.5rem] sm:items-center', z.bereich === 'Gesamt' && 'border-t pt-3']}
+              style={z.bereich === 'Gesamt' ? 'border-color: var(--z-line)' : undefined}
+            >
+              <div class="min-w-0">
+                <p class:list={['truncate text-[0.8rem]', z.bereich === 'Gesamt' ? 'font-bold' : 'font-medium']}>{z.bereich}</p>
+                <p class="z-label">
+                  <span class="whitespace-nowrap">{z.ist}</span> / <span class="whitespace-nowrap">{z.ziel} Ziel</span>
+                </p>
+              </div>
+              <div class="z-bar-track order-2 col-span-2 sm:order-none sm:col-span-1">
+                <span class="z-bar-fill" data-tone={tone(z.pct)} style={`width:${(Math.min(z.pct, 100) / SCALE) * 100}%`} />
+                {z.pct > 100 && <span class="z-bar-over" style={`left:${hundred}%;width:${((z.pct - 100) / SCALE) * 100}%`} />}
+                <span class="z-hundred" style={`left:${hundred}%`} />
+              </div>
+              <p class="order-1 self-start text-right text-[0.78rem] leading-tight sm:order-none sm:self-auto">
+                <span class="font-bold underline decoration-dotted underline-offset-2">{pctTxt(z.pct)}</span>
+                <span class:list={['block text-[0.66rem] whitespace-nowrap', z.diff.startsWith('+') ? 'z-up' : 'z-muted']}>{z.diff}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </figure>
+</div>

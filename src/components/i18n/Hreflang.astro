@@ -1,0 +1,44 @@
+---
+/**
+ * Hreflang Component
+ *
+ * Emits <link rel="alternate" hreflang="..."> tags for the current page.
+ * For pages that map to a routeId in src/i18n/routes.ts, emits one entry per
+ * configured locale. For pages without a routeId (e.g. dynamic detail routes),
+ * falls back to emitting a self-referential entry so search engines still get
+ * a valid alternate link instead of pointing back to a parent listing page.
+ */
+
+import { getRouteTranslations, type RouteId } from '@/i18n/helpers';
+import { defaultLocale, locales } from '@/i18n/config';
+
+interface Props {
+  /**
+   * Optional route ID. If omitted, the current URL path is used as-is.
+   */
+  routeId?: RouteId;
+}
+
+const { routeId } = Astro.props;
+
+function withTrailingSlash(path: string): string {
+  if (path === '/' || path.endsWith('/')) return path;
+  return `${path}/`;
+}
+
+function toAbsolute(path: string): string {
+  return new URL(withTrailingSlash(path), Astro.site).toString();
+}
+
+const translations = routeId
+  ? getRouteTranslations(routeId)
+  : locales.map((locale) => ({ locale, path: Astro.url.pathname }));
+
+const defaultUrl =
+  translations.find((t) => t.locale === defaultLocale)?.path ?? Astro.url.pathname;
+---
+
+{translations.map(({ locale, path }) => (
+  <link rel="alternate" hreflang={locale} href={toAbsolute(path)} />
+))}
+<link rel="alternate" hreflang="x-default" href={toAbsolute(defaultUrl)} />

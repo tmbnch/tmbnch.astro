@@ -1,0 +1,268 @@
+---
+/**
+ * Nachbau des Ressourcen-Dashboards mit Drilldown auf eine Person: je Monat gebuchte (Ist),
+ * eingeplante und aus Verträgen noch offene Stunden gegen die verfügbare Kapazität (rote Linie).
+ * Links die Summe des Zeitraums mit aufklappbaren Stundenarten und der Auslastung (Soll/Ist).
+ * Tabs wechseln die Person; ohne JS steht die erste da.
+ */
+import '@/components/angebote/frame.css';
+import './zahlen.css';
+
+interface Props {
+  url?: string;
+}
+const { url = 'app.euer-betrieb.de/reports/ressourcen' } = Astro.props;
+
+type Person = {
+  id: string;
+  kuerzel: string;
+  name: string;
+  rolle: string;
+  color: string;
+  gebucht: number[];
+  geplant: number[];
+  offen: number[];
+  verfuegbar: number[];
+};
+
+const personen: Person[] = [
+  {
+    id: 'rs',
+    kuerzel: 'RS',
+    name: 'Ralf Seifert',
+    rolle: 'Senior-Berater · Team Hansestadt',
+    color: 'oklch(55% 0.15 260)',
+    gebucht: [143.75, 171, 171.25, 135.75, 169.5, 241.75, 112.25, 84.5, 0, 0, 0, 0],
+    geplant: [0, 0, 0, 0, 0, 46, 0, 0, 113.1, 78.8, 75.8, 80.7],
+    offen: [0, 0, 0, 0, 0, 0, 0, 0, 126.7, 133.2, 135.1, 124.3],
+    verfuegbar: [131, 138.3, 152.9, 116.5, 131, 87.4, 167.4, 152.9, 160.2, 116.5, 152.9, 65.5],
+  },
+  {
+    id: 'mb',
+    kuerzel: 'MB',
+    name: 'Mareike Brandt',
+    rolle: 'Beraterin · Team Nord',
+    color: 'oklch(62% 0.15 160)',
+    gebucht: [118.5, 126, 134.25, 104, 121.5, 112, 88.75, 61.5, 0, 0, 0, 0],
+    geplant: [0, 0, 0, 0, 0, 12, 14, 22, 72.5, 76, 70.25, 48],
+    offen: [0, 0, 0, 0, 0, 0, 0, 0, 38, 36.5, 34, 26],
+    verfuegbar: [138, 136.5, 152, 128, 139.5, 134, 112, 92, 151, 146, 141, 88],
+  },
+  {
+    id: 'tk',
+    kuerzel: 'TK',
+    name: 'Tobias Krüger',
+    rolle: 'Berater · Team West',
+    color: 'oklch(70% 0.15 70)',
+    gebucht: [92.5, 84, 101.25, 78.5, 96, 70.75, 58, 39.5, 0, 0, 0, 0],
+    geplant: [0, 0, 0, 0, 0, 0, 9.5, 14, 41, 44.5, 36, 29.5],
+    offen: [0, 0, 0, 0, 0, 0, 0, 0, 19.5, 15, 14, 9],
+    verfuegbar: [148, 140, 155, 134.5, 149, 141, 119, 98.5, 150.5, 149, 144, 94],
+  },
+];
+
+const monate = Array.from({ length: 12 }, (_, i) => `${i + 1}/26`);
+const sumOf = (a: number[]) => a.reduce((s, v) => s + v, 0);
+const fmt = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+// Anteile der gebuchten Stunden nach Art (wie in der Lösung aufgeschlüsselt).
+const arten = [
+  { label: 'Vor Ort', share: 0.516 },
+  { label: 'Fahrzeit', share: 0.058 },
+  { label: 'Remote', share: 0.127 },
+  { label: 'Administrativ', share: 0.299 },
+];
+
+const W = 640;
+const H = 300;
+const padL = 30;
+const padB = 24;
+const padT = 18;
+const maxV = 300;
+const colW = (W - padL) / 12;
+const yv = (v: number) => padT + (1 - v / maxV) * (H - padT - padB);
+const hv = (v: number) => (v / maxV) * (H - padT - padB);
+const xMid = (i: number) => padL + colW * i + colW / 2;
+const barW = colW * 0.66;
+const heute = 9; // Oktober: Monate davor sind Ist, ab Oktober Prognose
+
+const view = personen.map((p) => {
+  const g = sumOf(p.gebucht);
+  const pl = sumOf(p.geplant);
+  const o = sumOf(p.offen);
+  const v = sumOf(p.verfuegbar);
+  const gesamt = g + pl + o;
+  const diff = v - gesamt;
+  const pct = (gesamt / v) * 100;
+  const istV = sumOf(p.verfuegbar.slice(0, heute - 1));
+  const istG = sumOf(p.gebucht.slice(0, heute - 1));
+  return {
+    ...p,
+    g,
+    pl,
+    o,
+    v,
+    gesamt,
+    diff,
+    pct,
+    istPct: (istG / istV) * 100,
+    tone: pct > 100 ? 'z-over' : pct < 75 ? 'text-[oklch(62%_0.15_70)]' : 'z-up',
+    line: p.verfuegbar.map((val, i) => `${xMid(i).toFixed(1)},${yv(val).toFixed(1)}`).join(' '),
+    bars: p.gebucht.map((gv, j) => {
+      const parts = [
+        { v: gv, c: 'var(--z-booked)' },
+        { v: p.geplant[j], c: 'var(--z-planned)' },
+        { v: p.offen[j], c: 'var(--z-open)' },
+      ];
+      let top = yv(0);
+      const segs = parts.map((part) => {
+        const h = hv(part.v);
+        top -= h;
+        return { y: top, h, c: part.c };
+      });
+      return { x: xMid(j) - barW / 2, cx: xMid(j), segs, total: gv + p.geplant[j] + p.offen[j], labelY: top - 4 };
+    }),
+  };
+});
+---
+
+<figure class="af-frame z-app" data-drilldown>
+  <div class="af-bar" aria-hidden="true">
+    <span class="af-dots"><span></span><span></span><span></span></span>
+    <span class="af-url">{url}</span>
+    <span class="af-dots invisible"><span></span><span></span><span></span></span>
+  </div>
+
+  <div class="p-3 sm:p-5">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <p class="text-sm font-bold">Ressourcen · Auslastungsprognose</p>
+        <p class="z-label">Gebuchte, geplante und aus Verträgen offene Stunden gegen die verfügbare Kapazität, Jan bis Dez 2026</p>
+      </div>
+    </div>
+
+    <div class="mt-3 grid grid-cols-3 gap-1 rounded-2xl p-1 sm:-mx-1 sm:flex sm:rounded-full" style="background: var(--z-panel)" role="tablist" aria-label="Person">
+      {
+        view.map((p, i) => (
+          <button type="button" role="tab" class="z-person-tab" aria-selected={i === 0 ? 'true' : 'false'} data-person-tab={p.id}>
+            <span class="z-avatar" style={`background:${p.color}`}>{p.kuerzel}</span>
+            {p.name}
+          </button>
+        ))
+      }
+    </div>
+
+    {
+      view.map((p, i) => (
+        <div class="z-person mt-3 grid gap-3 lg:grid-cols-[18.5rem_minmax(0,1fr)]" data-person={p.id} hidden={i !== 0} role="tabpanel">
+          <div class="z-card p-3 text-[0.75rem]" style="background: var(--z-panel)">
+            <p class="z-label font-semibold tracking-wider uppercase">Zeitraum gesamt</p>
+            <p class="mt-0.5 text-[0.7rem] z-muted">{p.rolle}</p>
+            <div class="z-card mt-2 p-2.5">
+              <p class="flex items-center justify-between">
+                <span class="flex items-center gap-1.5"><span class="inline-block h-0.5 w-3" style="background: var(--z-red)" />Verfügbar</span>
+                <span class="font-semibold">{fmt(p.v)} Std.</span>
+              </p>
+              <div class="my-2 border-t" style="border-color: var(--z-line)" />
+              <details class="z-details" open={i === 0}>
+                <summary class="flex min-h-11 cursor-pointer items-center justify-between">
+                  <span class="flex items-center gap-1.5">
+                    <span class="z-chev z-muted text-[0.75rem]">▶</span>
+                    <span class="z-dot" style="background: var(--z-booked)" />Gebucht
+                  </span>
+                  <span class="font-semibold">{fmt(p.g)} Std.</span>
+                </summary>
+                <ul class="mt-1 mb-1 ml-4 space-y-0.5 border-l pl-2.5" style="border-color: var(--z-line)">
+                  {arten.map((a) => (
+                    <li class="z-muted flex justify-between text-[0.68rem]">
+                      <span>{a.label}</span>
+                      <span>{fmt(p.g * a.share)} Std.</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+              <p class="mt-1 flex items-center justify-between">
+                <span class="flex items-center gap-1.5 pl-3.5"><span class="z-dot" style="background: var(--z-planned)" />Geplant</span>
+                <span class="font-semibold">{fmt(p.pl)} Std.</span>
+              </p>
+              <p class="mt-1 flex items-center justify-between">
+                <span class="flex items-center gap-1.5 pl-3.5 whitespace-nowrap"><span class="z-dot" style="background: var(--z-open)" />Aus Verträgen offen</span>
+                <span class="font-semibold whitespace-nowrap">{fmt(p.o)} Std.</span>
+              </p>
+              <div class="my-2 border-t" style="border-color: var(--z-line)" />
+              <p class="flex items-center justify-between font-bold">
+                <span>Gesamt</span>
+                <span>{fmt(p.gesamt)} Std.</span>
+              </p>
+              <div class="my-2 border-t" style="border-color: var(--z-line)" />
+              <p class="flex items-center justify-between">
+                <span class="z-muted whitespace-nowrap">Auslastung Jahr</span>
+                <span class:list={['font-semibold whitespace-nowrap', p.tone]}>
+                  {p.diff < 0 ? '−' : '+'}{fmt(Math.abs(p.diff))} Std. ({p.pct.toFixed(1).replace('.', ',')} %)
+                </span>
+              </p>
+              <p class="mt-1 flex items-center justify-between">
+                <span class="z-muted">Ist bis August</span>
+                <span class="font-semibold">{p.istPct.toFixed(1).replace('.', ',')} %</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="z-card p-2 sm:p-3">
+            <svg viewBox={`0 0 ${W} ${H}`} class="block h-auto w-full" aria-label={`Monatliche Stunden von ${p.name}: Ist bis September, Prognose ab Oktober, rote Linie verfügbare Kapazität. Beispieldaten.`} role="img">
+              {[0, 150, 300].map((t) => (
+                <g>
+                  <line x1={padL} x2={W} y1={yv(t)} y2={yv(t)} stroke="var(--z-grid)" stroke-dasharray="4 4" />
+                  <text x={padL - 5} y={yv(t) + 3.5} text-anchor="end" class="zd-ax" fill="var(--z-muted)">{t}</text>
+                </g>
+              ))}
+              {[75, 225].map((t) => (
+                <line x1={padL} x2={W} y1={yv(t)} y2={yv(t)} stroke="var(--z-grid)" stroke-dasharray="4 4" />
+              ))}
+              <rect x={padL + colW * (heute - 1)} y={padT - 8} width={colW * (12 - heute + 1)} height={H - padT - padB + 8} fill="var(--z-panel)" opacity="0.7" />
+              <text x={padL + colW * (heute - 1) + 6} y={padT - 1} class="zd-ax" fill="var(--z-muted)">Prognose</text>
+              <text x={padL + 6} y={padT - 1} class="zd-ax" fill="var(--z-muted)">Ist</text>
+              {p.bars.map((bar) => (
+                <g>
+                  {bar.segs.map((seg) => (
+                    <rect x={bar.x} y={seg.y} width={barW} height={seg.h} fill={seg.c} />
+                  ))}
+                  {bar.total > 0 && (
+                    <text x={bar.cx} y={bar.labelY} text-anchor="middle" class="zd-val" font-weight="700" fill="var(--z-text)">
+                      {Math.round(bar.total)}
+                    </text>
+                  )}
+                </g>
+              ))}
+              <polyline points={p.line} fill="none" stroke="var(--z-red)" stroke-width="2" />
+              {p.verfuegbar.map((val, j) => <circle cx={xMid(j)} cy={yv(val)} r="3" fill="var(--z-red)" />)}
+              {monate.map((m, j) => (
+                <text x={xMid(j)} y={H - 6} text-anchor="middle" class:list={['zd-ax', j % 2 === 1 && 'zd-odd']} fill="var(--z-muted)">{m}</text>
+              ))}
+            </svg>
+            <p class="z-label mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 px-1">
+              <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--z-booked)" />Gebucht (Ist)</span>
+              <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--z-planned)" />Geplant</span>
+              <span class="flex items-center gap-1.5"><span class="z-dot" style="background: var(--z-open)" />Aus Verträgen offen</span>
+              <span class="flex items-center gap-1.5"><span class="inline-block h-0.5 w-3" style="background: var(--z-red)" />Verfügbar</span>
+            </p>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-drilldown]').forEach((root) => {
+    const tabs = root.querySelectorAll<HTMLButtonElement>('[data-person-tab]');
+    tabs.forEach((tab) =>
+      tab.addEventListener('click', () => {
+        const id = tab.dataset.personTab;
+        tabs.forEach((t) => t.setAttribute('aria-selected', t === tab ? 'true' : 'false'));
+        root.querySelectorAll<HTMLElement>('[data-person]').forEach((panel) => {
+          panel.hidden = panel.dataset.person !== id;
+        });
+      }),
+    );
+  });
+</script>

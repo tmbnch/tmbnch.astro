@@ -1,0 +1,192 @@
+---
+/**
+ * Rect Light - bgjar-inspired hero background with overlapping
+ * rotated rectangles and a soft light beam. Static.
+ */
+---
+
+<div class="hero-rect-light pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true" data-rect-light>
+  <svg
+    class="absolute inset-0 h-full w-full"
+    viewBox="0 0 1440 720"
+    preserveAspectRatio="xMidYMid slice"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <linearGradient id="rlBeam" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="var(--rl-beam-start)" />
+        <stop offset="100%" stop-color="var(--rl-beam-end)" />
+      </linearGradient>
+      <linearGradient id="rlRect1" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="var(--rl-rect1-start)" />
+        <stop offset="100%" stop-color="var(--rl-rect1-end)" />
+      </linearGradient>
+      <linearGradient id="rlRect2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--rl-rect2-start)" />
+        <stop offset="100%" stop-color="var(--rl-rect2-end)" />
+      </linearGradient>
+      <linearGradient id="rlRect3" x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--rl-rect3-start)" />
+        <stop offset="100%" stop-color="var(--rl-rect3-end)" />
+      </linearGradient>
+      <filter id="rlBlur" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="40" />
+      </filter>
+    </defs>
+
+    <!-- Soft ambient beam -->
+    <polygon
+      class="hero-rect-beam"
+      points="-100,-50 900,-50 600,780 -300,780"
+      fill="url(#rlBeam)"
+      opacity="0.55"
+      filter="url(#rlBlur)"
+    />
+
+    <!-- Large rotated rect, top-left -->
+    <g transform="rotate(-8 200 140)">
+      <g class="hero-rect-shape hero-rect-shape-1">
+        <rect x="-60" y="40" width="520" height="200" rx="36" fill="url(#rlRect1)" opacity="0.38" />
+      </g>
+    </g>
+
+    <!-- Medium rect, middle-right -->
+    <g transform="rotate(6 1190 260)">
+      <g class="hero-rect-shape hero-rect-shape-2">
+        <rect x="980" y="180" width="420" height="160" rx="30" fill="url(#rlRect2)" opacity="0.32" />
+      </g>
+    </g>
+
+    <!-- Small rect, bottom-center -->
+    <g transform="rotate(-4 670 580)">
+      <g class="hero-rect-shape hero-rect-shape-3">
+        <rect x="520" y="520" width="300" height="120" rx="24" fill="url(#rlRect3)" opacity="0.28" />
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .hero-rect-light {
+    --rl-beam-start: oklch(94.5% 0.022 255 / 0.55);
+    --rl-beam-end: oklch(89.2% 0.038 255 / 0);
+    --rl-rect1-start: oklch(80.8% 0.06 255);
+    --rl-rect1-end: oklch(71.4% 0.082 255);
+    --rl-rect2-start: oklch(89.2% 0.038 255);
+    --rl-rect2-end: oklch(71.4% 0.082 255);
+    --rl-rect3-start: oklch(71.4% 0.082 255);
+    --rl-rect3-end: oklch(61.2% 0.096 255);
+  }
+
+  :global(.dark) .hero-rect-light {
+    --rl-beam-start: oklch(42% 0.18 295 / 0.45);
+    --rl-beam-end: oklch(34% 0.14 295 / 0);
+    --rl-rect1-start: oklch(50% 0.22 295);
+    --rl-rect1-end: oklch(42% 0.18 295);
+    --rl-rect2-start: oklch(58% 0.25 295);
+    --rl-rect2-end: oklch(42% 0.18 295);
+    --rl-rect3-start: oklch(42% 0.18 295);
+    --rl-rect3-end: oklch(34% 0.14 295);
+  }
+
+  .hero-rect-light {
+    --rl-mx: 0;
+    --rl-my: 0;
+  }
+
+  .hero-rect-shape {
+    animation: hero-rect-float ease-in-out infinite;
+    transform-origin: center;
+    transform-box: view-box;
+    transition: translate 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .hero-rect-shape-1 {
+    animation-duration: 14s;
+    animation-delay: 0s;
+    translate: calc(var(--rl-mx) * 26px) calc(var(--rl-my) * 20px);
+  }
+  .hero-rect-shape-2 {
+    animation-duration: 18s;
+    animation-delay: -4s;
+    translate: calc(var(--rl-mx) * -18px) calc(var(--rl-my) * -14px);
+  }
+  .hero-rect-shape-3 {
+    animation-duration: 16s;
+    animation-delay: -7s;
+    translate: calc(var(--rl-mx) * 12px) calc(var(--rl-my) * -18px);
+  }
+
+  @keyframes hero-rect-float {
+    0%, 100% { transform: translate(0, 0); }
+    33%      { transform: translate(14px, -12px); }
+    66%      { transform: translate(-10px, 10px); }
+  }
+
+  .hero-rect-beam {
+    animation: hero-rect-beam-pulse 10s ease-in-out infinite;
+    transform-origin: center;
+    transform-box: view-box;
+    transition: translate 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    translate: calc(var(--rl-mx) * 34px) calc(var(--rl-my) * 22px);
+  }
+
+  @keyframes hero-rect-beam-pulse {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 0.68; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-rect-shape,
+    .hero-rect-beam {
+      animation: none;
+      translate: 0 0;
+    }
+  }
+
+  @media (hover: none) {
+    .hero-rect-shape,
+    .hero-rect-beam {
+      translate: 0 0;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-rect-light]');
+  if (root && window.matchMedia('(hover: hover)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const section = root.parentElement;
+    if (section) {
+      let rafId = 0;
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+
+      const tick = () => {
+        currentX += (targetX - currentX) * 0.08;
+        currentY += (targetY - currentY) * 0.08;
+        root.style.setProperty('--rl-mx', currentX.toFixed(3));
+        root.style.setProperty('--rl-my', currentY.toFixed(3));
+
+        if (Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001) {
+          rafId = requestAnimationFrame(tick);
+        } else {
+          rafId = 0;
+        }
+      };
+
+      section.addEventListener('pointermove', (e) => {
+        const rect = section.getBoundingClientRect();
+        targetX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+        targetY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+        if (!rafId) rafId = requestAnimationFrame(tick);
+      });
+
+      section.addEventListener('pointerleave', () => {
+        targetX = 0;
+        targetY = 0;
+        if (!rafId) rafId = requestAnimationFrame(tick);
+      });
+    }
+  }
+</script>

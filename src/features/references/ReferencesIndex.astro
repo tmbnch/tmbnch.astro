@@ -1,0 +1,240 @@
+---
+import SeitenHero from '@/components/landing/SeitenHero.astro';
+import { Image } from 'astro:assets';
+import referenzBild from '@/assets/references/kundenstandorte-uebersicht-demo-1920.png';
+import { Picture } from 'astro:assets';
+import PageLayout from '@/layouts/PageLayout.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import { ClientLogoStrip } from '@/components/ui/marketing/ClientLogoStrip';
+import { defaultLocale } from '@/i18n/config';
+import { contactLinks, cases, additionalCases } from '@/data/rocketbase';
+import { caseTeaserImages as caseImages } from './caseImages';
+
+const locale = defaultLocale;
+
+const clientLogos = [
+  { key: 'bonprix_logo', name: 'bonprix' },
+  { key: 'statista-logo', name: 'Statista' },
+  { key: 'stage_logo', name: 'Stage Entertainment' },
+  { key: 'fkc_logo', name: 'FKC Consulting' },
+  { key: 'mavox_logo', name: 'MAVOX Winterdienst' },
+  { key: 'sam', name: 'Smart Active Media' },
+  { key: 'yomei_logo', name: 'YOMEI' },
+  { key: 'venus_logo', name: 'Venus' },
+  { key: 'stueckgut', name: 'Stückgut' },
+];
+
+// Wörtlicher Satz aus der jeweiligen Kundenstimme (rocketbase.ts), nicht umformuliert.
+// Fälle ohne Eintrag zeigen kein Zitat. Fällt ein Slug weg, verschwindet nur das Zitat.
+const kurzzitate: Record<string, string> = {
+  'schlosserei-diezinger': 'Jetzt haben wir genau das, was wir brauchen, und wenn etwas fehlt, wird es ergänzt.',
+  bonprix:
+    'Selbst die Zusammenarbeit mit unseren Entwicklungsteams in Indien hat RocketBase hervorragend gemeistert.',
+  statista:
+    'Besonders beeindruckend war der nahtlose Wissenstransfer innerhalb des Teams, bei dem keine Unterscheidung zwischen externen und internen Beteiligten erkennbar war.',
+};
+
+const teaserCaptions: Record<string, string> = {
+  bonprix: 'Viele Systeme im Konzern, die zusammenarbeiten müssen.',
+  statista: 'Ein altes Kernsystem erneuert, während die Arbeit weiterlief.',
+  'fkc-consulting': 'Standardsoftware durch eine eigene Plattform ersetzt.',
+  'schlosserei-diezinger': 'Einsatzplanung für den Alltag in der Werkstatt.',
+};
+---
+
+<PageLayout
+  title="Referenzen: Individualsoftware-Projekte"
+  description="Projekte mit Ausgangslage und Ergebnis: Vertec-Ablösung in einer Beratung, Excel-Planung in einer Schlosserei, Produktdaten bei bonprix."
+  lang={locale}
+  routeId="references"
+>
+  <SeitenHero eyebrow="Referenzen" titel="Echte Projekte, von der Ausgangslage bis zum Ergebnis" text="Zu jedem Projekt steht hier, was gebaut wurde und warum: im Konzern, bei der Erneuerung alter Systeme oder beim Wechsel von Standardsoftware zu einer eigenen Lösung.">
+    <Image
+      src={referenzBild}
+      alt="Kundenstandorte und Berater auf einer Deutschlandkarte, Demo-Daten"
+      widths={[640, 960, 1280]}
+      sizes="(min-width: 1024px) 50vw, 100vw"
+      class="border-border w-full rounded-2xl border shadow-xl"
+      loading="eager"
+    />
+  </SeitenHero>
+
+  <ClientLogoStrip logos={clientLogos} variant="light" />
+
+  <section class="py-14 sm:py-28">
+    <div class="container space-y-16">
+      {cases.map((item, idx) => (
+        <article
+          class:list={[
+            'grid gap-8 border-t border-border pt-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start lg:gap-14',
+            idx % 2 === 1 && 'lg:[grid-template-columns:1.05fr_0.95fr]',
+          ]}
+        >
+          <a
+            href={`/referenzen/${item.slug}/`}
+            class:list={[
+              'group block',
+              idx % 2 === 1 && 'lg:col-start-2 lg:row-start-1',
+            ]}
+          >
+            {item.slug in caseImages ? (
+              <div class="overflow-hidden rounded-[2rem]">
+                <Picture
+                  src={caseImages[item.slug as keyof typeof caseImages]}
+                  alt={item.title}
+                  widths={[480, 720, 960, 1280]}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 560px"
+                  formats={['avif', 'webp']}
+                  class="h-72 w-full object-cover object-left transition-transform duration-500 will-change-transform [backface-visibility:hidden] group-hover:scale-[1.02]"
+                  loading="lazy"
+                />
+              </div>
+            ) : (
+              <div class="flex h-72 flex-col justify-between rounded-[2rem] bg-[linear-gradient(160deg,rgba(243,245,249,0.96),rgba(229,234,242,0.92))] p-8 dark:bg-[linear-gradient(160deg,rgba(36,43,57,0.92),rgba(26,31,42,0.9))]">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600">{item.client}</p>
+                <div>
+                  <p class="font-display text-4xl font-bold tracking-tight text-foreground">{item.client}</p>
+                  <p class="mt-4 text-base leading-7 text-foreground-secondary">
+                    {item.kicker}
+                  </p>
+                </div>
+              </div>
+            )}
+            {teaserCaptions[item.slug] && (
+              <p class="mt-4 px-1 text-sm leading-6 text-foreground-secondary">
+                {teaserCaptions[item.slug]}
+              </p>
+            )}
+          </a>
+
+          <div
+            class:list={[
+              'max-w-2xl',
+              idx % 2 === 1 && 'lg:col-start-1 lg:row-start-1',
+            ]}
+          >
+            <h2 class="font-display text-3xl font-bold tracking-tight text-foreground">
+              <a href={`/referenzen/${item.slug}/`}>{item.heading}</a>
+            </h2>
+            <p class="mt-5 text-base leading-8 text-foreground-secondary">{item.kicker}</p>
+
+            <ul class="mt-8 space-y-4 border-l border-border pl-5 text-sm leading-7 text-foreground-secondary">
+              {item.highlights.map((highlight) => (
+                <li>{highlight}</li>
+              ))}
+            </ul>
+
+            <div class="mt-8 border-l border-brand-200 pl-5">
+              <p class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600">Wirkung</p>
+              <ul class="mt-4 space-y-3 text-sm leading-7 text-foreground-secondary">
+                {item.outcomes.slice(0, 2).map((outcome) => (
+                  <li>{outcome}</li>
+                ))}
+              </ul>
+            </div>
+
+            {item.testimonial && kurzzitate[item.slug] && (
+              <figure class="mt-8 rounded-2xl border border-border bg-card p-5">
+                <blockquote class="text-base leading-7 text-foreground">„{kurzzitate[item.slug]}“</blockquote>
+                <figcaption class="mt-3 text-sm text-foreground-secondary">
+                  <span class="font-semibold text-foreground">{item.testimonial.author}</span>, {item.testimonial.position}, {item.client}
+                </figcaption>
+              </figure>
+            )}
+
+            <div class="mt-8">
+              <a href={`/referenzen/${item.slug}/`} class="text-sm font-semibold text-brand-600 transition-colors hover:text-brand-500">
+                Ganzes Projekt ansehen
+              </a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  {additionalCases.length > 0 && (
+    <section class="border-t border-border py-14 sm:py-24">
+      <div class="container max-w-6xl">
+        <header class="max-w-3xl">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-600">Weitere Projekte</p>
+          <h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Noch mehr Beispiele
+          </h2>
+          <p class="mt-4 text-base leading-7 text-foreground-secondary">
+            Diese Projekte sind hier kürzer beschrieben und haben jeweils eine eigene Seite.
+          </p>
+        </header>
+
+        <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {additionalCases.map((item) => (
+            <li>
+              <a
+                href={`/referenzen/${item.slug}/`}
+                class="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-[transform,border-color,box-shadow] duration-200 will-change-transform [backface-visibility:hidden] hover:border-brand-300 hover:shadow-sm"
+              >
+                {item.slug in caseImages && (
+                  <div class="overflow-hidden">
+                    <Picture
+                      src={caseImages[item.slug as keyof typeof caseImages]}
+                      alt={item.title}
+                      widths={[320, 480, 640]}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+                      formats={['avif', 'webp']}
+                      class="h-40 w-full object-cover object-left transition-transform duration-500 will-change-transform [backface-visibility:hidden] group-hover:scale-[1.03]"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                <div class="flex flex-1 flex-col p-6">
+                  <p class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600">{item.client}</p>
+                  <h3 class="mt-3 text-base font-semibold leading-6 text-foreground transition-colors group-hover:text-brand-600">
+                    {item.heading}
+                  </h3>
+                  <p class="mt-3 flex-1 text-sm leading-6 text-foreground-secondary">
+                    {item.kicker}
+                  </p>
+                  {item.testimonial && (
+                    <figure class="mt-4 border-l-2 border-brand-200 pl-3">
+                      <blockquote class="text-sm leading-6 text-foreground">„{item.testimonial.quote}“</blockquote>
+                      <figcaption class="mt-1 text-xs text-foreground-muted">{item.testimonial.author}, {item.testimonial.position}</figcaption>
+                    </figure>
+                  )}
+                  <span class="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600">
+                    Details ansehen
+                    <Icon name="arrow-right" size="xs" class="transition-transform duration-200 group-hover:translate-x-0.5" />
+                  </span>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <section class="border-t border-border bg-background-secondary py-14 sm:py-24">
+    <div class="container grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-600">Nächster Schritt</p>
+        <h2 class="mt-4 font-display text-4xl font-bold tracking-tight text-foreground">
+          Habt ihr ein ähnliches Vorhaben?
+        </h2>
+        <p class="mt-6 text-lg leading-8 text-foreground-secondary">
+          Viele Projekte beginnen ohne fertige Beschreibung. Am Anfang steht oft ein Ablauf, der hakt,
+          oder eine Standardsoftware, die an Grenzen stößt. Genau dort fangen wir an.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-4">
+        <Button href={contactLinks.cal} target="_blank">
+          Erstgespräch buchen
+          <Icon name="arrow-up-right" size="sm" />
+        </Button>
+        <Button variant="outline" href="/kontakt/#anfrage-stellen">
+          Lieber schreiben
+        </Button>
+      </div>
+    </div>
+  </section>
+</PageLayout>

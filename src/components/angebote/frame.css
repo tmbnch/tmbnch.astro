@@ -1,0 +1,380 @@
+/*
+ * Gemeinsame Optik der Angebots-Seiten: Browser-Rahmen, Chips, Scroll-Effekte.
+ *
+ * Die Rahmen nehmen bewusst NICHT die Sektions-Tokens (bg-card, bg-background-
+ * secondary): in einer `.invert-section` würden die auf Dunkel umgemappt, und die
+ * Adressleiste stünde schwarz über einem hellen Screenshot. Stattdessen hängt die
+ * Rahmenfarbe nur am Theme der Seite (`.dark` auf <html>).
+ */
+
+.af-frame {
+  --af-bar: oklch(97.5% 0.004 260);
+  --af-bar-border: oklch(91% 0.008 260);
+  --af-url: oklch(100% 0 0);
+  --af-url-text: oklch(55% 0.02 260);
+  --af-dot: oklch(85% 0.01 260);
+  --af-chip: oklch(100% 0 0 / 0.92);
+  --af-chip-text: oklch(28% 0.03 260);
+  --af-chip-border: oklch(90% 0.01 260);
+  --af-shadow:
+    0 1px 0 oklch(100% 0 0 / 0.6) inset, 0 30px 70px -20px oklch(35% 0.08 265 / 0.35),
+    0 12px 24px -12px oklch(30% 0.05 265 / 0.25);
+
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: var(--af-url);
+  outline: 1px solid var(--af-bar-border);
+  box-shadow: var(--af-shadow);
+  isolation: isolate;
+}
+
+:where(.dark) .af-frame {
+  --af-bar: oklch(24% 0.012 265);
+  --af-bar-border: oklch(32% 0.015 265);
+  --af-url: oklch(19% 0.01 265);
+  --af-url-text: oklch(72% 0.02 265);
+  --af-dot: oklch(40% 0.015 265);
+  --af-chip: oklch(22% 0.015 265 / 0.9);
+  --af-chip-text: oklch(95% 0.005 265);
+  --af-chip-border: oklch(36% 0.02 265);
+  --af-shadow: 0 30px 70px -20px oklch(0% 0 0 / 0.7);
+}
+
+.af-contain {
+  background: radial-gradient(ellipse at top, oklch(96% 0.02 265), transparent 70%), var(--af-bar);
+}
+
+:where(.dark) .af-contain {
+  background: radial-gradient(ellipse at top, oklch(30% 0.03 265), transparent 70%), var(--af-bar);
+}
+
+.af-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--af-bar);
+  border-bottom: 1px solid var(--af-bar-border);
+}
+
+.af-dots {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.af-dots > span {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--af-dot);
+}
+
+.af-url {
+  flex: 1;
+  min-width: 0;
+  max-width: 26rem;
+  margin-inline: auto;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--af-url);
+  border: 1px solid var(--af-bar-border);
+  color: var(--af-url-text);
+  font-size: 0.72rem;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.af-chip {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: var(--af-chip);
+  color: var(--af-chip-text);
+  border: 1px solid var(--af-chip-border);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+  white-space: nowrap;
+  box-shadow: 0 10px 25px -10px oklch(30% 0.06 265 / 0.4);
+  backdrop-filter: blur(8px);
+}
+.af-chip::before {
+  content: '';
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--color-brand-500);
+}
+.af-chip[data-pos='tl'] {
+  left: 0.9rem;
+  top: 0.9rem;
+}
+.af-chip[data-pos='tr'] {
+  right: 0.9rem;
+  top: 0.9rem;
+}
+.af-chip[data-pos='bl'] {
+  left: 0.9rem;
+  bottom: 0.9rem;
+}
+.af-chip[data-pos='br'] {
+  right: 0.9rem;
+  bottom: 0.9rem;
+}
+
+/* Auf dem Handy werden Chips kleiner; der zweite fällt weg, sonst decken sie den Screenshot zu. */
+@media (max-width: 639px) {
+  .af-chip {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.6rem;
+  }
+  .af-chip + .af-chip {
+    display: none;
+  }
+  .af-url {
+    font-size: 0.68rem;
+  }
+  /*
+   * Die zweite Punktegruppe ist nur da, um die URL optisch zu zentrieren. Auf dem
+   * Handy kostet sie rund 28 px, die der Adresse fehlen - dort entfällt sie.
+   */
+  .af-dots.invisible {
+    display: none;
+  }
+}
+
+/*
+ * Scroll-Effekte über CSS-Scroll-Timelines: Elemente steigen beim Eintreten in den
+ * Viewport leicht auf und sind früh fertig (siehe Keyframes). Browser ohne Support (und reduced motion)
+ * zeigen alles sofort.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .af-rise {
+      animation: af-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+    .af-drift {
+      animation: af-drift linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+    .af-tilt {
+      animation: af-tilt linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 75%;
+    }
+  }
+}
+
+/* Nur Verschiebung und Deckkraft, keine Skalierung: Skalieren rechnet Text und
+   Screenshots um und lässt sie beim Scrollen weich wirken. Fertig ist der Effekt,
+   bevor das Element zur Hälfte im Bild ist (2026-10-05). */
+@keyframes af-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes af-drift {
+  from {
+    transform: translateY(40px);
+  }
+  to {
+    transform: translateY(-40px);
+  }
+}
+@keyframes af-tilt {
+  from {
+    opacity: 0.3;
+    transform: perspective(1600px) rotateX(8deg) translateY(36px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Vorher/Nachher-Karten (auch außerhalb der Scroll-Showcase nutzbar).
+ * Farben aus den Sektions-Tokens, damit sie im dunklen Band und im Dark Mode
+ * gleich gut lesbar sind.
+ */
+.af-before {
+  border: 1px dashed color-mix(in oklch, var(--color-foreground) 22%, transparent);
+  background: color-mix(in oklch, var(--color-foreground) 4%, transparent);
+}
+.af-before-pill {
+  color: oklch(72% 0.14 25);
+  background: color-mix(in oklch, oklch(65% 0.18 25) 16%, transparent);
+}
+.af-after {
+  border: 1px solid color-mix(in oklch, var(--color-brand-400) 45%, transparent);
+  background: color-mix(in oklch, var(--color-brand-500) 14%, transparent);
+  box-shadow: 0 20px 40px -24px color-mix(in oklch, var(--color-brand-500) 70%, transparent);
+}
+.af-after-pill {
+  color: white;
+  background: var(--color-brand-500);
+}
+
+/* ---- Lightbox: Knopf über dem Screenshot ---- */
+.af-zoom {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  cursor: zoom-in;
+  background: transparent;
+  border: 0;
+  border-radius: inherit;
+}
+.af-zoom:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: -4px;
+}
+.af-zoom-hint {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: oklch(22% 0.03 265 / 0.72);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.af-zoom-hint svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+@media (hover: hover) {
+  .af-zoom:hover .af-zoom-hint {
+    opacity: 1;
+    transform: none;
+  }
+}
+.af-zoom:focus-visible .af-zoom-hint {
+  opacity: 1;
+  transform: none;
+}
+/* Ohne Hover (Touch) bleibt der Hinweis klein sichtbar. */
+@media (hover: none) {
+  .af-zoom-hint {
+    opacity: 1;
+    transform: none;
+    font-size: 0;
+    gap: 0;
+    padding: 0.45rem;
+  }
+}
+
+/* ---- Lightbox: Dialog ---- */
+.af-lightbox {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: clamp(0.75rem, 3vw, 2.5rem);
+  border: 0;
+  background: transparent;
+  color: #fff;
+  overflow: auto;
+}
+.af-lightbox::backdrop {
+  background: oklch(14% 0.02 265 / 0.86);
+  backdrop-filter: blur(6px);
+}
+.af-lightbox[open] {
+  display: grid;
+  place-items: center;
+  animation: af-lb-in 0.22s ease-out;
+}
+.af-lightbox-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  max-width: 100%;
+}
+.af-lightbox-figure img {
+  display: block;
+  max-width: min(100%, 1800px);
+  max-height: calc(100dvh - 7rem);
+  width: auto;
+  height: auto;
+  border-radius: 0.75rem;
+  box-shadow: 0 40px 100px -30px rgb(0 0 0 / 0.7);
+  background: #fff;
+  cursor: zoom-out;
+}
+.af-lightbox-figure figcaption {
+  max-width: 60rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: rgb(255 255 255 / 0.75);
+}
+.af-lightbox-close {
+  position: fixed;
+  top: clamp(0.75rem, 2vw, 1.5rem);
+  right: clamp(0.75rem, 2vw, 1.5rem);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  color: #fff;
+  background: rgb(255 255 255 / 0.12);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.af-lightbox-close:hover {
+  background: rgb(255 255 255 / 0.22);
+}
+.af-lightbox-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.af-lightbox-close svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+:root.af-lightbox-open {
+  overflow: hidden;
+}
+@keyframes af-lb-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .af-lightbox[open] {
+    animation: none;
+  }
+}

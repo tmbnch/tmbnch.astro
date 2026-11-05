@@ -1,0 +1,48 @@
+---
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import { contactLinks } from '@/data/rocketbase';
+
+interface Props {
+  eyebrow?: string;
+  headline?: string;
+  body?: string;
+}
+
+const DEFAULTS = {
+  eyebrow: 'Nächster Schritt',
+  headline: 'Sprechen wir über eure Situation.',
+  body: '30 Minuten direkt mit Marten Prieß - kein Vertrieb, kein Funnel. Ein strukturiertes Gespräch, um zu klären, ob und wie ein Umbau für euer Unternehmen sinnvoll sein könnte.',
+} as const;
+
+const {
+  eyebrow = DEFAULTS.eyebrow,
+  headline = DEFAULTS.headline,
+  body = DEFAULTS.body,
+} = Astro.props;
+---
+
+<aside class="mt-16 not-prose" data-reveal="fade-up">
+  <div class="rounded-[2rem] border border-border bg-card p-8 shadow-[0_22px_55px_rgba(34,43,74,0.08)] sm:p-10">
+    <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+      <div>
+        <p class="text-brand-600 text-xs font-semibold tracking-[0.22em] uppercase">{eyebrow}</p>
+        <p class="font-display text-foreground mt-3 text-2xl font-bold leading-snug sm:text-3xl">{headline}</p>
+        <p class="text-foreground-secondary mt-4 text-base leading-7">{body}</p>
+      </div>
+      <div class="flex flex-col gap-4">
+        <Button href={contactLinks.cal} target="_blank">
+          <span>Erstgespräch buchen</span>
+          <Icon name="arrow-up-right" size="sm" />
+        </Button>
+        <div class="flex flex-col gap-2">
+          <p class="text-foreground-muted text-xs leading-5">Lieber Text statt Termin?</p>
+          <Button variant="outline" href={`mailto:${contactLinks.email}`}>
+            <Icon name="mail" size="sm" />
+            <span>{contactLinks.email}</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>

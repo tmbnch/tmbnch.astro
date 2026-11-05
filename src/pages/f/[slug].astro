@@ -1,0 +1,227 @@
+---
+/**
+ * Funnel-Landingpages für Anzeigen (/f/[slug]).
+ * Eine Seite pro Anzeigen-Variante - definiert in src/data/funnels.ts.
+ */
+import FunnelLayout from '@/layouts/FunnelLayout.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import Blueprint from '@/components/hero-backgrounds/Blueprint.astro';
+import { ClientLogoStrip } from '@/components/ui/marketing/ClientLogoStrip';
+import FunnelQuiz from '@/components/funnel/FunnelQuiz';
+import { funnels } from '@/data/funnels';
+
+export function getStaticPaths() {
+  return funnels.map((funnel) => ({
+    params: { slug: funnel.slug },
+    props: { funnel },
+  }));
+}
+
+const { funnel } = Astro.props;
+
+// Die Trust-Video-Sektion ist fertig gebaut, aber abgeschaltet, bis die
+// Screencasts geschnitten sind. Auf true setzen, um sie zu aktivieren.
+const SHOW_TRUST_VIDEO = false;
+const trustVideo = SHOW_TRUST_VIDEO ? funnel.trustVideo : undefined;
+
+const clientLogos = [
+  { key: 'bonprix_logo', name: 'bonprix' },
+  { key: 'statista-logo', name: 'Statista' },
+  { key: 'stage_logo', name: 'Stage Entertainment' },
+  { key: 'fkc_logo', name: 'FKC Consulting' },
+  { key: 'mavox_logo', name: 'MAVOX Winterdienst' },
+  { key: 'sam', name: 'Smart Active Media' },
+  { key: 'yomei_logo', name: 'YOMEI' },
+  { key: 'venus_logo', name: 'Venus' },
+];
+---
+
+<FunnelLayout title={funnel.meta.title} description={funnel.meta.description}>
+  <!-- HERO + QUIZ -->
+  <section class="relative overflow-hidden pt-8 pb-16 sm:pt-16 lg:pt-20">
+    <Blueprint />
+    <div
+      class="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,var(--color-background)_0%,transparent_75%)] opacity-70"
+      aria-hidden="true"
+    >
+    </div>
+
+    <div class="relative z-10 container max-w-3xl">
+      <div class="text-center">
+        <p
+          class="text-brand-600 dark:text-brand-300 text-sm font-semibold tracking-[0.22em] uppercase"
+        >
+          {funnel.hero.eyebrow}
+        </p>
+        <h1
+          lang="de"
+          class="font-display text-foreground mt-3 text-3xl font-bold tracking-tight text-balance hyphens-auto [-webkit-hyphens:auto] sm:mt-4 sm:text-4xl lg:text-5xl"
+        >
+          {funnel.hero.headline}
+          <span class="text-brand-500 mt-2 block">
+            {funnel.hero.headlineAccent}
+          </span>
+        </h1>
+        <p
+          class="text-foreground-secondary mx-auto mt-4 max-w-2xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8"
+        >
+          {funnel.hero.subline}
+        </p>
+      </div>
+
+      <div id="quiz" class="mt-6 scroll-mt-24 sm:mt-10">
+        <FunnelQuiz
+          client:load
+          funnel={funnel.slug}
+          questions={funnel.questions}
+          contact={funnel.contact}
+          success={funnel.success}
+          privacyUrl="/datenschutz/"
+        />
+      </div>
+
+      <!-- Ablauf: was passiert nach dem Absenden -->
+      <ol class="mt-10 grid gap-4 sm:grid-cols-3">
+        {
+          funnel.steps.map((step, index) => (
+            <li class="border-border/60 bg-card/60 flex items-start gap-3 rounded-2xl border p-4">
+              <div class="border-brand-300/70 bg-brand-500/5 text-brand-600 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border">
+                <Icon name={step.icon} size="sm" />
+              </div>
+              <div class="min-w-0">
+                <p class="text-foreground-muted font-mono text-[10px] font-semibold tracking-[0.22em] uppercase">
+                  0{index + 1}
+                </p>
+                <h3 class="font-display text-foreground text-sm font-bold tracking-tight">
+                  {step.title}
+                </h3>
+                <p class="text-foreground-muted mt-1 text-xs leading-5">{step.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- TRUST: Client-Logos -->
+  <ClientLogoStrip heading="Erfahrung aus Projekten mit" logos={clientLogos} variant="light" />
+
+  <!-- TRUST-VIDEO (Screencast aus echten Projekten) – zeigt Platzhalter, solange kein src gesetzt -->
+  {
+    trustVideo && (
+      <section class="py-14 lg:py-20">
+        <div class="container max-w-4xl">
+          <header class="mx-auto max-w-2xl text-center">
+            <h2 class="font-display text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
+              {trustVideo.heading}
+            </h2>
+            {trustVideo.text && (
+              <p class="text-foreground-secondary mx-auto mt-4 max-w-xl text-base leading-7">
+                {trustVideo.text}
+              </p>
+            )}
+          </header>
+
+          <div class="border-border mt-8 overflow-hidden rounded-2xl border shadow-lg">
+            {trustVideo.src ? (
+              <video
+                class="aspect-video w-full bg-black"
+                controls
+                preload="metadata"
+                poster={trustVideo.poster}
+              >
+                <source src={trustVideo.src} type="video/mp4" />
+              </video>
+            ) : (
+              <div class="bg-background-secondary relative flex aspect-video w-full items-center justify-center">
+                <div
+                  class="bg-grid-pattern pointer-events-none absolute inset-0 opacity-20"
+                  aria-hidden="true"
+                />
+                <div class="relative flex flex-col items-center gap-3 text-center">
+                  <div class="border-brand-300/70 bg-brand-500/10 text-brand-600 flex h-16 w-16 items-center justify-center rounded-full border">
+                    <Icon name="monitor" size="md" />
+                  </div>
+                  <p class="text-foreground-muted font-mono text-xs font-semibold tracking-[0.22em] uppercase">
+                    Video folgt
+                  </p>
+                  <p class="text-foreground-secondary max-w-sm text-sm leading-6">
+                    Hier kommt ein kurzer Screencast aus echten Projekten – Platzhalter, bis das
+                    Video fertig geschnitten ist.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- DETAILS / VERTIEFUNG (pro Anzeigen-Variante) -->
+  <section
+    class="bg-background-secondary border-border relative overflow-hidden border-y py-16 lg:py-24"
+  >
+    <div
+      class="bg-grid-pattern pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)] opacity-30"
+      aria-hidden="true"
+    >
+    </div>
+    <div class="relative z-10 container max-w-5xl">
+      <header class="mx-auto max-w-3xl text-center">
+        <h2
+          lang="de"
+          class="font-display text-foreground text-2xl font-bold tracking-tight text-balance hyphens-auto [-webkit-hyphens:auto] sm:text-3xl"
+        >
+          {funnel.details.heading}
+        </h2>
+        {
+          funnel.details.intro && (
+            <p class="text-foreground-secondary mt-4 text-base leading-7 sm:text-lg">
+              {funnel.details.intro}
+            </p>
+          )
+        }
+      </header>
+
+      <div class="mt-12 grid gap-5 sm:grid-cols-2">
+        {
+          funnel.details.blocks.map((block) => (
+            <article class="group border-border bg-card flex flex-col gap-3 rounded-2xl border p-6 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg">
+              <div class="flex items-start gap-4">
+                <div class="border-brand-300/70 bg-brand-500/5 text-brand-600 group-hover:border-brand-500 group-hover:bg-brand-500 group-hover:text-on-invert flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors duration-300">
+                  <Icon name={block.icon} size="sm" />
+                </div>
+                <h3 class="font-display text-foreground mt-1 text-base font-bold tracking-tight sm:text-lg">
+                  {block.title}
+                </h3>
+              </div>
+              <p class="text-foreground-secondary text-sm leading-6">{block.text}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ABSCHLUSS-CTA: zurück zum Quiz -->
+  <section class="py-16 lg:py-24">
+    <div class="container max-w-3xl text-center">
+      <h2 class="font-display text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
+        Ein paar Fragen. Ein kurzer Call. Klarheit.
+      </h2>
+      <p class="text-foreground-secondary mx-auto mt-4 max-w-xl text-base leading-7">
+        Beantwortet ein paar Fragen zu eurer Situation – dann besprechen wir sie gemeinsam in einem
+        30-Minuten-Call und ihr bekommt eine ehrliche Einschätzung. Kostenlos und unverbindlich.
+      </p>
+      <a
+        href="#quiz"
+        class="bg-foreground text-background hover:bg-foreground/90 mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-md px-6 text-base font-medium transition-all duration-150 ease-out active:scale-[0.98]"
+      >
+        Jetzt starten
+        <Icon name="arrow-up-right" size="sm" />
+      </a>
+    </div>
+  </section>
+</FunnelLayout>

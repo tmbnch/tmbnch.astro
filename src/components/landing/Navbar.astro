@@ -1,0 +1,607 @@
+---
+/**
+ * Navbar Component (i18n-aware)
+ * Dynamic navigation with translations and language switcher
+ */
+import { Picture } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import ThemeToggle from '@/components/layout/ThemeToggle.astro';
+import LanguageSwitcher from '@/components/i18n/LanguageSwitcher.astro';
+import rocketbaseLogo from '@/assets/rocketbase/logo.svg';
+import { type Locale, getLocaleFromPath } from '@/i18n/config';
+import { useTranslations, getLocalizedPath, getNavRoutes, type TranslationKey } from '@/i18n/index';
+import { cases } from '@/data/rocketbase';
+import bonprixCaseImage from '@/assets/references/teaser-bonprix.jpeg';
+import statistaCaseImage from '@/assets/references/teaser-statista.jpeg';
+import fkcCaseImage from '@/assets/references/teaser-fkc.jpeg';
+import schlossereiCaseImage from '@/assets/references/teaser-schlosserei.jpeg';
+import type { ImageMetadata } from 'astro';
+
+// Im Menü sind Screenshots bei 56 px nicht lesbar, deshalb dort das Kundenlogo.
+const navLogoModules = import.meta.glob<{ default: ImageMetadata }>('@/assets/client-logos/*.svg', { eager: true });
+const navLogos: Record<string, ImageMetadata> = Object.fromEntries(
+  Object.entries(navLogoModules).map(([path, mod]) => [path.split('/').pop()!.replace(/\.svg$/i, ''), mod.default]),
+);
+const navLogoKey: Record<string, string> = {
+  bonprix: 'bonprix_logo',
+  statista: 'statista-logo',
+  'fkc-consulting': 'fkc_logo',
+  'schlosserei-diezinger': 'diezinger_logo',
+};
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale: localeProp } = Astro.props;
+
+// Get locale from prop or infer from URL
+const locale = localeProp || getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+// Get navigation routes dynamically from i18n routes
+const navRoutes = getNavRoutes();
+
+const homePath = getLocalizedPath('home', locale);
+const ctaLink = getLocalizedPath('contact', locale);
+const referencesPath = getLocalizedPath('references', locale);
+const blogPath = getLocalizedPath('blog', locale);
+const servicesPath = getLocalizedPath('services', locale);
+
+// Lösungen-Dropdown: die drei Türen, durch die ein Betrieb einsteigt, die Ablöse und der Check
+// (Tür 5, seit 2026-10-20: für Betriebe, die Software schon haben).
+// Der Workshop hat einen eigenen Top-Level-Eintrag und steht deshalb nicht mehr hier.
+// Die Seiten bleiben in routes.ts auf show:false, damit sie nicht zusätzlich
+// als Top-Level-Einträge erscheinen.
+const serviceLinks = [
+  {
+    href: '/angebote/',
+    icon: 'edit',
+    title: 'Angebot & Kalkulation',
+    text: 'Angebote nach eurer Regel, Zusage per Klick.',
+  },
+  {
+    href: getLocalizedPath('einsatzplanung', locale),
+    icon: 'users',
+    title: t('nav.einsatzplanung'),
+    text: 'Plantafel, Leistung, Rechnung in einem System.',
+  },
+  {
+    href: '/zahlen/',
+    icon: 'table',
+    title: 'Zahlen & Steuerung',
+    text: 'Umsatz, Auslastung und Verträge täglich aktuell.',
+  },
+  {
+    href: getLocalizedPath('standardsoftwareAbloesung', locale),
+    icon: 'layers',
+    title: t('nav.standardsoftwareAbloesung'),
+    text: 'Branchensoftware Schritt für Schritt ablösen.',
+  },
+  {
+    href: '/software-check/',
+    icon: 'shield',
+    title: 'Software-Check',
+    text: 'Prüfung für selbst gebaute Software.',
+  },
+] as const;
+
+const blogPosts = await getCollection('blog', ({ data }) => {
+  return data.locale === locale && (import.meta.env.PROD ? data.draft !== true : true);
+});
+
+const featuredBlogPosts = blogPosts
+  .filter((post) => post.data.featured)
+  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
+  .slice(0, 3)
+  .map((post) => ({
+    slug: post.id.replace(`${locale}/`, ''),
+    title: post.data.title,
+    description: post.data.description,
+    image: post.data.image,
+    imageAlt: post.data.imageAlt,
+  }));
+
+const referenceTeaserImages = {
+  bonprix: bonprixCaseImage,
+  statista: statistaCaseImage,
+  'fkc-consulting': fkcCaseImage,
+  'schlosserei-diezinger': schlossereiCaseImage,
+} as const;
+
+const featuredReferences = cases
+  .filter((c) => c.slug in referenceTeaserImages)
+  .slice(0, 3)
+  .map((c) => ({
+    slug: c.slug,
+    client: c.client,
+    kicker: ('navTeaser' in c ? c.navTeaser : c.kicker) as string,
+    image: referenceTeaserImages[c.slug as keyof typeof referenceTeaserImages],
+  }));
+---
+
+<nav class="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+    <a href={homePath} class="flex items-center">
+      <img src={rocketbaseLogo.src} alt="RocketBase" class="h-8 w-auto dark:invert" width="114" height="32" loading="eager" fetchpriority="high" />
+    </a>
+
+    <div class="hidden items-center gap-6 lg:flex">
+      {navRoutes.map(({ routeId, label }) => (
+        routeId === 'services' ? (
+          <div class="relative" data-nav-dropdown>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-sm font-medium text-foreground-muted hover:text-foreground transition-colors"
+              aria-expanded="false"
+              aria-haspopup="true"
+              data-nav-dropdown-trigger
+            >
+              {t(label as TranslationKey)}
+              <svg class="h-3.5 w-3.5 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" data-nav-dropdown-chevron>
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            <div
+              class="absolute left-0 top-full z-50 hidden w-[26rem] pt-3 before:absolute before:inset-x-0 before:-top-2 before:h-5 before:content-[''] before:block"
+              data-nav-dropdown-panel
+              role="menu"
+            >
+              <div class="rounded-2xl border border-border bg-background p-3 shadow-[0_24px_60px_rgba(22,28,44,0.14)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
+                {serviceLinks.map((item, i) => (
+                  <Fragment>
+                  {(i === 3 || i === 4) && (
+                    <p class="mx-2.5 mt-2 mb-1 flex items-center gap-3 border-t border-border pt-3 text-[0.68rem] font-semibold tracking-[0.18em] text-foreground-muted uppercase">
+                      {i === 3 ? 'Oder das Ganze' : 'Ihr baut selbst'}
+                    </p>
+                  )}
+                  <a
+                    href={item.href}
+                    class="flex gap-3 rounded-xl p-2.5 transition-colors hover:bg-secondary"
+                    role="menuitem"
+                  >
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-brand-300/70 bg-brand-500/5 text-brand-600">
+                      <Icon name={item.icon} size="sm" />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-sm font-semibold text-foreground">{item.title}</p>
+                      <p class="mt-0.5 text-xs leading-5 text-foreground-muted line-clamp-1">{item.text}</p>
+                    </div>
+                  </a>
+                  </Fragment>
+                ))}
+
+                <div class="border-border mt-1 border-t pt-1">
+                <a
+                  href={servicesPath}
+                  class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-600 hover:text-brand-500"
+                  role="menuitem"
+                >
+                  Alle Lösungen ansehen
+                  <Icon name="arrow-right" size="xs" />
+                </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : routeId === 'references' ? (
+          <div class="relative" data-nav-dropdown>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-sm font-medium text-foreground-muted hover:text-foreground transition-colors"
+              aria-expanded="false"
+              aria-haspopup="true"
+              data-nav-dropdown-trigger
+            >
+              {t(label as TranslationKey)}
+              <svg class="h-3.5 w-3.5 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" data-nav-dropdown-chevron>
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            <div
+              class="absolute right-0 top-full z-50 hidden w-[26rem] pt-3 before:absolute before:inset-x-0 before:-top-2 before:h-5 before:content-[''] before:block"
+              data-nav-dropdown-panel
+              role="menu"
+            >
+              <div class="rounded-2xl border border-border bg-background p-3 shadow-[0_24px_60px_rgba(22,28,44,0.14)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
+                {featuredReferences.map((ref) => (
+                  <a
+                    href={`${referencesPath}${ref.slug}/`}
+                    class="flex gap-3 rounded-xl p-2.5 transition-colors hover:bg-secondary"
+                    role="menuitem"
+                  >
+                    {navLogos[navLogoKey[ref.slug] ?? ''] ? (
+                      <div class="flex h-14 w-20 shrink-0 items-center justify-center rounded-lg border border-border bg-white p-2">
+                        <img src={navLogos[navLogoKey[ref.slug]].src} alt={ref.client} class="max-h-full max-w-full object-contain" loading="lazy" />
+                      </div>
+                    ) : (
+                      <div class="overflow-hidden rounded-lg shrink-0 h-14 w-14">
+                        <Picture
+                          src={ref.image}
+                          alt={ref.client}
+                          widths={[56, 112, 168]}
+                          sizes="56px"
+                          formats={['avif', 'webp']}
+                          class="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                    <div class="min-w-0 flex-1">
+                      <p class="text-sm font-semibold text-foreground">{ref.client}</p>
+                      <p class="mt-1 text-xs leading-5 text-foreground-muted line-clamp-2">{ref.kicker}</p>
+                    </div>
+                  </a>
+                ))}
+
+                <div class="border-border mt-1 border-t pt-1">
+                <a
+                  href={referencesPath}
+                  class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-600 hover:text-brand-500"
+                  role="menuitem"
+                >
+                  Alle Referenzen ansehen
+                  <Icon name="arrow-right" size="xs" />
+                </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : routeId === 'blog' && featuredBlogPosts.length > 0 ? (
+          <div class="relative" data-nav-dropdown>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 text-sm font-medium text-foreground-muted hover:text-foreground transition-colors"
+              aria-expanded="false"
+              aria-haspopup="true"
+              data-nav-dropdown-trigger
+            >
+              {t(label as TranslationKey)}
+              <svg class="h-3.5 w-3.5 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" data-nav-dropdown-chevron>
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            <div
+              class="absolute right-0 top-full z-50 hidden w-[26rem] pt-3 before:absolute before:inset-x-0 before:-top-2 before:h-5 before:content-[''] before:block"
+              data-nav-dropdown-panel
+              role="menu"
+            >
+              <div class="rounded-2xl border border-border bg-background p-3 shadow-[0_24px_60px_rgba(22,28,44,0.14)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
+                {featuredBlogPosts.map((post) => (
+                  <a
+                    href={`${blogPath}${post.slug}/`}
+                    class="flex gap-3 rounded-xl p-2.5 transition-colors hover:bg-secondary"
+                    role="menuitem"
+                  >
+                    <div class="overflow-hidden rounded-lg shrink-0 h-14 w-14">
+                      {post.image ? (
+                        <Picture
+                          src={post.image}
+                          alt={post.imageAlt ?? post.title}
+                          widths={[56, 112, 168]}
+                          sizes="56px"
+                          formats={['avif', 'webp']}
+                          class="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div class="h-full w-full bg-[linear-gradient(160deg,rgba(243,245,249,0.96),rgba(229,234,242,0.92))] dark:bg-[linear-gradient(160deg,rgba(36,43,57,0.92),rgba(26,31,42,0.9))]" />
+                      )}
+                    </div>
+                    <div class="min-w-0 flex-1 self-center">
+                      <p class="text-sm font-semibold text-foreground line-clamp-2">{post.title}</p>
+                    </div>
+                  </a>
+                ))}
+
+                <div class="border-border mt-1 border-t pt-1">
+                <a
+                  href={blogPath}
+                  class="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-600 hover:text-brand-500"
+                  role="menuitem"
+                >
+                  Alle Beiträge ansehen
+                  <Icon name="arrow-right" size="xs" />
+                </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <a
+            href={getLocalizedPath(routeId, locale)}
+            class="text-sm font-medium text-foreground-muted hover:text-foreground transition-colors"
+          >
+            {t(label as TranslationKey)}
+          </a>
+        )
+      ))}
+
+      <div class="flex items-center gap-2">
+        <LanguageSwitcher />
+        <ThemeToggle />
+        <Button size="sm" href={ctaLink}>{t('nav.getStarted')}</Button>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="lg:hidden p-2 text-foreground hover:bg-secondary rounded-md transition-colors"
+      id="mobile-menu-toggle"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+    >
+      <span class="menu-icon">
+        <Icon name="menu" size="lg" />
+      </span>
+      <span class="close-icon hidden">
+        <Icon name="x" size="lg" />
+      </span>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="hidden absolute top-16 left-0 w-full bg-background border-b border-border p-6 lg:hidden flex-col gap-4 shadow-lg">
+    {navRoutes.map(({ routeId, label }) => (
+      routeId === 'services' ? (
+        <details class="group" data-mobile-accordion>
+          <summary class="flex cursor-pointer items-center justify-between list-none text-base font-medium text-foreground-secondary hover:text-foreground transition-colors [&::-webkit-details-marker]:hidden">
+            <span>{t(label as TranslationKey)}</span>
+            <svg class="h-4 w-4 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </summary>
+          <div class="mt-3 space-y-2 border-l-2 border-border pl-3">
+            {serviceLinks.map((item, i) => (
+              <Fragment>
+              {(i === 3 || i === 4) && <p class="mt-3 border-t border-border pt-3 text-[0.68rem] font-semibold tracking-[0.18em] text-foreground-muted uppercase">{i === 3 ? 'Oder das Ganze' : 'Ihr baut selbst'}</p>}
+              <a
+                href={item.href}
+                class="flex gap-3 rounded-lg p-2 transition-colors hover:bg-secondary"
+              >
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-brand-300/70 bg-brand-500/5 text-brand-600">
+                  <Icon name={item.icon} size="sm" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold text-foreground">{item.title}</p>
+                  <p class="mt-0.5 text-xs leading-5 text-foreground-muted line-clamp-1">{item.text}</p>
+                </div>
+              </a>
+              </Fragment>
+            ))}
+            <a
+              href={servicesPath}
+              class="block rounded-lg p-2 text-sm font-semibold text-brand-600 hover:text-brand-500"
+            >
+              Alle Lösungen ansehen →
+            </a>
+          </div>
+        </details>
+      ) : routeId === 'references' ? (
+        <details class="group" data-mobile-accordion>
+          <summary class="flex cursor-pointer items-center justify-between list-none text-base font-medium text-foreground-secondary hover:text-foreground transition-colors [&::-webkit-details-marker]:hidden">
+            <span>{t(label as TranslationKey)}</span>
+            <svg class="h-4 w-4 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </summary>
+          <div class="mt-3 space-y-2 border-l-2 border-border pl-3">
+            {featuredReferences.map((ref) => (
+              <a
+                href={`${referencesPath}${ref.slug}/`}
+                class="flex gap-3 rounded-lg p-2 transition-colors hover:bg-secondary"
+              >
+                {navLogos[navLogoKey[ref.slug] ?? ''] ? (
+                  <div class="flex h-11 w-16 shrink-0 items-center justify-center rounded-md border border-border bg-white p-1.5">
+                    <img src={navLogos[navLogoKey[ref.slug]].src} alt={ref.client} class="max-h-full max-w-full object-contain" loading="lazy" />
+                  </div>
+                ) : (
+                  <div class="h-11 w-11 shrink-0 overflow-hidden rounded-md">
+                    <Picture
+                      src={ref.image}
+                      alt={ref.client}
+                      widths={[44, 88]}
+                      sizes="44px"
+                      formats={['avif', 'webp']}
+                      class="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold text-foreground">{ref.client}</p>
+                  <p class="mt-0.5 text-xs leading-5 text-foreground-muted line-clamp-1">{ref.kicker}</p>
+                </div>
+              </a>
+            ))}
+            <a
+              href={referencesPath}
+              class="block rounded-lg p-2 text-sm font-semibold text-brand-600 hover:text-brand-500"
+            >
+              Alle Referenzen ansehen →
+            </a>
+          </div>
+        </details>
+      ) : routeId === 'blog' && featuredBlogPosts.length > 0 ? (
+        <details class="group" data-mobile-accordion>
+          <summary class="flex cursor-pointer items-center justify-between list-none text-base font-medium text-foreground-secondary hover:text-foreground transition-colors [&::-webkit-details-marker]:hidden">
+            <span>{t(label as TranslationKey)}</span>
+            <svg class="h-4 w-4 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </summary>
+          <div class="mt-3 space-y-2 border-l-2 border-border pl-3">
+            {featuredBlogPosts.map((post) => (
+              <a
+                href={`${blogPath}${post.slug}/`}
+                class="flex gap-3 rounded-lg p-2 transition-colors hover:bg-secondary"
+              >
+                <div class="h-11 w-11 shrink-0 overflow-hidden rounded-md">
+                  {post.image ? (
+                    <Picture
+                      src={post.image}
+                      alt={post.imageAlt ?? post.title}
+                      widths={[44, 88]}
+                      sizes="44px"
+                      formats={['avif', 'webp']}
+                      class="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div class="h-full w-full bg-[linear-gradient(160deg,rgba(243,245,249,0.96),rgba(229,234,242,0.92))] dark:bg-[linear-gradient(160deg,rgba(36,43,57,0.92),rgba(26,31,42,0.9))]" />
+                  )}
+                </div>
+                <div class="min-w-0 flex-1 self-center">
+                  <p class="text-sm font-semibold text-foreground line-clamp-2">{post.title}</p>
+                </div>
+              </a>
+            ))}
+            <a
+              href={blogPath}
+              class="block rounded-lg p-2 text-sm font-semibold text-brand-600 hover:text-brand-500"
+            >
+              Alle Beiträge ansehen →
+            </a>
+          </div>
+        </details>
+      ) : (
+        <a
+          href={getLocalizedPath(routeId, locale)}
+          class="text-base font-medium text-foreground-secondary hover:text-foreground transition-colors"
+        >
+          {t(label as TranslationKey)}
+        </a>
+      )
+    ))}
+
+    <div class="flex items-center gap-3 pt-2 border-t border-border">
+      <LanguageSwitcher />
+      <ThemeToggle />
+    </div>
+    <Button fullWidth href={ctaLink}>{t('nav.getStarted')}</Button>
+  </div>
+</nav>
+
+<script>
+  function initMobileMenu() {
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    const menuIcon = toggle?.querySelector('.menu-icon');
+    const closeIcon = toggle?.querySelector('.close-icon');
+
+    if (!toggle || !menu || !menuIcon || !closeIcon) return;
+
+    toggle.addEventListener('click', () => {
+      const isOpen = menu.classList.contains('hidden');
+
+      if (isOpen) {
+        menu.classList.remove('hidden');
+        menu.classList.add('flex');
+        menuIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+      } else {
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close menu when clicking on links
+    menu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  function initNavDropdowns() {
+    const dropdowns = document.querySelectorAll<HTMLElement>('[data-nav-dropdown]');
+    if (dropdowns.length === 0) return;
+
+    const closeAll = (except?: HTMLElement) => {
+      dropdowns.forEach((dd) => {
+        if (dd === except) return;
+        const trigger = dd.querySelector<HTMLButtonElement>('[data-nav-dropdown-trigger]');
+        const panel = dd.querySelector<HTMLElement>('[data-nav-dropdown-panel]');
+        const chevron = dd.querySelector<HTMLElement>('[data-nav-dropdown-chevron]');
+        panel?.classList.add('hidden');
+        trigger?.setAttribute('aria-expanded', 'false');
+        if (chevron) chevron.style.transform = '';
+      });
+    };
+
+    dropdowns.forEach((dd) => {
+      if (dd.dataset.bound === 'true') return;
+      dd.dataset.bound = 'true';
+
+      const trigger = dd.querySelector<HTMLButtonElement>('[data-nav-dropdown-trigger]');
+      const panel = dd.querySelector<HTMLElement>('[data-nav-dropdown-panel]');
+      const chevron = dd.querySelector<HTMLElement>('[data-nav-dropdown-chevron]');
+      if (!trigger || !panel) return;
+
+      let closeTimer = 0;
+      const open = () => {
+        if (closeTimer) {
+          window.clearTimeout(closeTimer);
+          closeTimer = 0;
+        }
+        closeAll(dd);
+        panel.classList.remove('hidden');
+        trigger.setAttribute('aria-expanded', 'true');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+      };
+      const scheduleClose = () => {
+        if (closeTimer) window.clearTimeout(closeTimer);
+        closeTimer = window.setTimeout(() => {
+          panel.classList.add('hidden');
+          trigger.setAttribute('aria-expanded', 'false');
+          if (chevron) chevron.style.transform = '';
+          closeTimer = 0;
+        }, 400);
+      };
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = !panel.classList.contains('hidden');
+        if (isOpen) {
+          scheduleClose();
+        } else {
+          open();
+        }
+      });
+
+      dd.addEventListener('mouseenter', open);
+      dd.addEventListener('mouseleave', scheduleClose);
+      panel.addEventListener('mouseenter', open);
+      panel.addEventListener('mouseleave', scheduleClose);
+    });
+
+    document.addEventListener('click', (e) => {
+      const target = e.target as Node;
+      const inside = Array.from(dropdowns).some((dd) => dd.contains(target));
+      if (!inside) closeAll();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAll();
+    });
+  }
+
+  initMobileMenu();
+  initNavDropdowns();
+  document.addEventListener('astro:page-load', () => {
+    initMobileMenu();
+    initNavDropdowns();
+  });
+</script>

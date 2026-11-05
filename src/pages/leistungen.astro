@@ -1,0 +1,258 @@
+---
+import SeitenHero from '@/components/landing/SeitenHero.astro';
+import { Image } from 'astro:assets';
+import auftragsplanung from '@/assets/references/auftragsplanung-demo-1920.png';
+import cockpit from '@/assets/references/cockpit-demo-1920.png';
+import angebotBild from '@/assets/references/angebot-db-demo-1920.png';
+import kundenstandorte from '@/assets/references/kundenstandorte-uebersicht-demo-1920.png';
+import BerichtMock from '@/components/check/BerichtMock.astro';
+import { angebote, einsatz, eigeneSoftware, softwareCheck, zahlen } from '@/data/funnelSchlank';
+/**
+ * „Alle Lösungen ansehen“: Übersicht über die drei Türen (Angebot, Einsatz, Zahlen), die Ablösung
+ * als „das Ganze“ und den immer gleichen Weg dorthin. Seit 2026-10-07 neu, ersetzt die alte
+ * Leistungsseite (Leistungsbausteine + typische Vorhaben). Die übrigen Vorhaben stehen kompakt
+ * unter „Was wir außerdem bauen“. Keine Preise auf dieser Seite.
+ */
+import PageLayout from '@/layouts/PageLayout.astro';
+import Button from '@/components/ui/form/Button/Button.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
+import { ClientLogoStrip } from '@/components/ui/marketing/ClientLogoStrip';
+import SectionHeader from '@/components/angebote/SectionHeader.astro';
+import { Picture } from 'astro:assets';
+import founderPortrait from '@/assets/rocketbase/founder-marten-priess.jpg';
+import { defaultLocale } from '@/i18n/config';
+import { getLocalizedPath } from '@/i18n/index';
+import { contactLinks } from '@/data/rocketbase';
+import { createProfessionalServiceSchema } from '@/lib/schema';
+
+const locale = defaultLocale;
+const contactUrl = getLocalizedPath('contact', locale);
+const workshopUrl = getLocalizedPath('discoveryWorkshop', locale);
+
+const wegweiser = [
+  { icon: 'edit', satz: 'Angebote dauern zu lange', name: 'Angebot & Kalkulation', href: '#angebote' },
+  { icon: 'users', satz: 'Die Planung hängt an Excel', name: 'Einsatz & Abrechnung', href: '#einsatz' },
+  { icon: 'table', satz: 'Die Zahlen kommen zu spät', name: 'Zahlen & Steuerung', href: '#zahlen' },
+  { icon: 'layers', satz: 'Unsere Software passt nicht mehr', name: 'Standardsoftware ablösen', href: '#abloesung' },
+  { icon: 'shield', satz: 'Wir haben selbst mit KI gebaut', name: 'Software-Check', href: '#check' },
+];
+
+// Nur ab lg: die Bereiche als große Zeilen mit echtem Bild, damit /leistungen/ als Vor-Tor trägt.
+const bereiche = [
+  { tor: angebote, bild: angebotBild, alt: 'Angebot mit Gewinn je Baustein, Demo-Daten', anker: 'angebote', href: '/angebote/', link: 'Angebot & Kalkulation ansehen' },
+  { tor: einsatz, bild: auftragsplanung, alt: 'Auftragsplanung mit Mitarbeitern und Einsätzen, Demo-Daten', anker: 'einsatz', href: '/einsatzplanung/', link: 'Einsatz & Abrechnung ansehen' },
+  { tor: zahlen, bild: cockpit, alt: 'Cockpit mit Umsatz und Auslastung, Demo-Daten', anker: 'zahlen', href: '/zahlen/', link: 'Zahlen & Steuerung ansehen' },
+  { tor: eigeneSoftware, bild: kundenstandorte, alt: 'Kundenstandorte auf einer Karte, Demo-Daten', anker: 'abloesung', href: '/standardsoftware-abloesung/', link: 'So läuft eine Ablösung' },
+  { tor: softwareCheck, bild: null, alt: '', anker: 'check', href: '/software-check/', link: 'Was geprüft wird' },
+];
+
+
+const weg = [
+  { nr: '01', titel: 'Erstgespräch', meta: '30 Minuten · kostenlos', text: 'Ihr erzählt, wo es hakt. Wir sagen ehrlich, ob und wie wir helfen können.' },
+  { nr: '02', titel: 'Workshop', meta: 'drei Termine', text: 'Wir nehmen euren Ablauf auf, wie er wirklich läuft. Danach wisst ihr, was die Lösung kann und was sie kostet.' },
+  { nr: '03', titel: 'Umsetzung', meta: 'Baustein für Baustein', text: 'Zuerst der Teil, der am meisten Zeit kostet. Das Tagesgeschäft läuft weiter.' },
+  { nr: '04', titel: 'Betrieb', meta: 'aus einer Hand', text: 'Hosting, Updates und Weiterentwicklung von denen, die es gebaut haben. Im ersten Jahr inklusive.' },
+];
+
+const ausserdem = [
+  { icon: 'layers', titel: 'Interne Plattformen', text: 'Für Produktdaten, Inhalte oder Abläufe, die in kein Standardprogramm passen.' },
+  { icon: 'globe', titel: 'Schnittstellen', text: 'Damit eure Programme Daten austauschen und niemand sie von Hand überträgt.' },
+  { icon: 'users', titel: 'Portale für Kunden', text: 'Eure Kunden bestellen, beantworten Rückfragen und holen Unterlagen ab, ohne lange Mailwechsel.' },
+];
+
+const clientLogos = [
+  { key: 'fkc_logo', name: 'FKC Consulting' },
+  { key: 'diezinger_logo', name: 'Schlosserei Diezinger' },
+  { key: 'statista-logo', name: 'Statista' },
+  { key: 'stage_logo', name: 'Stage Entertainment' },
+  { key: 'bonprix_logo', name: 'bonprix' },
+];
+
+const servicesPageUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const professionalServiceSchema = createProfessionalServiceSchema({
+  url: servicesPageUrl,
+  description:
+    'Individuelle Software für inhabergeführte Betriebe: Angebot und Kalkulation, Einsatz und Abrechnung, Zahlen und Steuerung, oder die Ablösung der Branchensoftware. Vom Erstgespräch über den Workshop bis zum Betrieb aus einer Hand.',
+  services: wegweiser.map((w) => w.name),
+});
+---
+
+<PageLayout
+  title="Lösungen: Angebot, Einsatz, Zahlen, Ablösung"
+  description="Software für Betriebe, die nicht in Standardlösungen passen: Angebot, Einsatz, Zahlen oder die Ablösung der Branchensoftware. Erstgespräch kostenlos."
+  lang={locale}
+  routeId="services"
+  extraSchemas={professionalServiceSchema}
+>
+  <!-- HERO -->
+  <SeitenHero eyebrow="Lösungen" titel="Software für Angebot, Einsatz und Zahlen, die zu eurem Betrieb passt" text="In diesen drei Bereichen werden wir am häufigsten gebraucht. Ihr könnt mit einem anfangen oder eure Branchensoftware ganz ablösen.">
+    <nav aria-label="Wegweiser zu den Bereichen" class="border-border bg-card/90 rounded-2xl border p-3 shadow-xl backdrop-blur-sm sm:p-4">
+      <p class="text-foreground-muted px-3 pt-2 pb-1 text-xs font-semibold tracking-[0.14em] uppercase">
+        Was passt am ehesten?
+      </p>
+      <ul>
+        {
+          wegweiser.map((w) => (
+            <li>
+              <a href={w.href} class="hover:bg-brand-500/5 group flex min-h-14 items-center gap-3 rounded-xl px-3 py-2.5 transition-colors">
+                <span class="bg-brand-500/10 text-brand-600 dark:text-brand-300 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                  <Icon name={w.icon} size="sm" />
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="text-foreground block font-semibold">{w.satz}</span>
+                  <span class="text-foreground-muted block text-sm">{w.name}</span>
+                </span>
+                <Icon name="chevron-down" size="sm" class="text-foreground-muted group-hover:text-brand-500 shrink-0 transition-colors" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </SeitenHero>
+  <ClientLogoStrip heading="Aus Projekten mit" logos={clientLogos} variant="light" uniform class="py-8" />
+
+  <!-- BEREICHE IM DETAIL -->
+  <section class="py-14 sm:py-24 lg:py-28">
+    <div class="container max-w-6xl space-y-14 lg:space-y-28">
+      {
+        bereiche.map((b, i) => (
+          <div id={b.anker} class="grid scroll-mt-24 items-center gap-6 lg:grid-cols-2 lg:gap-16">
+            <div class:list={[i % 2 === 1 && 'lg:order-2']}>
+              <p class="text-brand-600 dark:text-brand-300 text-xs font-semibold tracking-[0.14em] uppercase">
+                {b.tor.fuerWen}
+              </p>
+              <h2 class="font-display text-foreground mt-3 text-2xl leading-tight sm:text-3xl font-bold tracking-tight text-balance">
+                {b.tor.headline}
+              </h2>
+              <p class="text-foreground-secondary mt-4 text-base leading-7">{b.tor.lead}</p>
+              <ul class="mt-5 hidden space-y-2 lg:block">
+                {b.tor.vergleich.slice(0, 3).map(([, danach]) => (
+                  <li class="text-foreground-secondary flex gap-2.5 text-sm leading-6">
+                    <Icon name="check-circle" size="sm" class="text-brand-500 mt-0.5 shrink-0" />
+                    <span>{danach}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button variant="link" href={b.href} class="mt-4 px-0">
+                {b.link}
+                <Icon name="arrow-right" size="sm" />
+              </Button>
+            </div>
+            {b.bild ? (
+              <Image
+                src={b.bild}
+                alt={b.alt}
+                widths={[640, 960, 1280]}
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                class="border-border w-full rounded-2xl border shadow-xl"
+                loading="lazy"
+              />
+            ) : (
+              <BerichtMock />
+            )}
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- 02 DER WEG -->
+  <section class="bg-background-secondary border-border relative border-y py-14 sm:py-24 lg:py-28">
+    <div class="relative z-10 container max-w-6xl">
+      <SectionHeader
+        size="md"
+        number="02"
+        eyebrow="Der Weg"
+        title="Bei Angebot, Einsatz, Zahlen und Ablösung fängt es gleich an"
+        lead="Beratung, Konzept, Umsetzung und Betrieb kommen aus einer Hand, damit bei Übergaben kein Wissen verloren geht. Habt ihr selbst gebaut, entfällt der Workshop: Beim Software-Check seht ihr im Erstgespräch gemeinsam auf den Code, danach kommt direkt ein Preis je nach Umfang."
+      />
+      <ol class="relative mt-14 grid gap-4 md:grid-cols-4">
+        <span class="bg-border absolute top-[1.35rem] right-[12%] left-[12%] hidden h-px md:block" aria-hidden="true"></span>
+        {
+          weg.map((s, i) => (
+            <li data-reveal class="relative">
+              <span class:list={['relative z-10 mx-auto flex h-11 w-11 items-center justify-center rounded-full font-mono text-sm font-bold md:mx-0', i === 1 ? 'bg-brand-500 text-white shadow-[0_10px_24px_-10px_var(--color-brand-500)]' : 'border-brand-300 bg-card text-brand-600 border-2']}>
+                {s.nr}
+              </span>
+              <div class="border-border bg-card mt-4 rounded-2xl border p-5 text-center md:text-left">
+                <h3 class="font-display text-foreground text-lg font-bold tracking-tight">{s.titel}</h3>
+                <p class="text-brand-600 dark:text-brand-300 mt-0.5 text-xs font-semibold">{s.meta}</p>
+                <p class="text-foreground-secondary mt-2 text-sm leading-6">{s.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="mt-8 text-center">
+        <a href={workshopUrl} class="text-brand-600 inline-flex items-center gap-2 text-sm font-semibold hover:gap-3">
+          Der Workshop im Detail
+          <Icon name="arrow-right" size="sm" />
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- 03 AUSSERDEM -->
+  <section class="bg-background relative py-14 sm:py-24 lg:py-28">
+    <div class="relative z-10 container max-w-6xl">
+      <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-16">
+        <div data-reveal>
+          <SectionHeader size="md" align="left" number="03" eyebrow="Was wir außerdem bauen" title="Manche Anfragen passen in keinen dieser Bereiche" />
+          <p class="text-foreground-secondary mt-6 text-base leading-7">
+            Auch dann reden wir zuerst miteinander und sagen euch ehrlich, ob wir die Richtigen sind.
+          </p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          {
+            ausserdem.map((a) => (
+              <article data-reveal class="border-border bg-card rounded-2xl border p-5">
+                <span class="border-brand-300/70 bg-brand-500/5 text-brand-600 flex h-10 w-10 items-center justify-center rounded-xl border">
+                  <Icon name={a.icon} size="sm" />
+                </span>
+                <h3 class="font-display text-foreground mt-4 text-base font-bold tracking-tight">{a.titel}</h3>
+                <p class="text-foreground-secondary mt-1.5 text-sm leading-6">{a.text}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KONTAKT -->
+  <section class="loes-kontakt border-border relative overflow-x-clip border-t py-12 sm:py-20 lg:py-24">
+    <div class="relative z-10 container grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-16">
+      <div data-reveal class="flex items-start gap-5">
+        <Picture src={founderPortrait} alt="Marten Prieß" widths={[64, 128]} sizes="64px" formats={['avif', 'webp']} class="hidden h-16 w-16 shrink-0 rounded-full object-cover sm:block" loading="lazy" />
+        <div>
+          <h2 class="font-display text-foreground text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+            Nicht sicher, welcher Bereich passt?
+          </h2>
+          <p class="text-foreground-secondary mt-3 max-w-xl text-[0.95rem] leading-7">
+            Das klären wir in 30 Minuten. Ihr erzählt, wo es hakt, und wir sagen ehrlich, wo wir anfangen
+            würden. Das Gespräch führt Marten Prieß selbst, der Gründer von RocketBase.
+          </p>
+        </div>
+      </div>
+      <div data-reveal class="flex flex-wrap gap-3 lg:justify-end">
+        <Button size="lg" href={contactLinks.cal} target="_blank">
+          Erstgespräch buchen
+          <Icon name="arrow-up-right" size="sm" />
+        </Button>
+        <Button variant="outline" size="lg" href={`${contactUrl}#anfrage-stellen`}>
+          Lieber schreiben
+          <Icon name="arrow-right" size="sm" />
+        </Button>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .loes-kontakt {
+    background:
+      radial-gradient(55% 140% at 90% 50%, color-mix(in oklch, var(--color-brand-400) 22%, transparent), transparent 70%),
+      color-mix(in oklch, var(--color-brand-500) 7%, var(--color-background));
+  }
+</style>
