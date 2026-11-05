@@ -2,40 +2,19 @@
 import '@/styles/global.css';
 import SEO from '@/components/seo/SEO.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
-import Hreflang from '@/components/i18n/Hreflang.astro';
-import Analytics from '@/components/layout/Analytics.astro';
-import ScrollProgress from '@/components/layout/ScrollProgress.astro';
-import ConsentBanner from '@/components/ui/overlay/ConsentBanner';
 import { createWebsiteSchema, createOrganizationSchema } from '@/lib/schema';
-import type { Thing, WebSite, Organization, WithContext } from 'schema-dts';
+import type { Thing, WithContext } from 'schema-dts';
 import siteConfig from '@/config/site.config';
-import { type Locale, getLocaleFromPath } from '@/i18n/config';
-import { useTranslations } from '@/i18n/index';
-import type { RouteId } from '@/i18n/routes';
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
   imageAlt?: string;
-  article?: {
-    publishedTime?: Date;
-    modifiedTime?: Date;
-    authors?: string[];
-    tags?: string[];
-  };
   noindex?: boolean;
   nofollow?: boolean;
   includeOrgSchema?: boolean;
-  lang?: Locale;
-  /**
-   * Route ID for generating proper hreflang tags.
-   * If provided, uses translated URLs; otherwise falls back to path-based hreflang.
-   */
-  routeId?: RouteId;
-  /**
-   * Additional JSON-LD schemas to emit alongside WebSite / Organization.
-   */
+  /** Zusätzliche JSON-LD-Schemas (Software, FAQ, Breadcrumbs). */
   extraSchemas?: WithContext<Thing> | WithContext<Thing>[];
 }
 
@@ -44,258 +23,47 @@ const {
   description,
   image,
   imageAlt,
-  article,
   noindex = false,
   nofollow = false,
   includeOrgSchema = false,
-  lang,
-  routeId,
   extraSchemas,
 } = Astro.props;
 
-// Get locale from props or URL path
-const currentLocale = lang || getLocaleFromPath(Astro.url.pathname);
-
-// Build translated consent UI text
-const tc = useTranslations(currentLocale);
-const consentUi = {
-  heading: tc('consent.heading'),
-  description: tc('consent.description'),
-  acceptAll: tc('consent.acceptAll'),
-  declineAll: tc('consent.declineAll'),
-  customize: tc('consent.customize'),
-  savePreferences: tc('consent.savePreferences'),
-  settingsHeading: tc('consent.settingsHeading'),
-  privacyPolicyLabel: tc('consent.privacyPolicyLabel'),
-};
-const consentAlwaysOnLabel = tc('consent.alwaysOn');
-
-// Build JSON-LD schemas
-const schemas: Array<WithContext<Thing>> = [
-  createWebsiteSchema() as WithContext<WebSite>,
-];
-if (includeOrgSchema) {
-  schemas.push(createOrganizationSchema() as WithContext<Organization>);
-}
-if (extraSchemas) {
-  const extras = Array.isArray(extraSchemas) ? extraSchemas : [extraSchemas];
-  schemas.push(...extras);
-}
+const schemas: Array<WithContext<Thing>> = [createWebsiteSchema()];
+if (includeOrgSchema) schemas.push(createOrganizationSchema());
+if (extraSchemas) schemas.push(...(Array.isArray(extraSchemas) ? extraSchemas : [extraSchemas]));
 ---
 
 <!doctype html>
-<html lang={currentLocale} class="scroll-smooth">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Velocity Fonts: Outfit (display), Manrope (body), JetBrains Mono (code) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Non-render-blocking font loading -->
-    <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    </noscript>
-
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href={siteConfig.branding.favicon.svg} />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content={siteConfig.branding.colors.themeColor} />
 
-    <!-- SEO -->
     <SEO
       title={title}
       description={description}
       image={image}
       imageAlt={imageAlt}
-      article={article}
       noindex={noindex}
       nofollow={nofollow}
     />
-
-    <!-- Alternate language links for SEO (uses translated URLs when routeId provided) -->
-    <Hreflang routeId={routeId} />
-
-    <!-- Feed- und LLM-Autodiscovery: RSS für Reader und Suchagenten,
-         llms.txt als kompakte Inhaltsübersicht für Sprachmodelle. -->
-    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} Blog`} href="/rss.xml" />
     <link rel="alternate" type="text/plain" title="LLM-Inhaltsübersicht" href="/llms.txt" />
-
-    <!-- JSON-LD Structured Data -->
     <JsonLd schema={schemas} />
-
-    <!-- Analytics (loads if PUBLIC_GA_MEASUREMENT_ID or PUBLIC_GTM_ID is set) -->
-    <Analytics />
-
-    <!-- Theme script (runs before render to prevent flash) -->
-    <script is:inline>
-      (function () {
-        const theme = localStorage.getItem('theme');
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        if (theme === 'dark' || (!theme && systemDark)) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      })();
-    </script>
-
-    <style is:inline>
-      /* ------------------------------------------------------------------
-         Reveal animations - JS-driven via IntersectionObserver.
-         Predictable on every browser, works on initially-visible elements,
-         easy to tune. Hidden state only applies after JS marks the page
-         ready (no FOUC when JS is disabled - content stays visible).
-         ------------------------------------------------------------------ */
-      html.reveal-ready [data-reveal] {
-        opacity: 0;
-        transform: translateY(60px);
-        transition:
-          opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
-          transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
-        will-change: opacity, transform;
-      }
-      html.reveal-ready [data-reveal="fade-down"] { transform: translateY(-60px); }
-      html.reveal-ready [data-reveal="fade-left"] { transform: translateX(60px); }
-      html.reveal-ready [data-reveal="fade-right"] { transform: translateX(-60px); }
-      html.reveal-ready [data-reveal="zoom-in"] { transform: scale(0.85); }
-      html.reveal-ready [data-reveal="fade"] { transform: none; }
-
-      html.reveal-ready [data-reveal].is-in {
-        opacity: 1;
-        transform: none;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        html.reveal-ready [data-reveal] {
-          opacity: 1 !important;
-          transform: none !important;
-          transition: none !important;
-        }
-      }
-    </style>
-
-    <script is:inline>
-      // Reveal on scroll - IntersectionObserver, one-shot per element.
-      // The reveal-ready class on <html> only gates the hidden state,
-      // so if JS fails to run for any reason, content stays visible.
-      (function () {
-        const html = document.documentElement;
-        const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (rm) return;
-
-        html.classList.add('reveal-ready');
-
-        const reveal = function (el) {
-          if (el.classList.contains('is-in')) return;
-          let delay = 0;
-          const parent = el.parentElement;
-          if (parent) {
-            const idx = Array.prototype.indexOf.call(parent.children, el);
-            if (idx > 0 && idx < 8) delay = idx * 80;
-          }
-          if (delay) {
-            setTimeout(function () { el.classList.add('is-in'); }, delay);
-          } else {
-            el.classList.add('is-in');
-          }
-        };
-
-        const run = function () {
-          const els = document.querySelectorAll('[data-reveal]');
-          if (!els.length) return;
-
-          // Trigger early: start revealing as soon as the element enters the
-          // lower third of the viewport. Using a large negative rootMargin
-          // on the top means the trigger zone is the bottom 66% of the
-          // screen - catches fast scrolls reliably.
-          const io = new IntersectionObserver(function (entries) {
-            entries.forEach(function (e) {
-              if (e.isIntersecting) {
-                reveal(e.target);
-                io.unobserve(e.target);
-              }
-            });
-          }, {
-            rootMargin: '-5% 0px -10% 0px',
-            threshold: [0, 0.01, 0.1],
-          });
-
-          els.forEach(function (el) {
-            io.observe(el);
-            // Also reveal anything that is already in the viewport at page load
-            // (above-the-fold) - with a slight cascade so it feels alive.
-            const rect = el.getBoundingClientRect();
-            const vh = window.innerHeight || document.documentElement.clientHeight;
-            if (rect.top < vh && rect.bottom > 0) {
-              reveal(el);
-              io.unobserve(el);
-            }
-          });
-        };
-
-        // Fallback: poll on scroll in case IntersectionObserver misses an
-        // element during extreme fast scrolls (trackpad flings, momentum on
-        // iOS). Very cheap - only runs while something is still hidden.
-        const scrollCatchup = function () {
-          const pending = document.querySelectorAll('[data-reveal]:not(.is-in)');
-          if (!pending.length) {
-            window.removeEventListener('scroll', scrollCatchup);
-            return;
-          }
-          const vh = window.innerHeight || document.documentElement.clientHeight;
-          pending.forEach(function (el) {
-            const rect = el.getBoundingClientRect();
-            if (rect.top < vh * 0.9 && rect.bottom > 0) {
-              reveal(el);
-            }
-          });
-        };
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', run);
-        } else {
-          run();
-        }
-
-        window.addEventListener('scroll', scrollCatchup, { passive: true });
-
-        // Safety net: after 2.5s, force-reveal anything still hidden
-        setTimeout(function () {
-          document.querySelectorAll('[data-reveal]:not(.is-in)').forEach(function (el) {
-            el.classList.add('is-in');
-          });
-        }, 2500);
-      })();
-    </script>
   </head>
 
-  <body class="min-h-screen bg-background text-foreground antialiased">
-    <!-- Skip to content link -->
-    <a
-      href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-    >
-      Skip to content
-    </a>
-
+  <body>
+    <a href="#main-content" class="skip-link">Zum Inhalt springen</a>
     <slot name="header" />
-    <ScrollProgress />
-    <main id="main-content" class="flex-1">
+    <main id="main-content">
       <slot />
     </main>
-
     <slot name="footer" />
-
-    <ConsentBanner ui={consentUi} alwaysOnLabel={consentAlwaysOnLabel} />
   </body>
 </html>

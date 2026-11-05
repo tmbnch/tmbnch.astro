@@ -1,13 +1,10 @@
 ---
-import PageLayout from '@/layouts/PageLayout.astro';
-import { defaultLocale } from '@/i18n/config';
+import SiteLayout from '@/layouts/SiteLayout.astro';
 ---
 
-<PageLayout
+<SiteLayout
   title="Datenschutzbestimmungen"
   description="Datenschutzerklärung von RocketBase: Welche Daten wir erheben, wie wir sie verwenden und welche Rechte Sie als Nutzer haben."
-  lang={defaultLocale}
-  routeId="privacy"
   noindex
 >
   <section class="border-b border-border bg-background-secondary py-16">
@@ -112,4 +109,4 @@ import { defaultLocale } from '@/i18n/config';
       <p>Die Datenübermittlung erfolgt teilweise in die USA. Meta ist unter dem EU-US Data Privacy Framework zertifiziert; ergänzend bestehen Standardvertragsklauseln als Garantie für ein angemessenes Datenschutzniveau. Weitere Informationen finden Sie in der Datenschutzrichtlinie von Meta: <a href="https://www.facebook.com/privacy/policy" target="_blank" rel="noopener noreferrer">https://www.facebook.com/privacy/policy</a>.</p>
     </div>
   </section>
-</PageLayout>
+</SiteLayout>

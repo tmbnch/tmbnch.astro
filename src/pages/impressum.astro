@@ -1,13 +1,10 @@
 ---
-import PageLayout from '@/layouts/PageLayout.astro';
-import { defaultLocale } from '@/i18n/config';
+import SiteLayout from '@/layouts/SiteLayout.astro';
 ---
 
-<PageLayout
+<SiteLayout
   title="Impressum"
   description="Alle rechtlichen Informationen zu RocketBase auf einen Blick."
-  lang={defaultLocale}
-  routeId="imprint"
   noindex
 >
   <section class="border-b border-border bg-background-secondary py-16">
@@ -76,4 +73,4 @@ import { defaultLocale } from '@/i18n/config';
       <p>Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen.</p>
     </div>
   </section>
-</PageLayout>
+</SiteLayout>

@@ -48,7 +48,6 @@ Disallow: /api/
 # ----------------------------------------------------------------------
 # KI-Assistenten und Suchagenten: ausdrücklich erlaubt.
 # Inhaltsübersicht für Sprachmodelle: ${siteUrl}llms.txt
-# Volltexte aller Fachbeiträge:       ${siteUrl}llms-full.txt
 # ----------------------------------------------------------------------
 
 ${aiBlock}

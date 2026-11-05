@@ -52,11 +52,7 @@ if (image) {
     ogImage = new URL(`/og-screenshots/${pathnameSlug}.${screenshotExt}`, Astro.site).toString();
     ogImageSource = 'screenshot';
   } else {
-    // Case + blog OGs render a photographic teaser as JPEG; static pages render a flat PNG.
-    // The generated file extension matches the real format so URL, Content-Type and
-    // og:image:type stay consistent (see src/pages/og/[...slug].ts).
-    const generatedExt = /^(referenzen|blog)\//.test(pathnameSlug) ? 'jpg' : 'png';
-    ogImage = new URL(`/og/${pathnameSlug}.${generatedExt}`, Astro.site).toString();
+    ogImage = new URL(`/og/${pathnameSlug}.png`, Astro.site).toString();
     ogImageSource = 'generated';
   }
 }
@@ -84,8 +80,6 @@ function getImageType(url: string): string | undefined {
   const ext = url.match(/(\.\w+)(?:\?|$)/)?.[1]?.toLowerCase();
   return ext ? extToMime[ext] : undefined;
 }
-// Generated and screenshot OGs carry a real file extension, so the MIME type
-// can be derived from the URL directly (case/blog → .jpg, static → .png).
 const ogImageType = getImageType(ogImage);
 ---
 

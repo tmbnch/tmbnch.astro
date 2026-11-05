@@ -7,12 +7,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   output: 'static',
 
-  site: process.env.SITE_URL || 'https://rocketbase.io',
+  site: process.env.SITE_URL || 'https://timebench.io',
 
-  // Kanonische URL-Form ist MIT Trailing Slash (so werden Canonicals und Sitemap
-  // erzeugt). Ohne diese Einstellung indexiert Google beide Varianten getrennt –
-  // in der Search Console tauchten /standardsoftware-abloesung und
-  // /standardsoftware-abloesung/ als zwei Seiten mit geteilten Signalen auf.
+  // Kanonische URL-Form ist MIT Trailing Slash (Canonicals und Sitemap).
   trailingSlash: 'always',
 
   // i18n configuration
@@ -34,14 +31,7 @@ export default defineConfig({
           de: 'de',
         },
       },
-      // /f/ (Anzeigen), /b/ (Brief) und /instagram/ (Bio-Link) sind jeweils nur
-      // über ihren eigenen Kanal erreichbar und stehen auf noindex — sie gehören
-      // nicht in die Sitemap.
-      filter: (page) =>
-        !/\/(impressum|datenschutz)\/?$/.test(page) &&
-        !/\/f\//.test(page) &&
-        !/\/b\//.test(page) &&
-        !/\/instagram\/?$/.test(page),
+      filter: (page) => !/\/(impressum|datenschutz)\/?$/.test(page),
     }),
   ],
 

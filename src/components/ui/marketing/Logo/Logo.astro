@@ -1,72 +1,27 @@
 ---
 /**
- * Logo Component
- *
- * To customize: Replace the SVG files in src/assets/branding/
- * - logomark.svg       → Icon for light backgrounds
- * - logomark-dark.svg  → Icon for dark backgrounds
- * - logo-full.svg      → Full logo for light backgrounds
- * - logo-full-dark.svg → Full logo for dark backgrounds
+ * timebench-Logo: Bildmarke (Werkbank, Uhr, Blatt) plus Wortmarke.
+ * Quelle der Bildmarke: rcktbs-tmbnch/docs/brand/tmbnch-logo-colored.svg
  */
 import siteConfig from '@/config/site.config';
-
 import logomark from '@/assets/branding/logomark.svg';
-import logomarkDark from '@/assets/branding/logomark-dark.svg';
-import logoFull from '@/assets/branding/logo-full.svg';
-import logoFullDark from '@/assets/branding/logo-full-dark.svg';
+import logomarkMono from '@/assets/branding/logomark-mono.svg';
 
 interface Props {
-  /** Size preset */
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-  /** Force dark mode logo (for dark backgrounds) */
-  forceDark?: boolean;
-  /** Use full logo instead of logomark */
+  /** Nur die Bildmarke oder Bildmarke mit Wortmarke */
   variant?: 'logomark' | 'full';
-  /** Additional CSS classes */
+  /** Einfarbige Bildmarke */
+  mono?: boolean;
+  /** Kantenlänge der Bildmarke in px */
+  size?: number;
   class?: string;
 }
 
-const {
-  size = 'md',
-  forceDark = false,
-  variant = 'logomark',
-  class: className,
-} = Astro.props;
-
-const lightLogo = variant === 'full' ? logoFull : logomark;
-const darkLogo = variant === 'full' ? logoFullDark : logomarkDark;
-
-const sizeClasses: Record<string, string> = {
-  sm: 'h-5 w-5',
-  md: 'h-6 w-6',
-  lg: 'h-8 w-8',
-  xl: 'h-12 w-12',
-  '2xl': 'h-24 w-24',
-};
-
-const sizeClass = sizeClasses[size] || sizeClasses.md;
+const { variant = 'full', mono = false, size = 30, class: className } = Astro.props;
+const mark = mono ? logomarkMono : logomark;
 ---
 
-<span class:list={['inline-block', className]}>
-  {forceDark ? (
-    <img
-      src={darkLogo.src}
-      alt={siteConfig.branding.logo.alt}
-      class:list={[sizeClass]}
-    />
-  ) : (
-    <Fragment>
-      <img
-        src={lightLogo.src}
-        alt={siteConfig.branding.logo.alt}
-        class:list={[sizeClass, 'block dark:hidden']}
-      />
-      <img
-        src={darkLogo.src}
-        alt=""
-        class:list={[sizeClass, 'hidden dark:block']}
-        aria-hidden="true"
-      />
-    </Fragment>
-  )}
+<span class:list={['brand', className]}>
+  <img src={mark.src} alt={variant === 'logomark' ? siteConfig.branding.logo.alt : ''} width={size} height={size} />
+  {variant === 'full' && <span>time<b>bench</b></span>}
 </span>

@@ -7,4 +7,3 @@ export * from './Table';
 export * from './Pagination';
 export * from './Progress';
 export * from './Skeleton';
-export * from './GoogleMap';

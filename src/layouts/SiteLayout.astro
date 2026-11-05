@@ -1,0 +1,18 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { Thing, WithContext } from 'schema-dts';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  includeOrgSchema?: boolean;
+  extraSchemas?: WithContext<Thing> | WithContext<Thing>[];
+}
+
+const props = Astro.props;
+---
+
+<BaseLayout {...props}>
+  <slot />
+</BaseLayout>

@@ -1,22 +1,10 @@
 {
-  "name": "rcktbs.astro",
+  "name": "tmbnch.astro",
   "version": "0.1.0",
-  "description": "Southwell Astro Boilerplate - A production-ready starter template built on Astro 6 and Tailwind CSS v4",
+  "description": "Website von timebench (timebench.io), gebaut mit Astro und Tailwind CSS",
   "type": "module",
-  "author": "Southwell Media",
-  "license": "MIT",
-  "keywords": [
-    "astro",
-    "astro-theme",
-    "theme",
-    "tailwind",
-    "tailwindcss",
-    "typescript",
-    "blog",
-    "starter",
-    "boilerplate",
-    "seo"
-  ],
+  "author": "rocketbase.io software productions GmbH",
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -29,18 +17,15 @@
     "validate": "pnpm lint && pnpm check && pnpm build && pnpm check:links",
     "test": "vitest",
     "test:e2e": "playwright test",
-    "og:capture": "tsx scripts/capture-og-screenshots.ts",
     "check:links": "tsx scripts/check-links.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "8.1.0",
     "@astrojs/react": "7.1.0",
     "@astrojs/sitemap": "^3.7.4",
-    "@calcom/embed-react": "^1.5.3",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource-variable/manrope": "^5.3.0",
     "@fontsource-variable/outfit": "^5.3.0",
-    "@netlify/blobs": "^11.1.4",
     "astro": "7.4.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -58,8 +43,6 @@
   "devDependencies": {
     "@astrojs/check": "0.9.10",
     "@eslint/js": "^10.0.1",
-    "@netlify/functions": "^6.0.2",
-    "@pagefind/default-ui": "^1.5.2",
     "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.5",
@@ -68,7 +51,6 @@
     "eslint": "^10.12.0",
     "eslint-plugin-astro": "^3.2.1",
     "globals": "^17.13.0",
-    "pagefind": "^1.5.2",
     "prettier": "^3.9.10",
     "prettier-plugin-astro": "^1.1.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
@@ -80,5 +62,6 @@
   },
   "engines": {
     "node": ">=24"
-  }
+  },
+  "private": true
 }
