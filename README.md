@@ -1,107 +1,48 @@
-<p align="center">
-  <a href="https://www.rocketbase.io">
-    <img src="src/assets/rocketbase/logo.svg" alt="Rocketbase" width="280" />
-  </a>
-</p>
+# timebench.io
 
-<p align="center">
-  <strong>rocketbase.io</strong> — Digitalpartner für individuelle Software, Prozessoptimierung und nachhaltige Plattformen.
-</p>
+Die Marketing-Website von timebench, der Zeiterfassung aus dem Monorepo `rcktbs-tmbnch` (dort heißt das Produkt noch „tmbnch“). Die Seite läuft statisch auf Netlify unter **timebench.io**.
 
-<p align="center">
-  <a href="https://www.rocketbase.io">www.rocketbase.io</a>
-</p>
+Technisch ist sie eine Kopie von `rcktbs.astro`: Astro 7, Tailwind CSS v4, TypeScript, pnpm, Node 24.
 
----
+## Loslegen
 
-## Über diese Website
-
-Dies ist der Quellcode der öffentlichen Rocketbase-Website. Die Seite erklärt, was wir tun, wen wir begleiten und wie eine Zusammenarbeit aussieht — mit direktem Draht zu Marten Prieß.
-
-Inhaltlich im Fokus:
-
-- **Individuelle Software & Plattformen** — vom Konzept bis zum laufenden Betrieb
-- **Prozessoptimierung** — Digitalisierung entlang bestehender Abläufe
-- **Direkte Begleitung** — kein Agentur-Staffellauf, sondern ein Ansprechpartner
-- **Blog & Cases** — Einblicke in Projekte, Technik und Arbeitsweise
-
-Die Seite ist deutschsprachig (B2B, DACH) und wird über Netlify ausgeliefert.
-
----
-
-## Entwicklung
-
-```bash
-# Voraussetzungen: Node ≥ 22.12, pnpm
+```sh
 pnpm install
-
-# .env anlegen (siehe .env.example)
-cp .env.example .env
-
-# Dev-Server
-pnpm dev
+pnpm dev        # Dev-Server; Astro 7 startet ihn im Hintergrund, Adresse steht in der Ausgabe
+pnpm build      # statischer Build nach dist/
+pnpm check      # astro check (Typen)
+pnpm lint
 ```
 
-### Commands
+## Seiten
 
-| Command | Beschreibung |
-|---------|--------------|
-| `pnpm dev` | Dev-Server starten |
-| `pnpm build` | Production-Build |
-| `pnpm preview` | Build lokal vorschauen |
-| `pnpm check` | Astro Type-Checker |
-| `pnpm lint` | ESLint |
-| `pnpm lint:fix` | ESLint mit Auto-Fix |
-| `pnpm format` | Prettier |
-| `pnpm test` | Vitest (Unit) |
-| `pnpm test:e2e` | Playwright (E2E) |
-| `pnpm validate` | lint + check + build |
+| Pfad | Inhalt |
+|---|---|
+| `/` | Startseite: Hero, drei Säulen, Produkt-Tour, Desktop-Tracker, Privatsphäre, ArbZG, Funktionen, Warteliste |
+| `/projektzeiterfassung/` | Lösungsseite Projektzeit |
+| `/arbeitszeiterfassung/` | Lösungsseite Arbeitszeit, Urlaub und Abwesenheiten |
+| `/impressum/`, `/datenschutz/` | Rechtstexte, Betreiber ist die rocketbase.io software productions GmbH |
 
----
+Dazu kommen OG-Bilder unter `/og/*.png`, generiert mit Satori in `src/lib/og.ts`, außerdem `robots.txt`, `llms.txt`, Manifest und Icons.
 
-## Stack & Dependencies
+## Die klickbaren Dummies
 
-- **[Astro 6](https://astro.build)** mit React Islands für interaktive Komponenten
-- **[Tailwind CSS v4](https://tailwindcss.com)** via `@tailwindcss/vite` — Design-Tokens in `src/styles/tokens/`
-- **TypeScript**, **MDX** für Inhalte, **CVA** für Component-Varianten
-- **Satori** für automatisch generierte OG-Images
-- **Pagefind** für die Volltextsuche
-- **Vitest** (Unit) und **Playwright** (E2E) für Tests
-- Deployment über **[Netlify](https://www.netlify.com)** (`@astrojs/netlify`)
+Die Produktansichten auf den Seiten sind kein Screenshot. Sie werden im Browser aus Beispieldaten aufgebaut und lassen sich anklicken: Wochen- und Monatskalender, Stundenzettel, Jahresübersicht für Urlaub, Teamkalender und das Fenster des Desktop-Trackers mit den Buchungsvorschlägen.
 
-Aufgesetzt auf dem [**Velocity**](https://github.com/southwellmedia/velocity) Astro-Boilerplate von Southwell Media — inzwischen stark an Rocketbase angepasst.
+- Ein Dummy wird mit `<Demo kind="week" />` eingebunden (`src/components/demo/Demo.astro`).
+- Die Logik liegt in `src/scripts/demo/`, eine Datei pro Ansicht. `data.ts` enthält Projekte, Personen, Feiertage und Abwesenheiten.
+- `DemoTour.astro` setzt mehrere Dummies hinter Tabs in einen App-Rahmen.
 
----
+Optik und Farben folgen der echten App im Monorepo (`packages/calendar`, `apps/desktop/src/renderer`, `apps/frontend/src/absence`). Ändert sich dort etwas Sichtbares, sollte der Dummy nachziehen.
 
-## Projektstruktur
+## Warteliste
 
-```
-src/
-  assets/         # Bilder, Logos, Client-Logos, Cases
-  components/
-    ui/           # Basis-UI-Komponenten
-    patterns/     # Zusammengesetzte Patterns (ContactForm, etc.)
-    layout/       # Header, Footer, ThemeToggle
-    blog/         # ArticleHero, BlogCard, ShareButtons
-    landing/      # Credibility, TechStack, FeatureTabs
-    seo/          # SEO, JSON-LD, Breadcrumbs
-  content/        # Blog-Posts, Autoren, FAQs (MDX/JSON)
-  config/         # site.config.ts, nav.config.ts
-  data/           # rocketbase.ts — Cases, Strengths, Kontaktdaten
-  i18n/           # Routen- und Locale-Config
-  styles/         # Global CSS, Tokens, Themes
-  pages/          # Routen, API-Endpoints, OG-Image-Generierung
-```
+Das Formular (`src/components/site/Waitlist.astro`) läuft über Netlify Forms. Netlify erkennt es beim Deploy am Attribut `data-netlify`. Die Einträge stehen im Netlify-Dashboard unter „Forms“, Formularname `warteliste`, mit dem Feld `quelle` für die Stelle auf der Seite.
 
----
+## Design
 
-## Konfiguration
+Logo und Palette stammen aus `rcktbs-tmbnch/docs/brand/`. Die Tokens liegen in `src/styles/tokens/primitives.css` und `src/styles/themes/timebench.css`, die Seitenkomponenten in `src/styles/timebench.css`. Die Schriften Bricolage Grotesque und JetBrains Mono werden über Fontsource selbst ausgeliefert.
 
-- **Site-Config**: `src/config/site.config.ts` — Name, Beschreibung, Kontakt, Social Links
-- **Navigation**: `src/config/nav.config.ts`
-- **Inhalte & Daten**: `src/data/rocketbase.ts` (Cases, Strengths, Service-Areas)
-- **Design-Tokens**: `src/styles/tokens/` (Farben, Typografie, Spacing)
-- **Themes**: `src/styles/themes/` (`default`, `midnight`)
-- **Environment**: `.env` — siehe `.env.example`
+## Deploy
 
----
+`netlify.toml` baut mit `pnpm run build` und veröffentlicht `dist/`. `www.timebench.io` leitet auf `timebench.io` weiter. Die Domain muss im Netlify-Projekt noch eingetragen werden.
