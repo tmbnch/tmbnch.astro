@@ -79,6 +79,16 @@ Plausible lädt, sobald `PUBLIC_PLAUSIBLE_SCRIPT_ID` gesetzt ist (`src/component
 
 Die vier `Beta`-Schritte ergeben den Trichter für die Abbruchquote. Jeder Name muss in Plausible unter Goals als Custom Event angelegt sein. Die Datenschutzerklärung zeigt den Plausible-Absatz nur, wenn die Variable gesetzt ist.
 
+## Cookie-Banner und Meta
+
+Banner (`src/components/ui/overlay/ConsentBanner`, Einstellungen in `src/config/consent.config.ts`), Meta-Pixel (`src/components/seo/MetaPixel.astro`) und Conversions API (in `netlify/functions/beta.ts`) stammen aus rcktbs.astro.
+
+- Der Banner erscheint mit `PUBLIC_CONSENT_ENABLED=true` und kennt nur „Notwendig“ und „Marketing“. Plausible braucht keine Einwilligung.
+- Das Pixel lädt erst nach Zustimmung zu „Marketing“. Ein abgeschickter Beta-Fragebogen meldet `Lead` im Browser und über die Conversions API mit derselben `eventId`, damit Meta ihn nur einmal zählt.
+- Datensatz ist „timebench.io Web“ (`1755967522173018`) im Business-Portfolio der rocketbase.io GmbH, bewusst getrennt vom Pixel von rocketbase.io.
+- Die Domain-Verifizierung steht in `PUBLIC_META_DOMAIN_VERIFICATION`. Nach dem Deploy unter Business-Einstellungen → Domains → timebench.io auf „Domain verifizieren“ klicken.
+- „Cookie-Einstellungen“ im Footer öffnet die Auswahl erneut.
+
 ## Design
 
 Logo und Palette stammen aus `rcktbs-tmbnch/docs/brand/`. Die Tokens liegen in `src/styles/tokens/primitives.css` und `src/styles/themes/timebench.css`, die Seitenkomponenten in `src/styles/timebench.css`. Die Schriften Bricolage Grotesque und JetBrains Mono werden über Fontsource selbst ausgeliefert.

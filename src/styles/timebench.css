@@ -19,7 +19,8 @@ body {
 }
 img, svg { display: block; max-width: 100%; }
 a { color: inherit; }
-button { font: inherit; color: inherit; }
+/* Im Base-Layer, damit Tailwind-Utilities der Boilerplate-Komponenten (Cookie-Banner) gewinnen */
+@layer base { button { font: inherit; color: inherit; } }
 .mono { font-family: var(--mono); font-feature-settings: "tnum"; }
 .tnum { font-variant-numeric: tabular-nums; }
 
@@ -680,3 +681,11 @@ section { padding: 88px 0; }
 .contact-form .quiz-error { margin: 0; background: #fde8e4; color: #8a2a17; }
 .contact-form .btn { justify-self: start; }
 .contact-ok { display: grid; gap: 4px; padding: 14px 16px; border-radius: var(--radius); background: var(--sprout-100); color: var(--live-text); }
+.foot-consent { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- Cookie-Banner (aus rcktbs.astro) ---------- */
+#consent-settings-title { font-size: 22px; letter-spacing: -0.02em; line-height: 1.25; margin: 0; }
+@media (max-width: 640px) {
+  /* Bei 320 px passen die drei Knöpfe sonst nicht nebeneinander */
+  .consent-banner-actions > * { min-width: 0; white-space: normal; line-height: 1.2; }
+}

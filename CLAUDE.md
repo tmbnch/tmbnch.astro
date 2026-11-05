@@ -31,7 +31,7 @@ Deutsch, Du-Ansprache, Rechtstexte in Sie-Form. Konkrete Beispiele statt Superla
 
 ## Datenschutz
 
-Die Seite setzt keine Cookies. Einzige Analyse ist Plausible, aktiv nur mit `PUBLIC_PLAUSIBLE_SCRIPT_ID`. Wer einen Dienst ergänzt, ergänzt im selben Commit `src/pages/datenschutz.astro`.
+Ohne Einwilligung setzt die Seite keine Cookies. Plausible zählt cookielos (`PUBLIC_PLAUSIBLE_SCRIPT_ID`). Das Meta-Pixel lädt nur nach Zustimmung im Cookie-Banner; neue Dienste mit Cookies gehören in eine Kategorie von `src/config/consent.config.ts`. Wer einen Dienst ergänzt, ergänzt im selben Commit `src/pages/datenschutz.astro`.
 
 ## Variablen und Functions
 

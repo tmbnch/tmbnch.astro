@@ -3,7 +3,7 @@
  * Datenschutzerklärung für timebench.io. Grundlage ist die Fassung von rocketbase.io,
  * gekürzt auf das, was diese Seite tatsächlich einsetzt: Hosting bei Netlify,
  * Beta-Fragebogen und Kontaktformular (Netlify Functions, Blobs, eigenes CRM), selbst
- * gehostete Schriften und, sobald
+ * gehostete Schriften, Meta-Pixel und Conversions API (nur mit Einwilligung) und, sobald
  * PUBLIC_PLAUSIBLE_SCRIPT_ID gesetzt ist, Plausible. Kommt ein weiterer Dienst dazu,
  * muss er hier ergänzt werden.
  */
@@ -11,6 +11,7 @@ import SiteLayout from '@/layouts/SiteLayout.astro';
 import siteConfig from '@/config/site.config';
 
 const plausible = Boolean(import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_ID);
+const meta = Boolean(import.meta.env.PUBLIC_META_PIXEL_ID) && import.meta.env.PUBLIC_CONSENT_ENABLED === 'true';
 ---
 
 <SiteLayout
@@ -94,10 +95,21 @@ const plausible = Boolean(import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_ID);
       </p>
 
       <h2>5. Cookies, Schriften und Analyse</h2>
-      <p>
-        Diese Website setzt keine Cookies. Schriften werden von unserem eigenen Server ausgeliefert; dabei wird keine
-        Verbindung zu Google Fonts oder anderen Drittanbietern aufgebaut.
-      </p>
+      {
+        meta ? (
+          <p>
+            Ohne Ihre Einwilligung setzt diese Website keine Cookies. Ihre Entscheidung im Cookie-Banner speichern wir im
+            lokalen Speicher Ihres Browsers (Art. 6 Abs. 1 lit. c DSGVO, § 25 Abs. 2 Nr. 2 TDDDG). Über „Cookie-Einstellungen“
+            im Fuß jeder Seite können Sie sie jederzeit ändern oder widerrufen. Schriften werden von unserem eigenen Server
+            ausgeliefert; dabei wird keine Verbindung zu Google Fonts oder anderen Drittanbietern aufgebaut.
+          </p>
+        ) : (
+          <p>
+            Diese Website setzt keine Cookies. Schriften werden von unserem eigenen Server ausgeliefert; dabei wird keine
+            Verbindung zu Google Fonts oder anderen Drittanbietern aufgebaut.
+          </p>
+        )
+      }
       {
         plausible ? (
           <>
@@ -124,7 +136,36 @@ const plausible = Boolean(import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT_ID);
             </p>
           </>
         ) : (
-          <p>Analyse- oder Marketing-Dienste setzen wir nicht ein.</p>
+          <p>Analysedienste setzen wir nicht ein.</p>
+        )
+      }
+
+      {
+        meta && (
+          <>
+            <h3>Meta-Pixel und Conversions API (Facebook / Instagram)</h3>
+            <p>
+              Mit Ihrer Einwilligung verwenden wir das Meta-Pixel und die Conversions API. Anbieter ist die Meta Platforms
+              Ireland Limited, Merrion Road, Dublin 4, D04 X2K5, Irland. Damit messen wir, ob Besucher, die über eine unserer
+              Anzeigen auf Facebook oder Instagram kommen, sich für die Beta anmelden. Das Pixel setzt dafür Cookies von Meta.
+            </p>
+            <p>
+              Melden Sie sich über den Beta-Fragebogen an, übermitteln wir dieses Ereignis zusätzlich direkt von unserem
+              Server an Meta. E-Mail-Adresse, Telefonnummer und Name werden dabei vor der Übertragung mit SHA-256
+              pseudonymisiert (gehasht); dazu kommen IP-Adresse, Browserkennung und, nur mit Ihrer Einwilligung, die
+              Meta-Cookies.
+            </p>
+            <p>
+              Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG. Sie können sie
+              jederzeit mit Wirkung für die Zukunft über „Cookie-Einstellungen“ widerrufen. Die Datenübermittlung erfolgt
+              teilweise in die USA; Meta ist unter dem EU-US Data Privacy Framework zertifiziert, ergänzend bestehen
+              Standardvertragsklauseln. Weitere Informationen:{' '}
+              <a href="https://www.facebook.com/privacy/policy" target="_blank" rel="noopener noreferrer">
+                facebook.com/privacy/policy
+              </a>
+              .
+            </p>
+          </>
         )
       }
 

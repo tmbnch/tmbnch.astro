@@ -89,7 +89,7 @@ const total = betaQuestions.length + 1;
 </form>
 
 <script>
-  import { collectAttribution } from '@/lib/attribution';
+  import { collectAttribution, newEventId, trackMetaLead, withMetaCookies } from '@/lib/attribution';
   import { betaWishQuestion } from '@/data/beta';
   import { track, type TrackEvent } from '@/lib/track';
 
@@ -174,7 +174,9 @@ const total = betaQuestions.length + 1;
       const list = [...answers.values()];
       const wish = String(data.get('wish') || '').trim();
       if (wish) list.push({ questionId: betaWishQuestion.id, question: betaWishQuestion.question, optionId: 'freitext', answer: wish });
-      const utm = { ...collectAttribution(), quelle: form.dataset.source || '' };
+      const utm = { ...withMetaCookies(collectAttribution()), quelle: form.dataset.source || '' };
+      const eventId = newEventId();
+      data.set('eventId', eventId);
       data.set('answers', JSON.stringify(list));
       data.set('utm', JSON.stringify(utm));
       data.set('page', location.href);
@@ -195,6 +197,7 @@ const total = betaQuestions.length + 1;
         steps.forEach((s) => (s.hidden = true));
         form.querySelector<HTMLElement>('.quiz-progress')!.hidden = true;
         form.querySelector<HTMLElement>('.quiz-done')!.hidden = false;
+        trackMetaLead(eventId);
         track('Beta: Abgeschickt', {
           quelle: form.dataset.source || '',
           team: answers.get('team')?.optionId ?? '',

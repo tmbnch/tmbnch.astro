@@ -9,7 +9,8 @@ import { deliverToSales, type StoredLead } from '../lib/sales-delivery';
  * Gleicher Weg wie `funnel-lead` auf rocketbase.io: erst haltbar im Blob ablegen, dann ans
  * CRM zustellen. Klappt die Zustellung nicht, liefert `lead-redeliver` alle zehn Minuten
  * nach; über `submissionId` ist das idempotent. Die Mail über Plunk ist nur der Notnagel,
- * wenn das CRM den Eintrag beim ersten Versuch nicht angenommen hat.
+ * wenn das CRM den Eintrag beim ersten Versuch nicht angenommen hat. Dazu meldet die Function
+ * den Lead an die Meta Conversions API, sobald META_PIXEL_ID und META_CAPI_TOKEN gesetzt sind.
  */
 
 const answerSchema = z.object({
@@ -29,6 +30,8 @@ const leadSchema = z.object({
   answers: z.array(answerSchema).max(20),
   utm: z.record(z.string(), z.string().max(500)).optional(),
   page: z.string().max(2000).optional(),
+  /** Geteilt mit dem Browser-Pixel, damit Meta das Lead-Event dedupliziert */
+  eventId: z.string().max(100).optional(),
   // Bewusst permissiv (siehe contact.ts): Ein Fehler mit Feldnamen wäre eine Anleitung für Bots.
   honeypot: z.string().max(200),
 });
@@ -49,6 +52,112 @@ const parseJson = (value: string, fallback: unknown) => {
 
 const escape = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// --- Meta Conversions API, unverändert aus rcktbs.astro (funnel-lead.ts) ---
+
+// SHA-256-Hash (hex), wie von der Meta Conversions API für PII gefordert.
+const sha256 = async (value: string): Promise<string> => {
+  const bytes = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+};
+
+// Meta verlangt Normalisierung (trim + lowercase) vor dem Hashen.
+const hashField = (value?: string) => {
+  const normalized = value?.trim().toLowerCase();
+  return normalized ? sha256(normalized) : undefined;
+};
+
+// Telefonnummer: nur Ziffern behalten (Meta-Empfehlung), dann hashen.
+const hashPhone = (value?: string) => {
+  const digits = value?.replace(/[^0-9]/g, '');
+  return digits ? sha256(digits) : undefined;
+};
+
+interface CapiInput {
+  pixelId: string;
+  token: string;
+  eventId?: string;
+  email?: string;
+  phone?: string;
+  name: string;
+  fbp?: string;
+  fbc?: string;
+  fbclid?: string;
+  sourceUrl?: string;
+  clientIp?: string;
+  userAgent?: string;
+  receivedAt: string;
+  testEventCode?: string;
+}
+
+// Serverseitiges Lead-Event an die Meta Conversions API senden.
+// Läuft best-effort: Fehler dürfen die Lead-Verarbeitung nie blockieren.
+const sendMetaCapiLead = async (input: CapiInput): Promise<void> => {
+  const nameParts = input.name.trim().split(/\s+/);
+  const firstName = nameParts[0];
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : undefined;
+
+  const [em, ph, fn, ln] = await Promise.all([
+    hashField(input.email),
+    hashPhone(input.phone),
+    hashField(firstName),
+    hashField(lastName),
+  ]);
+
+  const userData: Record<string, unknown> = {};
+  if (em) userData.em = [em];
+  if (ph) userData.ph = [ph];
+  if (fn) userData.fn = [fn];
+  if (ln) userData.ln = [ln];
+  // Der fbc-Cookie hat Vorrang; sonst aus fbclid rekonstruieren.
+  const fbc =
+    input.fbc ||
+    (input.fbclid
+      ? `fb.1.${Date.parse(input.receivedAt) || Date.now()}.${input.fbclid}`
+      : undefined);
+  if (input.fbp) userData.fbp = input.fbp;
+  if (fbc) userData.fbc = fbc;
+  if (input.clientIp) userData.client_ip_address = input.clientIp;
+  if (input.userAgent) userData.client_user_agent = input.userAgent;
+
+  const payload = {
+    data: [
+      {
+        event_name: 'Lead',
+        event_time: Math.floor((Date.parse(input.receivedAt) || Date.now()) / 1000),
+        event_id: input.eventId,
+        action_source: 'website',
+        event_source_url: input.sourceUrl,
+        user_data: userData,
+      },
+    ],
+    ...(input.testEventCode ? { test_event_code: input.testEventCode } : {}),
+  };
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/v21.0/${input.pixelId}/events?access_token=${encodeURIComponent(input.token)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      },
+    );
+    if (!res.ok) {
+      console.error('Meta CAPI error:', res.status, await res.text());
+    }
+  } catch (capiError) {
+    console.error('Meta CAPI request failed:', capiError);
+  } finally {
+    clearTimeout(timeout);
+  }
+};
 
 /** Notnagel-Mail, nur wenn das CRM die Abgabe nicht angenommen hat. Wirft nie. */
 const sendFallbackMail = async (lead: StoredLead, reason: string) => {
@@ -110,6 +219,7 @@ export default async (request: Request, context: Context) => {
       answers: parseJson(form.get('answers')?.toString() || '[]', []),
       utm: parseJson(form.get('utm')?.toString() || '{}', {}),
       page: form.get('page')?.toString() || undefined,
+      eventId: form.get('eventId')?.toString() || undefined,
       honeypot: form.get('honeypot')?.toString() || '',
     });
 
@@ -169,6 +279,33 @@ export default async (request: Request, context: Context) => {
     } else {
       console.error('Zustellung ans Sales-Backend fehlgeschlagen:', delivery.reason);
       await sendFallbackMail(stored, delivery.reason);
+    }
+
+    // Serverseitiges Lead-Event an Meta, best-effort. Die Cookie-Zuordnung (_fbp/_fbc) schickt
+    // der Browser nur mit, wenn Marketing erlaubt ist; ohne sie bleibt nur die gehashte Mail.
+    const metaPixelId = Netlify.env.get('META_PIXEL_ID');
+    const metaCapiToken = Netlify.env.get('META_CAPI_TOKEN');
+    if (metaPixelId && metaCapiToken) {
+      const attribution = lead.utm || {};
+      await sendMetaCapiLead({
+        pixelId: metaPixelId,
+        token: metaCapiToken,
+        eventId: lead.eventId,
+        email: lead.email,
+        phone: lead.phone || undefined,
+        name: lead.name,
+        fbp: attribution._fbp,
+        fbc: attribution._fbc,
+        fbclid: attribution.fbclid,
+        sourceUrl: lead.page,
+        clientIp:
+          request.headers.get('x-nf-client-connection-ip') ||
+          request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+          undefined,
+        userAgent: stored.userAgent,
+        receivedAt,
+        testEventCode: Netlify.env.get('META_CAPI_TEST_EVENT_CODE'),
+      });
     }
 
     return json({ success: true });

@@ -6,6 +6,9 @@ interface ImportMetaEnv {
   readonly SITE_URL?: string;
   /** Plausible-Skript-ID (`pa-…`); ohne sie lädt keine Analyse */
   readonly PUBLIC_PLAUSIBLE_SCRIPT_ID?: string;
+  readonly PUBLIC_CONSENT_ENABLED?: string;
+  readonly PUBLIC_META_PIXEL_ID?: string;
+  readonly PUBLIC_META_DOMAIN_VERIFICATION?: string;
 }
 
 interface ImportMeta {

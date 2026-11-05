@@ -3,6 +3,8 @@ import '@/styles/global.css';
 import SEO from '@/components/seo/SEO.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import Plausible from '@/components/seo/Plausible.astro';
+import MetaPixel from '@/components/seo/MetaPixel.astro';
+import ConsentBanner from '@/components/ui/overlay/ConsentBanner';
 import { createWebsiteSchema, createOrganizationSchema } from '@/lib/schema';
 import type { Thing, WithContext } from 'schema-dts';
 import siteConfig from '@/config/site.config';
@@ -33,6 +35,9 @@ const {
   bodyClass,
 } = Astro.props;
 
+/** Domain-Verifizierung im Meta Business Manager, siehe .env.example */
+const metaDomainVerification = import.meta.env.PUBLIC_META_DOMAIN_VERIFICATION;
+
 const schemas: Array<WithContext<Thing>> = [createWebsiteSchema()];
 if (includeOrgSchema) schemas.push(createOrganizationSchema());
 if (extraSchemas) schemas.push(...(Array.isArray(extraSchemas) ? extraSchemas : [extraSchemas]));
@@ -61,6 +66,8 @@ if (extraSchemas) schemas.push(...(Array.isArray(extraSchemas) ? extraSchemas : 
     <link rel="alternate" type="text/plain" title="LLM-Inhaltsübersicht" href="/llms.txt" />
     <JsonLd schema={schemas} />
     <Plausible />
+    <MetaPixel />
+    {metaDomainVerification && <meta name="facebook-domain-verification" content={metaDomainVerification} />}
   </head>
 
   <body class={bodyClass}>
@@ -70,5 +77,6 @@ if (extraSchemas) schemas.push(...(Array.isArray(extraSchemas) ? extraSchemas : 
       <slot />
     </main>
     <slot name="footer" />
+    <ConsentBanner />
   </body>
 </html>

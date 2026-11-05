@@ -1,0 +1,47 @@
+---
+/**
+ * Meta-Pixel (Facebook/Instagram), wie auf rocketbase.io. Lädt erst, wenn der Besucher im
+ * Cookie-Banner Marketing zugestimmt hat; ohne PUBLIC_META_PIXEL_ID passiert gar nichts.
+ * Der Lead aus dem Beta-Fragebogen geht zusätzlich serverseitig über die Conversions API
+ * (netlify/functions/beta.ts); beide teilen eine eventId, damit Meta sie dedupliziert.
+ */
+const metaPixelId = import.meta.env.PUBLIC_META_PIXEL_ID;
+---
+
+{
+  metaPixelId && (
+    <script is:inline define:vars={{ metaPixelId }}>
+      function loadMetaPixel() {
+        if (window.__metaPixelLoaded) return;
+        window.__metaPixelLoaded = true;
+        /* eslint-disable @typescript-eslint/no-unused-expressions, prefer-spread, prefer-rest-params */
+        !(function (f, b, e, v, n, t, s) {
+          if (f.fbq) return;
+          n = f.fbq = function () {
+            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+          };
+          if (!f._fbq) f._fbq = n;
+          n.push = n;
+          n.loaded = true;
+          n.version = '2.0';
+          n.queue = [];
+          t = b.createElement(e);
+          t.async = true;
+          t.src = v;
+          s = b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t, s);
+        })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+        /* eslint-enable @typescript-eslint/no-unused-expressions, prefer-spread, prefer-rest-params */
+        window.fbq('init', metaPixelId);
+        window.fbq('track', 'PageView');
+      }
+      function checkAndLoadMeta(categories) {
+        if (categories && categories.marketing) loadMetaPixel();
+      }
+      if (window.__consentState && window.__consentState.decided) checkAndLoadMeta(window.__consentState.categories);
+      window.addEventListener('consent-updated', function (e) {
+        checkAndLoadMeta(e.detail && e.detail.categories);
+      });
+    </script>
+  )
+}

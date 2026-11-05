@@ -3,6 +3,7 @@ import Logo from '@/components/ui/marketing/Logo/Logo.astro';
 import siteConfig from '@/config/site.config';
 import { footerColumns } from '@/data/navigation';
 const year = new Date().getFullYear();
+const consentEnabled = import.meta.env.PUBLIC_CONSENT_ENABLED === 'true';
 ---
 
 <footer class="foot">
@@ -23,6 +24,11 @@ const year = new Date().getFullYear();
     </div>
     <div class="foot-bottom">
       <span>© {year} {siteConfig.legalName}</span>
+      {consentEnabled && (
+        <button type="button" class="foot-consent" onclick="window.openConsentSettings && window.openConsentSettings()">
+          Cookie-Einstellungen
+        </button>
+      )}
       <span>Gebaut in {siteConfig.address?.city}</span>
     </div>
   </div>
