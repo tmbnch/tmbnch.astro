@@ -56,7 +56,12 @@ const siteConfig: SiteConfig = {
     zip: '21423',
     country: 'DE',
   },
-  socialLinks: [],
+  // Profile der rocketbase.io GmbH; timebench hat (noch) keine eigenen.
+  socialLinks: [
+    'https://github.com/rocketbase-io',
+    'https://www.linkedin.com/company/rocketbase-io/',
+    'https://www.instagram.com/rocketbase.io/',
+  ],
   verification: {
     google: env.GOOGLE_SITE_VERIFICATION,
     bing: env.BING_SITE_VERIFICATION,

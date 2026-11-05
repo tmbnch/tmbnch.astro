@@ -1,8 +1,18 @@
 ---
 import Logo from '@/components/ui/marketing/Logo/Logo.astro';
+import Icon from '@/components/ui/primitives/Icon/Icon.astro';
 import siteConfig from '@/config/site.config';
 import { footerColumns } from '@/data/navigation';
 const year = new Date().getFullYear();
+const SOCIAL: Record<string, { label: string; icon: 'linkedin' | 'github' | 'instagram' }> = {
+  'linkedin.com': { label: 'LinkedIn', icon: 'linkedin' },
+  'github.com': { label: 'GitHub', icon: 'github' },
+  'instagram.com': { label: 'Instagram', icon: 'instagram' },
+};
+const social = siteConfig.socialLinks.flatMap((href) => {
+  const hit = Object.entries(SOCIAL).find(([host]) => href.includes(host));
+  return hit ? [{ href, ...hit[1] }] : [];
+});
 const consentEnabled = import.meta.env.PUBLIC_CONSENT_ENABLED === 'true';
 ---
 
@@ -14,6 +24,15 @@ const consentEnabled = import.meta.env.PUBLIC_CONSENT_ENABLED === 'true';
         <p class="muted" style="max-width:30em;margin:12px 0 0">
           Zeiterfassung für Teams, die nach Projekten arbeiten und jede Stunde sauber nachweisen müssen.
         </p>
+        {social.length > 0 && (
+          <div class="foot-social">
+            {social.map((l) => (
+              <a href={l.href} target="_blank" rel="noopener noreferrer" aria-label={`rocketbase.io bei ${l.label}`}>
+                <Icon name={l.icon} size="sm" />
+              </a>
+            ))}
+          </div>
+        )}
       </div>
       {footerColumns.map((col) => (
         <div>

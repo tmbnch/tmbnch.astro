@@ -689,3 +689,6 @@ section { padding: 88px 0; }
   /* Bei 320 px passen die drei Knöpfe sonst nicht nebeneinander */
   .consent-banner-actions > * { min-width: 0; white-space: normal; line-height: 1.2; }
 }
+.foot-social { display: flex; gap: 6px; margin-top: 16px; }
+.foot-social a { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: var(--radius); color: var(--fg-muted); }
+.foot-social a:hover { color: var(--ink); background: var(--muted); }

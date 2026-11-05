@@ -28,6 +28,7 @@ export function createOrganizationSchema(): WithContext<Organization> {
     legalName: siteConfig.legalName,
     url: 'https://rocketbase.io',
     email: siteConfig.email,
+    sameAs: siteConfig.socialLinks,
     address: siteConfig.address
       ? {
           '@type': 'PostalAddress',
