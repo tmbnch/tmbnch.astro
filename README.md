@@ -26,7 +26,7 @@ pnpm lint
 | `/kontakt/` | Kontaktformular |
 | `/impressum/`, `/datenschutz/` | Rechtstexte, Betreiber ist die rocketbase.io software productions GmbH |
 
-Dazu kommen OG-Bilder unter `/og/*.png`, generiert mit Satori in `src/lib/og.ts`, außerdem `robots.txt`, `llms.txt`, Manifest und Icons.
+OG-Bilder: `pnpm og:capture` fotografiert die Seiten mit Playwright und legt sie unter `public/og-screenshots/` ab (eingecheckt, nach Änderungen am Hero neu aufnehmen; einzelne Seiten mit `pnpm og:capture kontakt`). Wo kein Screenshot liegt, etwa bei Impressum und Datenschutz, greift das mit Satori generierte Bild aus `src/lib/og.ts`. Dazu kommen `robots.txt`, `llms.txt`, Manifest und Icons.
 
 ## Die klickbaren Dummies
 

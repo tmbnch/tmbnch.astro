@@ -36,7 +36,7 @@ const phoneHref = `tel:${siteConfig.phone?.replace(/\s/g, '')}`;
       <form class="contact-form" id="contact-form" action="/api/contact" method="POST">
         <label>Name<input type="text" name="name" required minlength="2" maxlength="100" autocomplete="name" /></label>
         <label>E-Mail<input type="email" name="email" required maxlength="200" autocomplete="email" /></label>
-        <label>Betreff <span class="muted">(optional)</span><input type="text" name="subject" maxlength="200" /></label>
+        <label><span>Betreff <span class="muted">(optional)</span></span><input type="text" name="subject" maxlength="200" /></label>
         <label>Nachricht<textarea name="message" required minlength="10" maxlength="5000" rows="6"></textarea></label>
 
         <div hidden aria-hidden="true">
