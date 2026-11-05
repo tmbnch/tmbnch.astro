@@ -1,0 +1,282 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import AppFrame from '@/components/demo/AppFrame.astro';
+import Demo from '@/components/demo/Demo.astro';
+import DemoTour, { type TourTab } from '@/components/demo/DemoTour.astro';
+import WaitlistSection from '@/components/site/WaitlistSection.astro';
+import Faq from '@/components/site/Faq.astro';
+import Crumbs from '@/components/site/Crumbs.astro';
+import { createBreadcrumbSchema, createFAQSchema, createSoftwareSchema } from '@/lib/schema';
+import siteConfig from '@/config/site.config';
+
+const faqs = [
+  {
+    question: 'Muss jeder die Desktop-App installieren?',
+    answer: 'Die Web-App reicht zum Erfassen. Die Desktop-App lohnt sich für alle, die viel zwischen Projekten springen und abends die Vorschläge nutzen wollen. Sie läuft auf macOS, Windows und Linux.',
+  },
+  {
+    question: 'Wie kommen unsere Daten aus Toggl rüber?',
+    answer: 'Mit einem API-Token aus Toggl. timebench holt Kunden, Projekte, Tags und Einträge und gleicht danach jede Stunde ab, auch Löschungen. Lokale Änderungen in timebench bleiben dabei erhalten.',
+  },
+  {
+    question: 'Wer sieht die Stundensätze?',
+    answer: 'Nur Admins und Owner eines Workspace. Mitarbeitende sehen ihre Stunden und ob ein Eintrag abrechenbar ist.',
+  },
+  {
+    question: 'Gibt es eine App fürs Handy?',
+    answer: 'Die Web-App ist fürs Handy gebaut: Die Woche zeigt drei Tage, der Monat wird kompakt. Eine eigene App aus dem Store gibt es noch nicht.',
+  },
+  {
+    question: 'Können wir timebench selbst betreiben?',
+    answer: 'Ja. timebench läuft mit Docker Compose und PostgreSQL auf eurem eigenen Server. Wer das nicht möchte, nutzt unsere Instanz.',
+  },
+];
+
+const tour: TourTab[] = [
+  { kind: 'week', label: 'Woche', title: 'Diese Woche', opts: { h: 42 }, captionLead: 'Woche', caption: 'Auf freier Fläche ziehen legt einen Eintrag an. Bestehende Einträge per Drag verschieben.' },
+  { kind: 'month', label: 'Monat', title: 'Monat', captionLead: 'Monat', caption: 'Tagessummen und die ersten Einträge, Urlaub als farbige Markierung.' },
+  { kind: 'timesheet', label: 'Stundenzettel', title: 'Stundenzettel', captionLead: 'Stundenzettel', caption: 'Eine Zeile pro Projekt, eine Spalte pro Tag. Tippe „1:30“, „90m“ oder „1,5“.' },
+];
+
+const tree = [
+  { level: 0, color: '#4f7cff', name: 'Musterfabrik AG', kind: 'Kunde', hours: '61:30' },
+  { level: 1, color: '#4f7cff', name: 'Website Relaunch', kind: 'Projekt', hours: '48:15' },
+  { level: 2, name: 'Startseite', kind: 'Task', hours: '21:00' },
+  { level: 2, name: 'CMS-Anbindung', kind: 'Task', hours: '27:15' },
+  { level: 1, color: '#a0703c', name: 'Wartung & Support', kind: 'Projekt', hours: '13:15' },
+  { level: 0, color: '#14a38b', name: 'TechVision UG', kind: 'Kunde', hours: '36:45' },
+  { level: 1, color: '#14a38b', name: 'Mobile App', kind: 'Projekt', hours: '36:45' },
+  { level: 0, color: '#f08a24', name: 'Studio Halm', kind: 'Kunde', hours: '29:00' },
+  { level: 1, color: '#f08a24', name: 'Onlineshop', kind: 'Projekt', hours: '29:00' },
+];
+
+const rates = [
+  { l: 1, label: 'Person bei diesem Kunden', rate: '105 €' },
+  { l: 2, label: 'Satz der Person', rate: '95 €' },
+  { l: 3, label: 'Projekt oder Aufgabe', rate: '120 €' },
+  { l: 4, label: 'Kunde', rate: '110 €' },
+  { l: 5, label: 'Workspace-Standard', rate: '90 €' },
+];
+
+const report = [
+  { name: 'Website Relaunch', color: '#4f7cff', bill: 62, intern: 6, total: '61:30' },
+  { name: 'Mobile App', color: '#14a38b', bill: 40, intern: 0, total: '36:45' },
+  { name: 'Onlineshop', color: '#f08a24', bill: 30, intern: 3, total: '29:00' },
+  { name: 'Wartung & Support', color: '#a0703c', bill: 14, intern: 0, total: '13:15' },
+  { name: 'Intern', color: '#8f8b7d', bill: 0, intern: 18, total: '16:20' },
+];
+
+const url = `${siteConfig.url}/projektzeiterfassung/`;
+const schemas = [
+  createSoftwareSchema({ name: 'timebench Projektzeiterfassung', url }),
+  createFAQSchema(faqs),
+  createBreadcrumbSchema([
+    { name: 'Start', url: `${siteConfig.url}/` },
+    { name: 'Projektzeiterfassung', url },
+  ]),
+];
+---
+
+<SiteLayout
+  title="Projektzeiterfassung"
+  description="Projektzeit auf Kunde, Projekt und Aufgabe buchen. Mit Timer, Kalender, Stundenzettel, Stundensätzen, Rundung und Export."
+  extraSchemas={schemas}
+  hasWaitlist
+>
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <Crumbs current="Projektzeiterfassung" />
+        <h1 style="font-size:clamp(38px,5.4vw,64px)">Jede Stunde beim <span class="hl-under">richtigen Kunden</span>.</h1>
+        <p class="lead">
+          Timer, Kalender oder Stundenzettel: Du erfasst so, wie es zu deinem Tag passt. timebench ordnet jede Minute
+          einem Kunden, einem Projekt und einer Aufgabe zu und rechnet mit dem Stundensatz, der genau dort gilt.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:26px">
+          <a class="btn" href="#warteliste">Auf die Warteliste</a>
+          <a class="btn btn-ghost" href="#erfassen">Ansichten ausprobieren</a>
+        </div>
+        <div class="facts"><span>Timer im Browser und auf dem Desktop</span><span>Export als CSV, Excel, PDF</span><span>Toggl-Import</span></div>
+      </div>
+      <div class="hero-stage">
+        <AppFrame title="Diese Woche" nav={['Zeiterfassung', 'Reports', 'Kunden']}>
+          <Demo kind="week" opts={{ h: 32 }} />
+        </AppFrame>
+      </div>
+    </div>
+  </header>
+
+  <!-- Struktur -->
+  <section class="ruled">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">Struktur</span>
+        <h2>Kunde, Projekt, Aufgabe. Oder wie ihr es nennt.</h2>
+        <p class="lead">
+          Jeder Workspace legt seine Ebenen selbst fest. Eine Agentur arbeitet mit Kunde, Projekt und Task, eine Kanzlei
+          mit Mandant und Akte. Farben vergebt ihr pro Kunde, damit man die Woche auf einen Blick lesen kann.
+        </p>
+        <p style="margin-top:18px">
+          Beim Tippen reicht ein <span class="mono">@</span> für das Projekt und ein <span class="mono">#</span> für ein
+          Tag. Gibt es das Tag noch nicht, legt timebench es gleich an.
+        </p>
+        <div class="quick" aria-label="Beispiel für die Schnelleingabe">
+          <span>Hero-Varianten</span><span class="tok at">@Website Relaunch</span><span class="tok hash">#design</span><span class="caret"></span><span class="mono muted" style="margin-left:auto;font-size:13px">↵ startet den Timer</span>
+        </div>
+      </div>
+      <div class="tree">
+        {tree.map((n, i) => (
+          <div class:list={['n', { l1: n.level === 1, l2: n.level === 2 }]} style={`${n.color ? `--c:${n.color};` : ''}${n.level === 0 && i > 0 ? 'margin-top:6px' : ''}`}>
+            {n.level < 2 && <i></i>}
+            {n.level === 0 ? <b>{n.name}</b> : n.name}
+            <span class="lv">{n.kind}</span><span class="hrs">{n.hours}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Drei Ansichten -->
+  <section id="erfassen" class="ruled" style="background:linear-gradient(var(--paper),#f4f2e9)">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Drei Ansichten</span>
+        <h2>Der eine bucht live, die andere am Freitag.</h2>
+        <p class="lead">
+          Kalender und Stundenzettel zeigen dieselben Einträge. Wer tagsüber den Timer laufen lässt, sieht seine Blöcke in
+          der Woche. Wer lieber einmal pro Woche Zahlen eintippt, nimmt den Stundenzettel.
+        </p>
+      </div>
+      <DemoTour tabs={tour} url="app.timebench.io/zeiten" nav={['Zeiterfassung', 'Reports', 'Kunden', 'Einstellungen']} />
+    </div>
+  </section>
+
+  <!-- Desktop -->
+  <section class="ruled">
+    <div class="wrap split rev">
+      <div>
+        <span class="eyebrow">Desktop-Tracker</span>
+        <h2>Vergessene Stunden tauchen wieder auf.</h2>
+        <p class="lead">
+          Ein Kundencall hier, zwanzig Minuten Hotfix dort: Das geht am Ende des Tages am leichtesten verloren. Die
+          Desktop-App erkennt solche Strecken am Repo, an der Website oder am Meeting-Titel und schlägt sie zum Buchen vor.
+        </p>
+        <ul class="checks">
+          <li><span>Hat ein Repo schon einmal auf „Mobile App“ gebucht, steht das Projekt beim nächsten Mal schon drin.</span></li>
+          <li><span>Mehrere Strecken ohne Pause lassen sich als ein Block übernehmen.</span></li>
+          <li><span>Die Rohdaten bleiben sieben Tage auf deinem Rechner. <a href="/#datenschutz-feature">Mehr dazu</a></span></li>
+        </ul>
+      </div>
+      <div style="max-width:400px;width:100%;justify-self:center"><Demo kind="desk" /></div>
+    </div>
+  </section>
+
+  <!-- Stundensätze -->
+  <section class="ruled">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">Stundensätze</span>
+        <h2>Der speziellste Satz gewinnt.</h2>
+        <p class="lead">
+          Ein Sonderpreis für Lena bei Musterfabrik schlägt ihren normalen Satz. Ein Festsatz am Projekt schlägt den
+          Kundensatz. Gibt es nichts davon, gilt der Satz des Workspace.
+        </p>
+        <ul class="checks">
+          <li><span><b>Abrechenbar</b> setzt ihr pro Projekt vor und ändert es bei Bedarf am einzelnen Eintrag.</span></li>
+          <li><span><b>Rundung</b> auf 15 Minuten pro Eintrag ist voreingestellt. Pro Kunde lässt sie sich anders setzen.</span></li>
+          <li><span><b>Mehrere Währungen</b> werden getrennt summiert. Sätze sehen nur Admins.</span></li>
+        </ul>
+      </div>
+      <div data-cascade>
+        <div class="seg-sc">
+          <button type="button" data-lvl="1" class="on">Lena bei Musterfabrik</button>
+          <button type="button" data-lvl="3">Projekt mit Festsatz</button>
+          <button type="button" data-lvl="5">Neue Kollegin, neuer Kunde</button>
+        </div>
+        <div class="cascade">
+          {rates.map((r) => (
+            <div data-l={r.l} class:list={[{ win: r.l === 1 }]}>
+              <span class="lvl">{r.l}</span><span style="flex:1">{r.label}</span><span class="rate">{r.rate}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reports -->
+  <section class="ruled">
+    <div class="wrap split rev">
+      <div>
+        <span class="eyebrow">Reports</span>
+        <h2>Am Monatsende eine Datei für die Rechnung.</h2>
+        <p class="lead">
+          Gruppiert nach Kunde, Projekt, Person oder Tag, als Liste oder als Pivot. Einen Report wie „Musterfabrik, immer
+          letzter Monat“ speichert ihr einmal und ruft ihn danach mit einem Klick ab.
+        </p>
+        <p class="muted" style="margin-top:14px">timebench liefert die abrechenbaren Stunden. Die Rechnung schreibt euer Buchhaltungsprogramm.</p>
+      </div>
+      <div class="report">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;gap:10px;flex-wrap:wrap">
+          <b>Oktober 2026</b>
+          <span class="muted" style="font-size:13px"><span style="display:inline-block;width:10px;height:10px;background:#17160f;border-radius:2px"></span> abrechenbar <span style="display:inline-block;width:10px;height:10px;background:#17160f;opacity:.45;border-radius:2px;margin-left:8px"></span> intern</span>
+        </div>
+        {report.map((r) => (
+          <div class="rbar">
+            <span>{r.name}</span>
+            <div class="track" style={`--c:${r.color}`}><b data-w={r.bill} style="width:0"></b>{r.intern > 0 && <b data-w={r.intern} style="width:0"></b>}</div>
+            <span class="v">{r.total}</span>
+          </div>
+        ))}
+        <div style="display:flex;justify-content:space-between;border-top:1.5px solid var(--ink);margin-top:8px;padding-top:10px;font-weight:650"><span>Abrechenbar</span><span class="mono">140:30 h · 14.215 €</span></div>
+        <div class="exports"><span class="chip">CSV</span><span class="chip">Excel</span><span class="chip">PDF</span><span class="chip">Als „letzter Monat“ speichern</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Anschlüsse -->
+  <section class="ruled">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Anschlüsse</span>
+        <h2>Umziehen aus Toggl dauert einen Nachmittag.</h2>
+        <p class="lead">
+          Der Import übernimmt Kunden, Projekte, Tags und Einträge und gleicht danach stündlich ab. So kann das Team in Ruhe
+          wechseln, während die Zahlen in beiden Werkzeugen stimmen.
+        </p>
+      </div>
+      <div class="ints">
+        <span>Toggl-Import mit Sync</span><span>iCal-Abo</span><span>API-Token</span><span>Kommandozeile</span><span>MCP-Server für KI-Assistenten</span><span>Login mit Google</span><span>Login mit Microsoft</span><span class="soon">weitere Integrationen in Planung</span>
+      </div>
+    </div>
+  </section>
+
+  <Faq title="Was Teams vor dem Wechsel wissen wollen" items={faqs} />
+
+  <WaitlistSection
+    title="Bereit für die erste Woche mit timebench?"
+    lead="Trag dich ein. Wir melden uns, sobald ein Platz für dein Team frei ist."
+    source="projektzeiterfassung"
+    blob="sprout"
+  />
+</SiteLayout>
+
+<style is:global>
+  .tree { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-size: 14px; }
+  .tree .n { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; }
+  .tree .n:hover { background: var(--muted-2); }
+  .tree .n i { width: 9px; height: 9px; border-radius: 99px; background: var(--c); flex: none; }
+  .tree .n .lv { margin-left: auto; font-size: 11px; color: var(--fg-muted); font-family: var(--mono); }
+  .tree .n .hrs { font-family: var(--mono); font-size: 12px; color: var(--ink-700); width: 56px; text-align: right; }
+  .tree .l1 { padding-left: 30px; }
+  .tree .l2 { padding-left: 52px; color: var(--ink-700); }
+  .tree .l1::before, .tree .l2::before { content: "└"; color: var(--border); margin-right: -2px; font-family: var(--mono); }
+  .quick { margin-top: 16px; border: 1.5px solid var(--ink); border-radius: 10px; background: var(--card); padding: 12px 14px; font-size: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .quick .tok { border-radius: 5px; padding: 1px 6px; font-weight: 600; }
+  .quick .tok.at { background: color-mix(in srgb, #4f7cff 18%, white); color: #2346b8; }
+  .quick .tok.hash { background: var(--muted); }
+  .quick .caret { width: 1.5px; height: 18px; background: var(--ink); animation: blink 1s steps(2) infinite; }
+  .seg-sc { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .seg-sc button { border: 1px solid var(--border); background: var(--card); border-radius: 99px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+  .seg-sc button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+</style>

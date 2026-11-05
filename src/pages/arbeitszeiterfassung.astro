@@ -1,0 +1,280 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import Demo from '@/components/demo/Demo.astro';
+import WaitlistSection from '@/components/site/WaitlistSection.astro';
+import Faq from '@/components/site/Faq.astro';
+import Crumbs from '@/components/site/Crumbs.astro';
+import DayBars from '@/components/visuals/DayBars.astro';
+import { createBreadcrumbSchema, createFAQSchema, createSoftwareSchema } from '@/lib/schema';
+import siteConfig from '@/config/site.config';
+
+const faqs = [
+  {
+    question: 'Reicht das für die Pflicht zur Arbeitszeiterfassung?',
+    answer: 'timebench dokumentiert Beginn, Ende und Dauer jeder Arbeitszeit und prüft die Regeln des ArbZG. Ob das in eurem Fall genügt, hängt auch von Tarifvertrag und Betriebsvereinbarung ab. Die Regeln lassen sich pro Workspace anpassen. Eine Rechtsberatung ersetzt das nicht.',
+  },
+  {
+    question: 'Müssen wir zusätzlich stempeln?',
+    answer: 'Wer seine Projektzeit bucht, hat seine Arbeitszeit schon erfasst. Für Tätigkeiten ohne Projekt gibt es interne Projekte wie „Verwaltung“ oder „Weiterbildung“.',
+  },
+  {
+    question: 'Was passiert bei Vertrauensarbeitszeit?',
+    answer: 'Die Zeit wird trotzdem erfasst, nur der Saldo spielt dann eine kleinere Rolle. Ihr könnt den Arbeitsplan so setzen, dass kein Soll entsteht.',
+  },
+  {
+    question: 'Wer genehmigt Urlaub?',
+    answer: 'Admins und die als Führungskraft eingetragene Person. Führungskräfte sehen außerdem die Stunden ihrer direkten Mitarbeitenden.',
+  },
+  {
+    question: 'Können wir unsere Abwesenheiten aus dem alten System übernehmen?',
+    answer: 'Resturlaub und Überstundenstand tragt ihr als Startwert ein. Für einen vollständigen Import sprecht uns an, das richten wir in der Warteliste-Phase gemeinsam ein.',
+  },
+];
+
+const findings = [
+  { c: 'var(--bloom-500)', t: '7:30 h ohne Pause', s: 'Jonas Muster · Mi, 4. Nov', tag: '§ 4' },
+  { c: 'var(--bloom-500)', t: 'Ruhezeit 9:15 h statt 11 h', s: 'Aylin Demir · Di, 3. Nov → Mi, 4. Nov', tag: '§ 5' },
+  { c: 'var(--clock)', t: 'Zwei Einträge überlappen um 30 min', s: 'Jonas Muster · Do, 5. Nov, 09:45–10:15', tag: 'Doppelt' },
+  { c: 'var(--holiday)', t: 'Gebucht an einem Urlaubstag', s: 'Lena Viertag · Mo, 2. Nov · 1:15 h', tag: 'Urlaub' },
+];
+
+const saldo = [
+  { m: 'Juli', w: 50, v: '+1:15' },
+  { m: 'August', w: 20, v: '+0:30' },
+  { m: 'September', w: 78, v: '+4:10' },
+  { m: 'Oktober', w: 92, v: '+5:20' },
+];
+
+const types = [
+  ['#14a38b', 'Urlaub'], ['#ea3d92', 'Krankheit'], ['#f895c6', 'Krankheit stundenweise'], ['#c9c6ba', 'Unbezahlter Urlaub'],
+  ['#f08a24', 'Überstundenausgleich'], ['#b4e97c', 'Elternzeit'], ['#4f7cff', 'Berufsschule'],
+];
+
+const requests = [
+  { i: 'AD', c: 'var(--sprout-200)', who: 'Aylin Demir', what: 'Urlaub', detail: 'Mo, 23. Nov bis Fr, 27. Nov · 5 Tage · danach 4 übrig' },
+  { i: 'MB', c: 'var(--bloom-100)', who: 'Mara Beispiel', what: 'Urlaub, halber Tag', detail: 'Mi, 18. Nov nachmittags · 0,5 Tage · danach 10,5 übrig' },
+  { i: 'JM', c: '#fdf0c2', who: 'Jonas Muster', what: 'Urlaub', detail: '21. Dez bis 31. Dez · 7 Tage · danach 0 übrig' },
+];
+
+const url = `${siteConfig.url}/arbeitszeiterfassung/`;
+const schemas = [
+  createSoftwareSchema({ name: 'timebench Arbeitszeiterfassung', url }),
+  createFAQSchema(faqs),
+  createBreadcrumbSchema([
+    { name: 'Start', url: `${siteConfig.url}/` },
+    { name: 'Arbeitszeiterfassung', url },
+  ]),
+];
+---
+
+<SiteLayout
+  title="Arbeitszeiterfassung"
+  description="Arbeitszeit nach ArbZG dokumentieren, Überstunden führen, Urlaub beantragen und freigeben. Aus denselben Einträgen wie die Projektzeit."
+  extraSchemas={schemas}
+  hasWaitlist
+>
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <Crumbs current="Arbeitszeiterfassung" />
+        <h1 style="font-size:clamp(38px,5.4vw,64px)">Die Arbeitszeit fällt beim Buchen <span class="hl-under">mit ab</span>.</h1>
+        <p class="lead">
+          Seit dem Beschluss des Bundesarbeitsgerichts vom September 2022 müssen Arbeitgeber die Arbeitszeit erfassen. In
+          timebench entsteht dieser Nachweis aus denselben Einträgen, die dein Team ohnehin für Projekte bucht. Dazu kommen
+          Soll und Ist, das Überstundenkonto und der Urlaub.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:26px">
+          <a class="btn" href="#warteliste">Auf die Warteliste</a>
+          <a class="btn btn-ghost" href="#abwesenheiten">Urlaubskalender ausprobieren</a>
+        </div>
+        <div class="facts"><span>Regeln nach ArbZG voreingestellt</span><span>Teilzeit und Arbeitspläne</span><span>Feiertage pro Bundesland</span></div>
+      </div>
+      <div style="display:grid;gap:14px">
+        <div class="saldo">
+          <div><small>Soll November</small><strong>64:00</strong></div>
+          <div><small>Ist</small><strong>66:15</strong></div>
+          <div><small>Saldo gesamt</small><strong class="pos">+12:30</strong></div>
+        </div>
+        <DayBars />
+      </div>
+    </div>
+  </header>
+
+  <!-- Regeln -->
+  <section class="ruled">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">Regeln</span>
+        <h2>Das Arbeitszeitgesetz, als Einstellung.</h2>
+        <p class="lead">
+          Die Regeln sind nach deutschem Recht voreingestellt und versioniert. Ändert ein Tarifvertrag etwas, legt ihr eine
+          neue Version mit Startdatum an. Alte Monate werden weiter nach den alten Regeln geprüft.
+        </p>
+        <div class="rules">
+          <div><b>§ 4</b><span>30 Minuten Pause nach 6 Stunden, 45 nach 9. Gezählt werden Blöcke ab 15 Minuten.</span></div>
+          <div><b>§ 5</b><span>11 Stunden Ruhezeit zwischen zwei Arbeitstagen.</span></div>
+          <div><b>§ 3</b><span>Höchstens 10 Stunden Arbeit am Tag.</span></div>
+          <div><b>Doppelt</b><span>Überlappende Einträge und gebuchte Zeit an Feiertagen oder Urlaubstagen.</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="flist">
+          <div class="fh"><span>Auffälligkeiten · November</span><span class="fcount muted" style="font-weight:500;font-size:13px">{findings.length} offen</span></div>
+          {findings.map((f) => (
+            <button type="button" class="frow" style={`--c:${f.c}`}><i></i><div>{f.t}<small>{f.s}</small></div><span class="tg">{f.tag}</span></button>
+          ))}
+        </div>
+        <p class="hint" style="margin-top:12px">Klick auf eine Zeile markiert sie als geklärt.</p>
+        <p class="muted" style="margin-top:18px;font-size:15px">
+          timebench warnt nur. Es zieht keine Pause selbst ab und sperrt keinen Eintrag. Wer die Zeit korrigiert, tut das
+          sichtbar im Änderungsprotokoll.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Überstunden -->
+  <section class="ruled">
+    <div class="wrap split rev">
+      <div>
+        <span class="eyebrow">Überstunden</span>
+        <h2>Ein Konto, das jeder selbst nachrechnen kann.</h2>
+        <p class="lead">
+          Der Arbeitsplan legt fest, wer an welchem Tag wie viele Stunden schuldet. Teilzeit mit freiem Mittwoch ist ein Plan
+          wie jeder andere. Urlaub, Krankheit und Feiertage senken das Soll automatisch.
+        </p>
+        <ul class="checks">
+          <li><span>Überstunden abbauen ist eine eigene Abwesenheitsart und zieht direkt vom Saldo ab.</span></li>
+          <li><span>Auszahlungen oder Startwerte trägt ein Admin als Korrektur mit Begründung ein.</span></li>
+          <li><span>Die Auslastung zeigt, wie viel der Ist-Zeit abrechenbar war.</span></li>
+        </ul>
+      </div>
+      <div class="wide-frame">
+        <div class="hd"><b>Jonas Muster · 2026</b><span class="muted" style="font-size:13px">Arbeitsplan Vollzeit, 40 h</span></div>
+        <div class="report" style="border:0;padding:0">
+          {saldo.map((s) => (
+            <div class="rbar"><span>{s.m}</span><div class="track" style="--c:var(--ink-700)"><b data-w={s.w} style="width:0"></b></div><span class="v">{s.v}</span></div>
+          ))}
+          <div class="rbar"><span>November</span><div class="track" style="--c:var(--live)"><b data-w="40" style="width:0"></b></div><span class="v">+2:15</span></div>
+          <div class="rbar"><span class="muted">Ausgleich 13. Nov</span><div class="track"></div><span class="v" style="color:var(--bloom-600)">−8:00</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-top:1.5px solid var(--ink);margin-top:8px;padding-top:10px;font-weight:650"><span>Saldo heute</span><span class="mono" style="color:var(--live-text)">+12:30 h</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abwesenheiten -->
+  <section id="abwesenheiten" class="ruled" style="background:linear-gradient(var(--paper),#f4f2e9)">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Urlaub &amp; Abwesenheiten</span>
+        <h2>Das ganze Jahr auf einer Seite.</h2>
+        <p class="lead">
+          Zwölf Monate, eine Zeile pro Monat. Urlaub beantragst du, indem du über die Tage ziehst. Der Antrag rechnet
+          Wochenenden und Feiertage heraus und zeigt, wie viel danach übrig bleibt. Probier es im Dezember.
+        </p>
+      </div>
+      <div class="wide-frame">
+        <div class="hd"><b>Mein Urlaub 2026</b><span class="seg" aria-hidden="true"><button tabindex="-1">Liste</button><button tabindex="-1" class="on">Jahr</button><button tabindex="-1">Team</button></span></div>
+        <Demo kind="year" />
+      </div>
+      <div class="split" style="margin-top:56px;align-items:start">
+        <div>
+          <h3>Was timebench mitrechnet</h3>
+          <ul class="checks">
+            <li><span><b>Resturlaub</b> aus dem Vorjahr verfällt am 31. März. Das Datum ist pro Workspace einstellbar.</span></li>
+            <li><span><b>Über Silvester</b> wird ein Urlaub automatisch auf beide Jahre aufgeteilt.</span></li>
+            <li><span><b>Halbe Tage und Stunden</b> für Arzttermine oder einen freien Nachmittag.</span></li>
+            <li><span><b>Elternzeit</b> kürzt den Anspruch nach § 17 BEEG.</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Abwesenheitsarten</h3>
+          <div class="types">{types.map(([c, n]) => <span><i style={`--c:${c}`}></i>{n}</span>)}</div>
+          <p class="muted" style="margin-top:14px;font-size:15px">Eigene Arten mit eigener Farbe legt ihr in den Einstellungen an.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Freigabe und Team -->
+  <section class="ruled">
+    <div class="wrap">
+      <div class="split" style="align-items:start">
+        <div>
+          <span class="eyebrow">Freigabe</span>
+          <h2>Genehmigen, ohne nachzuzählen.</h2>
+          <p class="lead">
+            Jeder Antrag zeigt, wie viele Tage er kostet und was danach übrig ist. Wer zur gleichen Zeit fehlt, steht im
+            Teamkalender darunter.
+          </p>
+          <p class="muted" style="margin-top:14px">Kolleginnen sehen, dass jemand fehlt. Den Grund sehen nur Admins und die zuständige Führungskraft.</p>
+        </div>
+        <div class="inbox">
+          {requests.map((r) => (
+            <div class="ir">
+              <span class="av" style={`--c:${r.c}`}>{r.i}</span>
+              <div><b>{r.who}</b> · {r.what}<small>{r.detail}</small></div>
+              <div class="acts"><button type="button">Ablehnen</button><button type="button" class="ok">Genehmigen</button></div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="wide-frame" style="margin-top:48px">
+        <div class="hd">
+          <b>Teamkalender</b>
+          <span class="legend" style="margin:0"><span><i style="--c:#14a38b"></i>Urlaub</span><span><i class="striped" style="--c:#14a38b"></i>beantragt</span><span><i style="--c:#ea3d92"></i>Krank</span><span><i style="--c:#4f7cff"></i>Berufsschule</span><span><i style="--c:#f08a24"></i>Ausgleich</span></span>
+        </div>
+        <Demo kind="team" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Monatsabschluss -->
+  <section class="ruled">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">Monatsabschluss</span>
+        <h2>Was abgeschlossen ist, bleibt so.</h2>
+        <p class="lead">
+          Nach dem Abschluss lassen sich Einträge in diesem Monat nicht mehr ändern. Muss doch etwas korrigiert werden, öffnet
+          ein Admin den Monat wieder, und das Änderungsprotokoll hält fest, wer es war.
+        </p>
+        <p style="margin-top:14px">
+          Feiertage kommen pro Bundesland. Eigene und Team-Abwesenheiten abonniert ihr als iCal-Link in Outlook, Google oder
+          Apple Kalender.
+        </p>
+      </div>
+      <div>
+        <div class="close-row">
+          {['Jun', 'Jul', 'Aug', 'Sep'].map((m) => <div class="locked"><b>{m}</b>🔒</div>)}
+          <div class="cur"><b>Okt</b><button class="btn btn-sm" type="button" data-close style="height:26px;font-size:11.5px;padding:0 8px;margin-top:4px">Abschließen</button></div>
+          <div><b>Nov</b><span class="muted">läuft</span></div>
+        </div>
+        <p class="hint" style="margin-top:12px">Oktober hat keine offenen Auffälligkeiten mehr und kann abgeschlossen werden.</p>
+      </div>
+    </div>
+  </section>
+
+  <Faq title="Zur Arbeitszeiterfassung" items={faqs} />
+
+  <WaitlistSection
+    title="Nächsten Monat zum ersten Mal in Ruhe abschließen."
+    lead="Trag dich ein. Wir melden uns, sobald ein Platz für dein Team frei ist."
+    source="arbeitszeiterfassung"
+  />
+</SiteLayout>
+
+<style is:global>
+  .rules { display: grid; gap: 0; border-top: 1px solid var(--ink); margin-top: 26px; }
+  .rules div { display: grid; grid-template-columns: 92px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+  .rules b { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+  .rules span { font-size: 15.5px; }
+  .types { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
+  .types span { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; padding: 5px 11px; border-radius: 99px; background: var(--card); border: 1px solid var(--rule); }
+  .types i { width: 9px; height: 9px; border-radius: 3px; background: var(--c); }
+  .wide-frame { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: 0 30px 60px -40px rgb(23 22 15 / .35); }
+  .wide-frame .hd { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .wide-frame .hd b { font-size: 18px; letter-spacing: -0.02em; }
+  .flist .frow { width: 100%; border: 0; border-bottom: 1px solid var(--rule); background: transparent; text-align: left; font: inherit; }
+</style>

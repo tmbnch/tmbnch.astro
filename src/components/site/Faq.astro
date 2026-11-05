@@ -1,0 +1,22 @@
+---
+/** FAQ als <details>-Liste. Dieselben Daten gehen über createFAQSchema ins JSON-LD. */
+interface Props {
+  title: string;
+  items: Array<{ question: string; answer: string }>;
+}
+const { title, items } = Astro.props;
+---
+
+<section class="ruled">
+  <div class="wrap" style="max-width:880px">
+    <div class="sec-head"><span class="eyebrow">Fragen</span><h2>{title}</h2></div>
+    <div class="faq">
+      {items.map((f, i) => (
+        <details open={i === 0}>
+          <summary><span>{f.question}</span></summary>
+          <p>{f.answer}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
